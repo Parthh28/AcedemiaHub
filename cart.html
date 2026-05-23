@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>Shopping Cart | AcademiaHub</title>
+    
+    <!-- Tailwind CSS (Static Compiled Build) -->
+    <link href="css/tailwind.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    
+    <!-- Custom Style extensions -->
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen flex flex-col">
+
+    <!-- Top Navigation Bar -->
+    <header class="bg-surface/80 backdrop-blur-[20px] sticky top-0 z-50 border-b border-outline-variant/30 shadow-sm h-16 flex items-center">
+        <div class="flex justify-between items-center w-full px-gutter max-w-container-max mx-auto h-16">
+            <div class="flex items-center gap-8">
+                <a class="font-headline-md text-headline-md font-extrabold text-primary flex items-center gap-2" href="index.html">
+                    <span class="material-symbols-outlined text-primary text-3xl">school</span>
+                    <span>AcademiaHub</span>
+                </a>
+                <nav class="hidden md:flex items-center gap-6">
+                    <a class="text-primary font-bold border-b-2 border-primary h-16 flex items-center" href="browse.html">Browse</a>
+                    <a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="browse.html?ref=categories">Categories</a>
+                    <a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="browse.html?ref=sellers">Sellers</a>
+                </nav>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="relative hidden lg:block">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant opacity-60">search</span>
+                    <input id="nav-search" class="bg-surface-container-low border border-outline-variant/50 rounded-full pl-10 pr-4 py-2 w-64 focus:w-80 transition-all duration-300 text-body-md" placeholder="Search study notes..." type="text">
+                </div>
+                <button class="material-symbols-outlined text-on-surface-variant hover:bg-primary/5 p-2 rounded-full transition-all relative">
+                    notifications
+                </button>
+                <button class="material-symbols-outlined text-on-surface-variant hover:bg-primary/5 p-2 rounded-full transition-all cart-icon relative">
+                    shopping_cart
+                </button>
+                <button class="hidden md:flex bg-primary text-on-primary px-6 py-2 rounded-full font-bold btn-glow transition-all duration-200" onclick="window.location.href='upload.html'">
+                    Upload Notes
+                </button>
+                <div id="profile-picture-container" class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center overflow-hidden border-2 border-primary/10">
+                    <img id="header-avatar" alt="User profile" class="w-full h-full object-cover" src="">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Panel -->
+    <main class="flex-grow max-w-container-max mx-auto px-gutter py-8 w-full">
+        
+        <h1 class="text-3xl font-extrabold text-on-surface mb-8 font-headline-lg">Your Shopping Cart</h1>
+
+        <!-- Empty Cart State -->
+        <div id="empty-cart-view" class="hidden py-16 text-center text-on-surface-variant glass-card border border-outline-variant/30 rounded-3xl max-w-2xl mx-auto my-12">
+            <span class="material-symbols-outlined text-6xl text-primary mb-4 opacity-40">shopping_basket</span>
+            <h2 class="text-2xl font-extrabold mb-2">Your Cart is Empty</h2>
+            <p class="mb-6 text-sm">You have not added any study notes to your cart yet.</p>
+            <button class="bg-primary text-on-primary px-8 py-3 rounded-xl font-bold btn-glow transition-all" onclick="window.location.href='browse.html'">Browse Note Catalog</button>
+        </div>
+
+        <!-- Populated Cart View -->
+        <div id="cart-content-view" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Left 2 Columns: Items List -->
+            <div class="lg:col-span-2 space-y-4" id="cart-items-container">
+                <!-- Loaded dynamically by JavaScript -->
+            </div>
+
+            <!-- Right Column: Order Summary Sidebox -->
+            <div class="space-y-6">
+                
+                <div class="bg-surface-container-lowest border border-outline-variant/30 rounded-3xl p-6 shadow-sm sticky top-20">
+                    
+                    <h3 class="text-lg font-bold text-on-surface mb-6 border-b border-outline-variant/20 pb-3">Order Summary</h3>
+
+                    <div class="space-y-4 mb-6">
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-on-surface-variant opacity-80">Subtotal</span>
+                            <span id="summary-subtotal" class="font-bold text-on-surface">₹0.00</span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm text-error hidden" id="discount-row">
+                            <span class="opacity-80">Discount (<span id="discount-percentage">10</span>%)</span>
+                            <span class="font-bold">- $<span id="discount-amount">0.00</span></span>
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-on-surface-variant opacity-80">System Service Fee</span>
+                            <span class="font-bold text-on-surface text-xs text-primary bg-primary/10 px-2 py-0.5 rounded uppercase font-label-sm">Free</span>
+                        </div>
+                        <div class="flex justify-between items-center border-t border-outline-variant/20 pt-4 text-md">
+                            <span class="font-bold text-on-surface">Total</span>
+                            <span id="summary-total" class="text-2xl font-extrabold text-primary font-headline-lg">₹0.00</span>
+                        </div>
+                    </div>
+
+                    <!-- Discount code field -->
+                    <div class="mb-6 space-y-2">
+                        <label class="text-xs font-bold text-on-surface-variant block uppercase font-label-sm tracking-wider opacity-60">Promo / Discount Code</label>
+                        <div class="flex gap-2">
+                            <input id="promo-input" class="flex-grow bg-surface-container-low border border-outline-variant/40 rounded-xl px-3 py-2 text-sm focus:ring-1 focus:ring-primary" placeholder="e.g. STUDENT10" type="text">
+                            <button id="promo-btn" class="bg-surface border border-outline-variant/40 text-on-surface-variant px-4 py-2 rounded-xl text-xs font-bold hover:border-primary hover:text-primary transition-all">Apply</button>
+                        </div>
+                        <p id="promo-message" class="text-[10px] font-bold hidden"></p>
+                    </div>
+
+                    <!-- Checkout triggers -->
+                    <div class="space-y-3">
+                        <button class="w-full bg-primary text-on-primary py-4 rounded-2xl font-bold btn-glow transition-all flex items-center justify-center gap-3" onclick="proceedToCheckout()">
+                            <span class="material-symbols-outlined">secure</span>
+                            <span>Proceed to Secure Checkout</span>
+                        </button>
+                        <button class="w-full bg-transparent text-on-surface-variant hover:text-primary py-2 rounded-xl text-xs font-bold transition-all text-center" onclick="window.location.href='browse.html'">
+                            Continue Studying & Shopping
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-surface-container-low py-12 px-gutter border-t border-outline-variant/30 mt-auto">
+        <div class="max-w-container-max mx-auto px-gutter flex justify-between items-center flex-col sm:flex-row gap-4">
+            <a class="font-headline-md text-headline-md font-extrabold text-primary" href="index.html">AcademiaHub</a>
+            <p class="font-label-sm text-xs text-on-surface-variant opacity-60">© 2026 AcademiaHub. Empowering academic success.</p>
+        </div>
+    </footer>
+
+    <!-- Shared application logic -->
+    <script src="js/app.js"></script>
+    <script>
+        // Profile Avatar header binder
+        const user = JSON.parse(localStorage.getItem('current_user'));
+        if (user && user.profileImage) {
+            document.getElementById('header-avatar').src = user.profileImage;
+        }
+
+        // Active coupon percentage
+        let activeDiscountPercent = 0;
+
+        // Render Cart items list and calculations
+        function renderCart() {
+            const cart = getCart();
+            const emptyView = document.getElementById('empty-cart-view');
+            const contentView = document.getElementById('cart-content-view');
+            const itemsContainer = document.getElementById('cart-items-container');
+
+            if (cart.length === 0) {
+                contentView.classList.add('hidden');
+                emptyView.classList.remove('hidden');
+                return;
+            }
+
+            emptyView.classList.add('hidden');
+            contentView.classList.remove('hidden');
+
+            itemsContainer.innerHTML = '';
+            let subtotal = 0;
+
+            cart.forEach(note => {
+                subtotal += note.price;
+                const article = document.createElement('article');
+                article.className = 'bg-surface-container-lowest border border-outline-variant/30 rounded-3xl p-5 shadow-sm flex flex-col sm:flex-row gap-5 items-center justify-between';
+                
+                article.innerHTML = `
+                    <div class="flex items-center gap-5 w-full sm:w-auto">
+                        <img src="${note.image}" class="w-20 h-20 rounded-2xl object-cover border border-outline-variant/20 bg-surface-variant">
+                        <div>
+                            <span class="px-2 py-0.5 bg-primary/10 text-primary text-[10px] font-bold rounded-md subject-chip uppercase font-label-sm">${note.category}</span>
+                            <h3 class="font-bold text-on-surface text-base mb-1 mt-1 hover:text-primary cursor-pointer" onclick="window.location.href='details.html?id=${note.id}'">${note.title}</h3>
+                            <p class="text-xs text-on-surface-variant opacity-75">${note.university} • By ${note.seller}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center justify-between w-full sm:w-auto sm:gap-8">
+                        <span class="font-headline-md text-lg font-extrabold text-primary">₹${note.price.toFixed(2)}</span>
+                        <button class="w-10 h-10 rounded-full hover:bg-error/5 text-on-surface-variant hover:text-error flex items-center justify-center transition-all" onclick="removeFromCart('${note.id}')">
+                            <span class="material-symbols-outlined">delete</span>
+                        </button>
+                    </div>
+                `;
+                itemsContainer.appendChild(article);
+            });
+
+            // Summary Calculations
+            const discountDeduction = subtotal * (activeDiscountPercent / 100);
+            const total = subtotal - discountDeduction;
+
+            document.getElementById('summary-subtotal').textContent = `₹${subtotal.toFixed(2)}`;
+            document.getElementById('summary-total').textContent = `₹${total.toFixed(2)}`;
+
+            const discountRow = document.getElementById('discount-row');
+            if (activeDiscountPercent > 0) {
+                document.getElementById('discount-percentage').textContent = activeDiscountPercent;
+                document.getElementById('discount-amount').textContent = discountDeduction.toFixed(2);
+                discountRow.classList.remove('hidden');
+            } else {
+                discountRow.classList.add('hidden');
+            }
+
+            // Save subtotal/discount calculations to session for checkout page
+            localStorage.setItem('checkout_totals', JSON.stringify({
+                subtotal: subtotal,
+                discountPercent: activeDiscountPercent,
+                discountAmount: discountDeduction,
+                total: total
+            }));
+        }
+
+        // Apply coupon code logic
+        function setupPromoCode() {
+            const promoInput = document.getElementById('promo-input');
+            const promoBtn = document.getElementById('promo-btn');
+            const promoMsg = document.getElementById('promo-message');
+
+            promoBtn.addEventListener('click', () => {
+                const code = promoInput.value.trim().toUpperCase();
+                promoMsg.classList.remove('hidden', 'text-error', 'text-primary');
+
+                if (code === 'STUDENT10') {
+                    activeDiscountPercent = 10;
+                    promoMsg.textContent = 'Coupon Applied: 10% Discount!';
+                    promoMsg.classList.add('text-primary');
+                    showNotification('Coupon Applied: 10% off!', 'success');
+                } else if (code === 'GPA50') {
+                    activeDiscountPercent = 50;
+                    promoMsg.textContent = 'Special Creator Coupon: 50% Off!';
+                    promoMsg.classList.add('text-primary');
+                    showNotification('Super Coupon Applied: 50% off!', 'success');
+                } else if (code === '') {
+                    promoMsg.textContent = 'Please enter a code.';
+                    promoMsg.classList.add('text-error');
+                } else {
+                    activeDiscountPercent = 0;
+                    promoMsg.textContent = 'Invalid coupon code. Try STUDENT10 or GPA50!';
+                    promoMsg.classList.add('text-error');
+                }
+
+                renderCart();
+            });
+        }
+
+        // Search Bar navigation sync
+        function setupCartSearch() {
+            const navSearch = document.getElementById('nav-search');
+            navSearch.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && navSearch.value.trim() !== '') {
+                    window.location.href = `browse.html?search=${encodeURIComponent(navSearch.value.trim())}`;
+                }
+            });
+        }
+
+        // Checkout redirection logic
+        function proceedToCheckout() {
+            // Check if user is logged in
+            const user = localStorage.getItem('current_user');
+            if (!user) {
+                showNotification('Please log in to continue.', 'error');
+                setTimeout(() => {
+                    window.location.href = 'login.html?ref=cart';
+                }, 1000);
+            } else {
+                window.location.href = 'checkout.html';
+            }
+        }
+
+        // Bind update listeners
+        window.addEventListener('cartUpdated', renderCart);
+
+        // Initialize script
+        window.addEventListener('DOMContentLoaded', () => {
+            renderCart();
+            setupPromoCode();
+            setupCartSearch();
+        });
+    </script>
+</body>
+</html>

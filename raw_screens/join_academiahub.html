@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>AcademiaHub | Authentication</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary": "#ffffff",
+                    "on-surface": "#0b1c30",
+                    "surface-container-low": "#eff4ff",
+                    "primary-fixed": "#e2dfff",
+                    "inverse-primary": "#c3c0ff",
+                    "error-container": "#ffdad6",
+                    "tertiary-container": "#a44100",
+                    "surface-dim": "#cbdbf5",
+                    "on-primary-fixed": "#0f0069",
+                    "tertiary-fixed-dim": "#ffb695",
+                    "background": "#f8f9ff",
+                    "on-secondary-fixed": "#001e2f",
+                    "surface-variant": "#d3e4fe",
+                    "on-primary-fixed-variant": "#3323cc",
+                    "on-primary": "#ffffff",
+                    "surface-bright": "#f8f9ff",
+                    "error": "#ba1a1a",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary-container": "#004666",
+                    "on-error": "#ffffff",
+                    "secondary-fixed-dim": "#89ceff",
+                    "secondary-fixed": "#c9e6ff",
+                    "tertiary": "#7e3000",
+                    "primary-container": "#4f46e5",
+                    "surface-container-highest": "#d3e4fe",
+                    "on-tertiary-fixed-variant": "#7b2f00",
+                    "primary-fixed-dim": "#c3c0ff",
+                    "on-tertiary-fixed": "#351000",
+                    "surface-container-high": "#dce9ff",
+                    "surface-tint": "#4d44e3",
+                    "inverse-surface": "#213145",
+                    "inverse-on-surface": "#eaf1ff",
+                    "secondary": "#006591",
+                    "surface": "#f8f9ff",
+                    "on-surface-variant": "#464555",
+                    "surface-container": "#e5eeff",
+                    "on-tertiary-container": "#ffd2be",
+                    "tertiary-fixed": "#ffdbcc",
+                    "on-background": "#0b1c30",
+                    "on-secondary": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "outline": "#777587",
+                    "on-primary-container": "#dad7ff",
+                    "on-secondary-fixed-variant": "#004c6e",
+                    "secondary-container": "#39b8fd",
+                    "primary": "#3525cd",
+                    "outline-variant": "#c7c4d8"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "24px",
+                    "margin-desktop": "40px",
+                    "container-max": "1280px",
+                    "unit": "8px",
+                    "margin-mobile": "16px"
+            },
+            "fontFamily": {
+                    "headline-lg": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "label-sm": ["JetBrains Mono"],
+                    "body-md": ["Inter"],
+                    "display-lg": ["Inter"]
+            },
+            "fontSize": {
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                    "label-sm": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .glass-effect {
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .auth-card-shadow {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.01);
+        }
+        .tab-transition {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .active-tab {
+            color: #3525cd;
+            border-bottom: 2px solid #3525cd;
+        }
+    </style>
+</head>
+<body class="bg-background font-body-md text-on-surface min-h-screen flex items-center justify-center p-4">
+<!-- Auth Container -->
+<main class="w-full max-w-[1000px] flex flex-col md:flex-row glass-effect rounded-xl overflow-hidden auth-card-shadow min-h-[640px]">
+<!-- Left Side: Illustration / Brand -->
+<section class="hidden md:flex flex-1 relative bg-primary items-center justify-center p-12 overflow-hidden">
+<!-- Decorative Gradient Blobs -->
+<div class="absolute top-0 -left-10 w-64 h-64 bg-secondary-container rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
+<div class="absolute bottom-0 -right-10 w-64 h-64 bg-tertiary-container rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" style="animation-delay: 2s"></div>
+<div class="relative z-10 text-on-primary text-center">
+<h1 class="font-display-lg text-display-lg mb-6 leading-tight">Master Your<br/>Academic Journey.</h1>
+<p class="font-body-lg text-body-lg text-on-primary-container opacity-90 max-w-sm mx-auto">
+                    Join 50,000+ students sharing premium notes and crushing their finals with AcademiaHub.
+                </p>
+<div class="mt-12">
+<img alt="Academic Success" class="rounded-lg shadow-2xl scale-110 rotate-3 hover:rotate-0 transition-transform duration-500" data-alt="A clean and modern high-angle photograph of a organized workspace with a high-end laptop, a cup of coffee, and handwritten notes on a tablet. The color palette is dominated by soft whites and vibrant indigo accents, reflecting an intellectual and high-velocity creator workspace. Soft daylight illuminates the scene, creating a professional and focused atmosphere consistent with a premium educational platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQx4J1xP1pOMIbU-LujuEoKC-JZUjq2GEj8UWXvzMUgOEK3k8KHH8TjevzK3nGiqj4ffArkZMy2CowT303N4tsYki9wYOSsTjByvFo_gJHbXPQfNcZktrCrAhod95SN8BY9myfSxqJWf2dpoQzA08FAOSAg0GkBbqDae84SGFhfK7BpySTiWPDkzr_CM9IgwqRaJv0s7f989kxdSgE-6NPyBv9r_FmzGA03pOAUA4pzQ-eJqzbB6fOCr71EopuAHBgMkin-W7Vo431"/>
+</div>
+</div>
+</section>
+<!-- Right Side: Form -->
+<section class="flex-1 bg-surface-container-lowest p-8 md:p-12 flex flex-col">
+<!-- Brand Logo (Mobile) -->
+<div class="md:hidden flex justify-center mb-8">
+<span class="font-headline-md text-headline-md font-bold text-primary">AcademiaHub</span>
+</div>
+<!-- Tabs -->
+<nav class="flex border-b border-outline-variant mb-8">
+<button class="flex-1 py-4 font-headline-md text-headline-md tab-transition active-tab" id="loginTab" onclick="switchTab('login')">
+                    Login
+                </button>
+<button class="flex-1 py-4 font-headline-md text-headline-md tab-transition text-on-surface-variant" id="signupTab" onclick="switchTab('signup')">
+                    Sign Up
+                </button>
+</nav>
+<!-- Login Form Content -->
+<div class="space-y-6" id="loginContent">
+<div class="space-y-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant block">UNIVERSITY EMAIL</label>
+<div class="relative">
+<input class="w-full bg-surface-container-low border-none rounded-lg p-4 focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all outline-none text-body-md" placeholder="alex.rivers@university.edu" type="email"/>
+<span class="material-symbols-outlined absolute right-4 top-4 text-on-surface-variant" data-icon="mail">mail</span>
+</div>
+</div>
+<div class="space-y-2">
+<div class="flex justify-between items-center">
+<label class="font-label-sm text-label-sm text-on-surface-variant block">PASSWORD</label>
+<a class="font-label-sm text-label-sm text-primary hover:underline transition-all" href="#">Forgot Password?</a>
+</div>
+<div class="relative">
+<input class="w-full bg-surface-container-low border-none rounded-lg p-4 focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all outline-none text-body-md" id="loginPassword" placeholder="••••••••" type="password"/>
+<button class="absolute right-4 top-4 text-on-surface-variant hover:text-primary transition-colors" onclick="togglePassword('loginPassword', 'loginEye')">
+<span class="material-symbols-outlined" data-icon="visibility" id="loginEye">visibility</span>
+</button>
+</div>
+</div>
+<button class="w-full bg-primary text-on-primary font-headline-md py-4 rounded-lg hover:-translate-y-1 hover:shadow-lg transition-all active:scale-[0.98]">
+                    Welcome Back
+                </button>
+</div>
+<!-- Sign Up Form Content (Hidden by default) -->
+<div class="space-y-6 hidden" id="signupContent">
+<div class="grid grid-cols-2 gap-4">
+<div class="space-y-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant block">FIRST NAME</label>
+<input class="w-full bg-surface-container-low border-none rounded-lg p-4 focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all outline-none text-body-md" placeholder="Alex" type="text"/>
+</div>
+<div class="space-y-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant block">LAST NAME</label>
+<input class="w-full bg-surface-container-low border-none rounded-lg p-4 focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all outline-none text-body-md" placeholder="Rivers" type="text"/>
+</div>
+</div>
+<div class="space-y-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant block">COLLEGE EMAIL</label>
+<div class="relative">
+<input class="w-full bg-surface-container-low border-none rounded-lg p-4 focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all outline-none text-body-md" id="signupEmail" oninput="validateEmail()" placeholder="alex.rivers@university.edu" type="email"/>
+<span class="material-symbols-outlined absolute right-4 top-4 text-outline-variant" data-icon="verified_user" id="emailStatus">verified_user</span>
+</div>
+<p class="font-label-sm text-[10px] text-on-surface-variant italic" id="emailHint">Must be a valid .edu or university domain.</p>
+</div>
+<div class="space-y-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant block">CREATE PASSWORD</label>
+<div class="relative">
+<input class="w-full bg-surface-container-low border-none rounded-lg p-4 focus:ring-2 focus:ring-primary focus:ring-offset-2 transition-all outline-none text-body-md" id="signupPassword" placeholder="Min. 8 characters" type="password"/>
+<button class="absolute right-4 top-4 text-on-surface-variant hover:text-primary transition-colors" onclick="togglePassword('signupPassword', 'signupEye')">
+<span class="material-symbols-outlined" data-icon="visibility" id="signupEye">visibility</span>
+</button>
+</div>
+</div>
+<button class="w-full bg-primary text-on-primary font-headline-md py-4 rounded-lg hover:-translate-y-1 hover:shadow-lg transition-all active:scale-[0.98]">
+                    Create Account
+                </button>
+</div>
+<!-- Social Logins -->
+<div class="mt-8">
+<div class="relative flex items-center mb-6">
+<div class="flex-grow border-t border-outline-variant"></div>
+<span class="flex-shrink mx-4 font-label-sm text-label-sm text-on-surface-variant">OR CONTINUE WITH</span>
+<div class="flex-grow border-t border-outline-variant"></div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<button class="flex items-center justify-center gap-2 py-3 px-4 bg-surface-container rounded-lg hover:bg-surface-variant transition-colors group">
+<svg class="w-5 h-5 group-hover:scale-110 transition-transform" viewbox="0 0 24 24">
+<path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
+<path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
+<path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path>
+<path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
+</svg>
+<span class="font-label-sm text-label-sm">Google</span>
+</button>
+<button class="flex items-center justify-center gap-2 py-3 px-4 bg-surface-container rounded-lg hover:bg-surface-variant transition-colors group">
+<svg class="w-5 h-5 group-hover:scale-110 transition-transform" viewbox="0 0 23 23">
+<path d="M0 0h23v23H0z" fill="#f3f3f3"></path>
+<path d="M1 1h10v10H1z" fill="#f35325"></path>
+<path d="M12 1h10v10H12z" fill="#81bc06"></path>
+<path d="M1 12h10v10H1z" fill="#05a6f0"></path>
+<path d="M12 12h10v10H12z" fill="#ffba08"></path>
+</svg>
+<span class="font-label-sm text-label-sm">Microsoft</span>
+</button>
+</div>
+</div>
+<!-- Footer -->
+<footer class="mt-auto pt-8 text-center">
+<p class="font-label-sm text-label-sm text-on-surface-variant">
+                    By continuing, you agree to AcademiaHub's <a class="text-primary hover:underline" href="#">Terms of Service</a> and <a class="text-primary hover:underline" href="#">Privacy Policy</a>.
+                </p>
+</footer>
+</section>
+</main>
+<script>
+        function switchTab(tab) {
+            const loginTab = document.getElementById('loginTab');
+            const signupTab = document.getElementById('signupTab');
+            const loginContent = document.getElementById('loginContent');
+            const signupContent = document.getElementById('signupContent');
+
+            if (tab === 'login') {
+                loginTab.classList.add('active-tab', 'text-primary');
+                loginTab.classList.remove('text-on-surface-variant');
+                signupTab.classList.remove('active-tab', 'text-primary');
+                signupTab.classList.add('text-on-surface-variant');
+                loginContent.classList.remove('hidden');
+                signupContent.classList.add('hidden');
+            } else {
+                signupTab.classList.add('active-tab', 'text-primary');
+                signupTab.classList.remove('text-on-surface-variant');
+                loginTab.classList.remove('active-tab', 'text-primary');
+                loginTab.classList.add('text-on-surface-variant');
+                signupContent.classList.remove('hidden');
+                loginContent.classList.add('hidden');
+            }
+        }
+
+        function togglePassword(inputId, iconId) {
+            const input = document.getElementById(inputId);
+            const icon = document.getElementById(iconId);
+            
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.innerText = 'visibility_off';
+                icon.classList.add('text-primary');
+            } else {
+                input.type = 'password';
+                icon.innerText = 'visibility';
+                icon.classList.remove('text-primary');
+            }
+        }
+
+        function validateEmail() {
+            const email = document.getElementById('signupEmail').value;
+            const statusIcon = document.getElementById('emailStatus');
+            const hint = document.getElementById('emailHint');
+            
+            // Simple check for educational domains
+            const isEdu = email.toLowerCase().endsWith('.edu') || email.includes('.ac.');
+            
+            if (isEdu) {
+                statusIcon.innerText = 'verified';
+                statusIcon.classList.remove('text-outline-variant', 'text-error');
+                statusIcon.classList.add('text-secondary');
+                hint.classList.remove('text-error');
+                hint.classList.add('text-secondary');
+                hint.innerText = "University email confirmed.";
+            } else if (email.length > 5) {
+                statusIcon.innerText = 'warning';
+                statusIcon.classList.add('text-error');
+                hint.classList.add('text-error');
+                hint.innerText = "Please use a student/university email.";
+            } else {
+                statusIcon.innerText = 'verified_user';
+                statusIcon.classList.remove('text-secondary', 'text-error');
+                statusIcon.classList.add('text-outline-variant');
+                hint.classList.remove('text-secondary', 'text-error');
+                hint.innerText = "Must be a valid .edu or university domain.";
+            }
+        }
+    </script>
+</body></html>

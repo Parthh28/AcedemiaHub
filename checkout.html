@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Checkout | AcademiaHub</title>
+    
+    <!-- Tailwind CSS (Static Compiled Build) -->
+    <link href="css/tailwind.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    
+    <!-- Custom Style extensions -->
+    <link href="css/style.css" rel="stylesheet">
+    
+    <!-- Razorpay Checkout SDK -->
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body class="bg-surface text-on-surface font-body-md selection:bg-primary-fixed-dim min-h-screen flex flex-col">
+
+    <!-- Top Navigation Bar -->
+    <nav class="sticky top-0 z-50 flex justify-between items-center w-full px-margin-desktop max-w-container-max mx-auto bg-surface/80 backdrop-blur-xl border-b border-outline-variant/30 h-16">
+        <a class="font-headline-md text-headline-md font-extrabold text-primary flex items-center gap-2" href="index.html">
+            <span class="material-symbols-outlined text-primary text-3xl">school</span>
+            <span>AcademiaHub</span>
+        </a>
+        <div class="hidden md:flex items-center gap-6">
+            <div class="flex items-center gap-2 text-on-surface-variant font-body-md">
+                <span class="material-symbols-outlined text-primary">lock</span>
+                <span>Secure Checkout</span>
+            </div>
+            <div class="h-4 w-[1px] bg-outline-variant/50"></div>
+            <div class="flex items-center gap-2">
+                <span class="font-label-sm text-label-sm bg-surface-container-high px-2 py-1 rounded-full text-on-surface-variant">Step 1 of 1</span>
+            </div>
+        </div>
+        <a class="text-on-surface-variant hover:text-primary transition-colors flex items-center gap-1 group" href="browse.html">
+            <span class="material-symbols-outlined group-hover:-translate-x-1 transition-transform">arrow_back</span>
+            <span class="font-label-sm text-label-sm font-bold">Back to Browse</span>
+        </a>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="flex-grow max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-12 w-full">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+            
+            <!-- Left Column: Checkout Forms -->
+            <form id="checkout-form" class="lg:col-span-8 space-y-8" onsubmit="event.preventDefault(); submitPayment();">
+                <header>
+                    <h1 class="font-headline-lg text-3xl font-extrabold mb-2">Finalize Your Knowledge</h1>
+                    <p class="text-on-surface-variant">Complete your purchase to unlock premium study resources and expert guides.</p>
+                </header>
+                
+                <!-- Payment Method Section -->
+                <section class="bg-surface-container-lowest rounded-3xl p-8 shadow-sm border border-outline-variant/10" id="payment-step">
+                    <div class="flex items-center gap-3 mb-8">
+                        <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">1</div>
+                        <h2 class="font-headline-md text-xl font-bold">Payment Method</h2>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                        <button type="button" id="pay-card-btn" class="flex items-center justify-between p-4 rounded-xl border-2 border-primary bg-primary/5 transition-all text-left">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-primary">payments</span>
+                                <div>
+                                    <p class="font-bold text-on-surface">Online Payment</p>
+                                    <p class="text-on-surface-variant text-xs">Powered by Razorpay</p>
+                                </div>
+                            </div>
+                            <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                        </button>
+                        <button type="button" id="pay-credits-btn" class="flex items-center justify-between p-4 rounded-xl border border-outline-variant hover:bg-surface-container transition-all group text-left">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary">token</span>
+                                <div>
+                                    <p class="font-bold text-on-surface">Hub Credits</p>
+                                    <p id="hub-credits-balance" class="text-on-surface-variant text-xs">Balance: 1,250 HC</p>
+                                </div>
+                            </div>
+                            <span class="material-symbols-outlined text-outline-variant">radio_button_unchecked</span>
+                        </button>
+                    </div>
+                    
+                    <div id="card-fields-container" class="hidden"></div>
+                </section>
+                
+                <!-- Billing Information Section -->
+                <section class="bg-surface-container-lowest rounded-3xl p-8 shadow-sm border border-outline-variant/10" id="billing-step">
+                    <div class="flex items-center gap-3 mb-8">
+                        <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">2</div>
+                        <h2 class="font-headline-md text-xl font-bold">Billing Information</h2>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="md:col-span-2">
+                            <label class="block font-label-sm text-xs font-bold text-on-surface-variant mb-2">Street Address</label>
+                            <input required id="bill-address" class="w-full bg-surface border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:border-primary rounded-xl py-3 px-4 font-body-md outline-none transition-all" placeholder="123 Academic Way" type="text"/>
+                        </div>
+                        <div>
+                            <label class="block font-label-sm text-xs font-bold text-on-surface-variant mb-2">City</label>
+                            <input required id="bill-city" class="w-full bg-surface border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:border-primary rounded-xl py-3 px-4 font-body-md outline-none transition-all" placeholder="Cambridge" type="text"/>
+                        </div>
+                        <div>
+                            <label class="block font-label-sm text-xs font-bold text-on-surface-variant mb-2">Postal Code</label>
+                            <input required id="bill-zip" class="w-full bg-surface border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:border-primary rounded-xl py-3 px-4 font-body-md outline-none transition-all" placeholder="CB1 2AB" type="text"/>
+                        </div>
+                        <div class="md:col-span-2">
+                            <label class="block font-label-sm text-xs font-bold text-on-surface-variant mb-2">Country / Region</label>
+                            <select id="bill-country" class="w-full bg-surface border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:border-primary rounded-xl py-3 px-4 font-body-md outline-none transition-all cursor-pointer">
+                                <option>United Kingdom</option>
+                                <option selected>United States</option>
+                                <option>Canada</option>
+                                <option>Germany</option>
+                                <option>Australia</option>
+                            </select>
+                        </div>
+                    </div>
+                </section>
+            </form>
+            
+            <!-- Right Column: Order Summary -->
+            <div class="lg:col-span-4">
+                <div class="sticky top-24 space-y-6">
+                    <div class="bg-surface-container-lowest rounded-3xl overflow-hidden shadow-sm border border-outline-variant/10">
+                        <div class="p-6 border-b border-outline-variant/20 bg-surface">
+                            <h3 class="text-lg font-bold text-on-surface">Order Summary</h3>
+                        </div>
+                        
+                        <div class="p-6 space-y-4">
+                            <!-- Items List -->
+                            <div id="checkout-items-list" class="space-y-4 max-h-64 overflow-y-auto pr-1">
+                                <!-- Loaded dynamically -->
+                            </div>
+                            
+                            <hr class="border-outline-variant/20 my-4"/>
+                            
+                            <!-- Totals -->
+                            <div class="space-y-3">
+                                <div class="flex justify-between text-sm text-on-surface-variant">
+                                    <span>Subtotal</span>
+                                    <span id="summary-subtotal" class="font-bold">₹0.00</span>
+                                </div>
+                                <div id="summary-discount-row" class="flex justify-between text-sm text-error hidden">
+                                    <span>Discount (<span id="discount-pct">0</span>%)</span>
+                                    <span class="font-bold">- $<span id="discount-val">0.00</span></span>
+                                </div>
+                                <div class="flex justify-between text-sm text-on-surface-variant">
+                                    <span>Platform Fee</span>
+                                    <span class="font-bold text-xs text-primary bg-primary/10 px-2 py-0.5 rounded uppercase font-label-sm">Free</span>
+                                </div>
+                                <div class="flex justify-between font-bold text-base pt-3 border-t border-outline-variant/20 text-on-surface">
+                                    <span>Total Price</span>
+                                    <span id="summary-total" class="text-2xl font-extrabold text-primary font-headline-lg">₹0.00</span>
+                                </div>
+                            </div>
+                            
+                            <!-- CTA -->
+                            <button form="checkout-form" type="submit" class="w-full bg-primary text-on-primary py-4 rounded-2xl font-bold btn-glow transition-all duration-200 mt-6 flex items-center justify-center gap-2 group">
+                                <span>Pay and Complete Order</span>
+                                <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">shopping_bag</span>
+                            </button>
+                            <p class="text-center text-[10px] text-on-surface-variant opacity-70 mt-4">
+                                By completing purchase, you agree to our <a class="underline hover:text-primary" href="#">Terms of Service</a>.
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <!-- Secure Badge -->
+                    <div class="bg-surface-container-high/40 rounded-2xl p-4 flex items-center gap-4 border border-outline-variant/20">
+                        <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center text-primary flex-shrink-0">
+                            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+                        </div>
+                        <div>
+                            <p class="font-bold text-sm text-on-surface">SSL Secured Checkout</p>
+                            <p class="text-xs text-on-surface-variant">Your transaction is encrypted and protected with industry-standard protocols.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-surface-container-low py-8 px-gutter border-t border-outline-variant/30 mt-auto">
+        <div class="max-w-container-max mx-auto px-gutter flex justify-between items-center flex-col sm:flex-row gap-4">
+            <a class="font-headline-md text-headline-md font-extrabold text-primary" href="index.html">AcademiaHub</a>
+            <p class="font-label-sm text-xs text-on-surface-variant opacity-60">© 2026 AcademiaHub. Empowering academic success.</p>
+        </div>
+    </footer>
+
+    <!-- Shared application logic -->
+    <script src="js/app.js"></script>
+    <script>
+        let paymentMethod = "card"; // "card" or "credits"
+        let orderTotal = 0;
+        let totals = null;
+
+        // Render checkout page
+        function initCheckout() {
+            const cart = getCart();
+            if (cart.length === 0) {
+                showNotification("Your cart is empty! Redirecting...", "error");
+                setTimeout(() => { window.location.href = "browse.html"; }, 1500);
+                return;
+            }
+
+            // Load Totals from localStorage
+            totals = JSON.parse(localStorage.getItem('checkout_totals')) || {
+                subtotal: cart.reduce((sum, item) => sum + item.price, 0),
+                discountPercent: 0,
+                discountAmount: 0,
+                total: cart.reduce((sum, item) => sum + item.price, 0)
+            };
+
+            orderTotal = totals.total;
+
+            // Render Items List
+            const itemsList = document.getElementById('checkout-items-list');
+            itemsList.innerHTML = '';
+            cart.forEach(note => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'flex gap-4 items-center';
+                itemDiv.innerHTML = `
+                    <div class="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 border border-outline-variant/20">
+                        <img class="w-full h-full object-cover" src="${note.image}" alt="${note.title}"/>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="font-bold text-on-surface text-xs truncate">${note.title}</p>
+                        <p class="text-[10px] text-on-surface-variant truncate">${note.university} • By ${note.seller}</p>
+                        <p class="text-primary font-bold text-xs mt-0.5">₹${note.price.toFixed(2)}</p>
+                    </div>
+                `;
+                itemsList.appendChild(itemDiv);
+            });
+
+            // Update Price Details
+            document.getElementById('summary-subtotal').textContent = `₹${totals.subtotal.toFixed(2)}`;
+            document.getElementById('summary-total').textContent = `₹${totals.total.toFixed(2)}`;
+
+            if (totals.discountPercent > 0) {
+                document.getElementById('discount-pct').textContent = totals.discountPercent;
+                document.getElementById('discount-val').textContent = totals.discountAmount.toFixed(2);
+                document.getElementById('summary-discount-row').classList.remove('hidden');
+            }
+
+            // Sync User Balance if logged in
+            const userObj = JSON.parse(localStorage.getItem('current_user'));
+            if (userObj) {
+                const creditsBtnBalance = document.getElementById('hub-credits-balance');
+                creditsBtnBalance.textContent = `Balance: ${Math.round(userObj.balance * 10)} HC (₹${userObj.balance.toFixed(2)})`;
+            }
+        }
+
+        // Toggle Payment Methods
+        const payCardBtn = document.getElementById('pay-card-btn');
+        const payCreditsBtn = document.getElementById('pay-credits-btn');
+        const cardFields = document.getElementById('card-fields-container');
+
+        payCardBtn.addEventListener('click', () => {
+            paymentMethod = "card";
+            payCardBtn.className = "flex items-center justify-between p-4 rounded-xl border-2 border-primary bg-primary/5 transition-all text-left w-full";
+            payCardBtn.querySelector('span:last-child').innerText = 'check_circle';
+            payCardBtn.querySelector('span:last-child').style.fontVariationSettings = "'FILL' 1";
+            payCardBtn.querySelector('span:last-child').classList.replace('text-outline-variant', 'text-primary');
+
+            payCreditsBtn.className = "flex items-center justify-between p-4 rounded-xl border border-outline-variant hover:bg-surface-container transition-all group text-left w-full";
+            payCreditsBtn.querySelector('span:last-child').innerText = 'radio_button_unchecked';
+            payCreditsBtn.querySelector('span:last-child').style.fontVariationSettings = "'FILL' 0";
+            payCreditsBtn.querySelector('span:last-child').classList.replace('text-primary', 'text-outline-variant');
+            payCreditsBtn.querySelector('span:last-child').classList.replace('text-primary', 'text-outline-variant');
+        });
+
+        payCreditsBtn.addEventListener('click', () => {
+            paymentMethod = "credits";
+            payCreditsBtn.className = "flex items-center justify-between p-4 rounded-xl border-2 border-primary bg-primary/5 transition-all text-left w-full";
+            payCreditsBtn.querySelector('span:last-child').innerText = 'check_circle';
+            payCreditsBtn.querySelector('span:last-child').style.fontVariationSettings = "'FILL' 1";
+            payCreditsBtn.querySelector('span:last-child').classList.replace('text-outline-variant', 'text-primary');
+
+            payCardBtn.className = "flex items-center justify-between p-4 rounded-xl border border-outline-variant hover:bg-surface-container transition-all group text-left w-full";
+            payCardBtn.querySelector('span:last-child').innerText = 'radio_button_unchecked';
+            payCardBtn.querySelector('span:last-child').style.fontVariationSettings = "'FILL' 0";
+            payCardBtn.querySelector('span:last-child').classList.replace('text-primary', 'text-outline-variant');
+            payCardBtn.querySelector('span:last-child').classList.replace('text-primary', 'text-outline-variant');
+        });
+
+
+
+        // Submit Payment
+        async function submitPayment() {
+            const userObj = JSON.parse(localStorage.getItem('current_user'));
+            if (!userObj) {
+                showNotification("You must be logged in to purchase.", "error");
+                return;
+            }
+
+            const cart = getCart();
+            if (cart.length === 0) {
+                showNotification("Your cart is empty.", "error");
+                return;
+            }
+
+            // Disable submit button
+            const submitBtn = document.querySelector('button[form="checkout-form"]');
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<span>Processing Order...</span><span class="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full ml-2"></span>';
+            }
+
+            try {
+                if (paymentMethod === "credits") {
+                    if (userObj.balance < orderTotal) {
+                        showNotification(`Insufficient Hub Credits! Balance is ₹${userObj.balance.toFixed(2)}, but order is ₹${orderTotal.toFixed(2)}.`, "error");
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = '<span>Pay and Complete Order</span><span class="material-symbols-outlined">shopping_bag</span>';
+                        }
+                        return;
+                    }
+
+                    showNotification("Processing purchases...", "info");
+                    for (const note of cart) {
+                        try {
+                            if (note.price === 0 || note.is_free) {
+                                await apiFetch('/purchases/free', { method: 'POST', body: { notesId: note.id } });
+                            } else {
+                                await apiFetch('/purchases/credits', { method: 'POST', body: { notesId: note.id } });
+                            }
+                        } catch (err) {
+                            if (err.status === 409 || err.error?.code === 'DUPLICATE_PURCHASE') {
+                                await removeFromCart(note.id);
+                            } else {
+                                throw err;
+                            }
+                        }
+                    }
+                    
+                    await handlePaymentSuccess();
+                } else {
+                    // Razorpay Flow
+                    showNotification("Initiating secure checkout...", "info");
+                    
+                    // Call backend to create Razorpay Order for the entire cart
+                    const initRes = await apiFetch('/payments/initiate-cart', {
+                        method: 'POST'
+                    });
+                    
+                    const paymentData = initRes.data;
+                    
+                    const options = {
+                        key: paymentData.key,
+                        amount: paymentData.amount * 100, // paise
+                        currency: paymentData.currency,
+                        name: "AcademiaHub",
+                        description: "Study Notes Purchase",
+                        order_id: paymentData.razorpay_order_id,
+                        handler: async function (response) {
+                            showNotification("Payment authorized. Verifying...", "info");
+                            try {
+                                await apiFetch('/payments/verify-cart', {
+                                    method: 'POST',
+                                    body: {
+                                        razorpayOrderId: response.razorpay_order_id,
+                                        razorpayPaymentId: response.razorpay_payment_id,
+                                        razorpaySignature: response.razorpay_signature
+                                    }
+                                });
+                                
+                                await handlePaymentSuccess();
+                            } catch (verifyErr) {
+                                console.error("Verification failed:", verifyErr);
+                                showNotification(verifyErr.error?.message || "Payment verification failed.", "error");
+                                if (submitBtn) {
+                                    submitBtn.disabled = false;
+                                    submitBtn.innerHTML = '<span>Pay and Complete Order</span><span class="material-symbols-outlined">shopping_bag</span>';
+                                }
+                            }
+                        },
+                        prefill: {
+                            name: userObj.name,
+                            email: userObj.email
+                        },
+                        theme: {
+                            color: "#3525cd"
+                        },
+                        modal: {
+                            ondismiss: function() {
+                                showNotification("Payment cancelled.", "info");
+                                if (submitBtn) {
+                                    submitBtn.disabled = false;
+                                    submitBtn.innerHTML = '<span>Pay and Complete Order</span><span class="material-symbols-outlined">shopping_bag</span>';
+                                }
+                            }
+                        }
+                    };
+                    
+                    const rzp = new Razorpay(options);
+                    rzp.on('payment.failed', function (response){
+                        showNotification("Payment failed: " + response.error.description, "error");
+                        if (submitBtn) {
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = '<span>Pay and Complete Order</span><span class="material-symbols-outlined">shopping_bag</span>';
+                        }
+                    });
+                    rzp.open();
+                }
+
+            } catch (err) {
+                console.error("Payment submission error:", err);
+                showNotification(err.error?.message || "Payment failed. Please try again.", "error");
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<span>Pay and Complete Order</span><span class="material-symbols-outlined">shopping_bag</span>';
+                }
+            }
+        }
+        
+        async function handlePaymentSuccess() {
+            await syncUserWithBackend();
+            showNotification("Order processed successfully! Thank you.", "success");
+
+            localStorage.setItem('latest_purchase', JSON.stringify({
+                cart: getCart(),
+                totals: totals,
+                paymentMethod: paymentMethod,
+                orderId: `AH-${Math.floor(100000 + Math.random() * 900000)}`
+            }));
+
+            await clearCart();
+
+            setTimeout(() => {
+                window.location.href = "purchase-success.html";
+            }, 1500);
+        }
+
+        window.addEventListener('DOMContentLoaded', initCheckout);
+    </script>
+</body>
+</html>

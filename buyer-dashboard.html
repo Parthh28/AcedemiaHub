@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>AcademiaHub | Buyer Dashboard</title>
+    
+    <!-- Tailwind CSS (Static Compiled Build) -->
+    <link href="css/tailwind.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    
+    <!-- Custom Style extensions -->
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body class="bg-surface font-body-md text-on-surface flex flex-col min-h-screen">
+
+    <!-- Top Navigation Bar -->
+    <header class="bg-surface/80 backdrop-blur-[20px] sticky top-0 z-50 border-b border-outline-variant/30 shadow-sm h-16 flex items-center">
+        <div class="flex justify-between items-center w-full px-gutter max-w-container-max mx-auto h-16">
+            <div class="flex items-center gap-8">
+                <a class="font-headline-md text-headline-md font-extrabold text-primary flex items-center gap-2" href="index.html">
+                    <span class="material-symbols-outlined text-primary text-3xl">school</span>
+                    <span>AcademiaHub</span>
+                </a>
+                <nav class="hidden md:flex items-center gap-6">
+                    <a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="browse.html">Browse</a>
+                    <a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="browse.html?ref=categories">Categories</a>
+                    <a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="browse.html?ref=sellers">Sellers</a>
+                </nav>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="relative hidden lg:block">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant opacity-60">search</span>
+                    <input id="nav-search" class="bg-surface-container-low border border-outline-variant/50 rounded-full pl-10 pr-4 py-2 w-64 focus:w-80 transition-all duration-300 text-body-md" placeholder="Search study notes..." type="text">
+                </div>
+                <button class="material-symbols-outlined text-on-surface-variant hover:bg-primary/5 p-2 rounded-full transition-all relative">
+                    notifications
+                </button>
+                <button class="material-symbols-outlined text-on-surface-variant hover:bg-primary/5 p-2 rounded-full transition-all cart-icon relative">
+                    shopping_cart
+                </button>
+                <button class="hidden md:flex bg-primary text-on-primary px-6 py-2 rounded-full font-bold btn-glow transition-all duration-200" onclick="window.location.href='upload.html'">
+                    Upload Notes
+                </button>
+                <div id="profile-picture-container" class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center overflow-hidden border-2 border-primary/10">
+                    <img id="header-avatar" alt="User profile" class="w-full h-full object-cover" src="">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex-grow flex max-w-container-max mx-auto w-full min-h-[calc(100vh-64px)]">
+        <!-- Side Navigation Bar -->
+        <aside class="hidden md:flex flex-col p-6 space-y-4 bg-surface/80 backdrop-blur-[20px] border-r border-outline-variant/20 w-64 sticky top-16 h-[calc(100vh-64px)]">
+            <div class="flex flex-col items-center py-6 border-b border-outline-variant/20 mb-4 text-center">
+                <img id="sidebar-avatar" alt="Student avatar" class="w-16 h-16 rounded-full mb-3 shadow-md border-2 border-primary/10 object-cover" src=""/>
+                <h3 id="sidebar-name" class="font-bold text-on-surface text-base">Alex Mercer</h3>
+                <p id="sidebar-major" class="text-xs text-on-surface-variant">Computer Science Junior</p>
+                <p id="sidebar-uni" class="text-[10px] text-primary font-bold uppercase mt-1">Stanford University</p>
+            </div>
+            <nav class="flex-grow space-y-1">
+                <a class="flex items-center gap-3 p-3 bg-primary/10 text-primary font-bold rounded-xl transition-all duration-200" href="buyer-dashboard.html">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">dashboard</span>
+                    <span class="text-sm font-semibold">My Study Hub</span>
+                </a>
+                <a class="flex items-center gap-3 p-3 text-on-surface-variant hover:bg-primary/5 hover:text-primary transition-all duration-200 rounded-xl" href="seller-dashboard.html">
+                    <span class="material-symbols-outlined">monetization_on</span>
+                    <span class="text-sm font-semibold">Seller Dashboard</span>
+                </a>
+                <a class="flex items-center gap-3 p-3 text-on-surface-variant hover:bg-primary/5 hover:text-primary transition-all duration-200 rounded-xl" href="upload.html">
+                    <span class="material-symbols-outlined">cloud_upload</span>
+                    <span class="text-sm font-semibold">Upload Materials</span>
+                </a>
+                <a class="flex items-center gap-3 p-3 text-on-surface-variant hover:bg-primary/5 hover:text-primary transition-all duration-200 rounded-xl" href="settings.html">
+                    <span class="material-symbols-outlined">settings</span>
+                    <span class="text-sm font-semibold">Settings</span>
+                </a>
+            </nav>
+            <div class="bg-primary/5 p-4 rounded-2xl border border-primary/10">
+                <p class="text-[10px] font-bold text-primary mb-2 tracking-wider uppercase font-label-sm">Academic Premium</p>
+                <p class="text-xs text-on-surface-variant mb-3">Gain full unlimited download access & flashcard premium tools.</p>
+                <button class="w-full bg-primary text-on-primary py-2 rounded-xl font-bold text-xs hover:shadow-lg transition-all" onclick="showNotification('Premium program coming soon!', 'info')">Upgrade Now</button>
+            </div>
+            <div class="pt-4 space-y-1 border-t border-outline-variant/10">
+                <button id="logout-btn" class="w-full flex items-center gap-3 p-3 text-error hover:bg-error/5 rounded-xl transition-all text-left">
+                    <span class="material-symbols-outlined">logout</span>
+                    <span class="text-sm font-semibold">Switch Account</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Canvas -->
+        <main class="flex-grow p-gutter overflow-y-auto">
+            <header class="mb-10">
+                <h1 id="welcome-title" class="text-3xl font-extrabold text-on-surface mb-2 font-headline-lg">Welcome back, Alex!</h1>
+                <p class="text-on-surface-variant text-base">Here's your personal learning activity and purchased resources.</p>
+            </header>
+
+            <!-- Analytics Cards (Bento Style) -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div class="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/20 shadow-sm flex items-start justify-between">
+                    <div>
+                        <p class="text-on-surface-variant text-xs font-bold uppercase tracking-wider font-label-sm mb-1 opacity-70">Purchased Guides</p>
+                        <h2 id="total-purchased-badge" class="text-4xl font-extrabold text-primary">0</h2>
+                        <div class="flex items-center text-primary gap-1 mt-2">
+                            <span class="material-symbols-outlined text-sm">check_circle</span>
+                            <span class="text-xs font-semibold">Fully Unlocked Files</span>
+                        </div>
+                    </div>
+                    <div class="bg-primary/10 p-3 rounded-2xl text-primary">
+                        <span class="material-symbols-outlined">description</span>
+                    </div>
+                </div>
+                <div class="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/20 shadow-sm flex items-start justify-between">
+                    <div>
+                        <p class="text-on-surface-variant text-xs font-bold uppercase tracking-wider font-label-sm mb-1 opacity-70">Hub Balance</p>
+                        <h2 id="hub-credits-badge" class="text-4xl font-extrabold text-tertiary">0 HC</h2>
+                        <p id="hub-credits-equiv" class="text-xs text-on-surface-variant mt-2 font-medium">Available: ₹0.00</p>
+                    </div>
+                    <div class="bg-tertiary/10 p-3 rounded-2xl text-tertiary">
+                        <span class="material-symbols-outlined">token</span>
+                    </div>
+                </div>
+                <div class="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/20 shadow-sm flex items-start justify-between">
+                    <div>
+                        <p class="text-on-surface-variant text-xs font-bold uppercase tracking-wider font-label-sm mb-1 opacity-70">Learning Goal</p>
+                        <h2 class="text-4xl font-extrabold text-secondary">3.9 GPA</h2>
+                        <div class="flex gap-1 mt-2">
+                            <span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">star</span>
+                            <span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">star</span>
+                            <span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">star</span>
+                            <span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">star</span>
+                            <span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">star</span>
+                        </div>
+                    </div>
+                    <div class="bg-secondary/10 p-3 rounded-2xl text-secondary">
+                        <span class="material-symbols-outlined">school</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recently Viewed & My Purchased Notes Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                
+                <!-- Recently Viewed Section -->
+                <section class="lg:col-span-4">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-lg font-bold text-on-surface">Trending Guides</h3>
+                        <a class="text-primary font-bold text-xs hover:underline" href="browse.html">View Catalog</a>
+                    </div>
+                    <div class="space-y-4" id="trending-container">
+                        <!-- Loaded dynamically -->
+                    </div>
+                </section>
+                
+                <!-- Purchased Notes Table -->
+                <section class="lg:col-span-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <h3 class="text-lg font-bold text-on-surface">My Study Materials</h3>
+                        <span class="text-xs text-on-surface-variant font-bold uppercase bg-surface-container px-3 py-1 rounded-full" id="items-count-indicator">0 Notes</span>
+                    </div>
+                    <div class="bg-surface-container-lowest rounded-3xl border border-outline-variant/20 overflow-hidden shadow-sm">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="bg-surface-container-low/50 border-b border-outline-variant/20">
+                                        <th class="p-4 text-xs font-bold text-on-surface-variant uppercase tracking-wider font-label-sm">Course Resource</th>
+                                        <th class="p-4 text-xs font-bold text-on-surface-variant uppercase tracking-wider font-label-sm">Category</th>
+                                        <th class="p-4 text-xs font-bold text-on-surface-variant uppercase tracking-wider font-label-sm">Access Status</th>
+                                        <th class="p-4 text-xs font-bold text-on-surface-variant uppercase tracking-wider font-label-sm text-right">Download</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-outline-variant/10" id="purchased-notes-table-body">
+                                    <!-- Loaded dynamically by JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="no-purchases-placeholder" class="hidden p-12 text-center text-on-surface-variant">
+                            <span class="material-symbols-outlined text-4xl text-primary opacity-40 mb-2">school</span>
+                            <p class="font-bold">No Purchased Notes Yet</p>
+                            <p class="text-xs mt-1 mb-4">Complete a checkout order to see your courses listed here.</p>
+                            <button class="bg-primary text-on-primary px-4 py-2 rounded-xl text-xs font-bold hover:shadow-md transition-all" onclick="window.location.href='browse.html'">Find Notes</button>
+                        </div>
+                    </div>
+                </section>
+                
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-surface-container-low border-t border-outline-variant/30 py-12 px-gutter mt-auto">
+        <div class="max-w-container-max mx-auto px-gutter grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div class="space-y-4">
+                <span class="font-headline-md text-headline-md font-bold text-primary">AcademiaHub</span>
+                <p class="text-on-surface-variant text-xs opacity-70">© 2026 AcademiaHub. Empowering academic success.</p>
+            </div>
+            <div>
+                <h4 class="font-bold text-on-surface mb-4 text-sm">Marketplace</h4>
+                <ul class="space-y-2 text-xs text-on-surface-variant font-medium">
+                    <li><a class="hover:text-primary transition-colors hover:underline" href="browse.html">Browse study materials</a></li>
+                    <li><a class="hover:text-primary transition-colors hover:underline" href="upload.html">Sell your revision notes</a></li>
+                    <li><a class="hover:text-primary transition-colors hover:underline" href="browse.html?ref=categories">Browse categories</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold text-on-surface mb-4 text-sm">Resources</h4>
+                <ul class="space-y-2 text-xs text-on-surface-variant font-medium">
+                    <li><a class="hover:text-primary transition-colors hover:underline" href="seller-dashboard.html">Seller Hub</a></li>
+                    <li><a class="hover:text-primary transition-colors hover:underline" href="settings.html">Account Panel</a></li>
+                    <li><a class="hover:text-primary transition-colors hover:underline" href="#">FAQ & Support</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="font-bold text-on-surface mb-4 text-sm">Security</h4>
+                <ul class="space-y-2 text-xs text-on-surface-variant font-medium">
+                    <li><a class="hover:text-primary transition-colors hover:underline" href="#">Terms of Service</a></li>
+                    <li><a class="hover:text-primary transition-colors hover:underline" href="#">Privacy Guidelines</a></li>
+                </ul>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Shared application logic -->
+    <script src="js/app.js"></script>
+    <script>
+        function resolveUrl(url, fallback) {
+            if (!url) return fallback;
+            return url.startsWith('http') ? url : 'http://localhost:5000' + url;
+        }
+
+        async function loadDashboard() {
+            // Check url parameter for success popup
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('purchase_success') === 'true') {
+                showNotification("Congratulations! Your guides are now fully unlocked.", "success");
+                // Clear query param
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+
+            // Sync User Session details
+            const userObj = JSON.parse(localStorage.getItem('current_user'));
+            if (!userObj) {
+                showNotification("Please log in to view dashboard.", "error");
+                setTimeout(() => { window.location.href = "login.html"; }, 1000);
+                return;
+            }
+
+            // Update DOM profile elements
+            document.getElementById('header-avatar').src = userObj.profileImage;
+            document.getElementById('sidebar-avatar').src = userObj.profileImage;
+            document.getElementById('sidebar-name').textContent = userObj.name;
+            document.getElementById('sidebar-major').textContent = `${userObj.major} • ${userObj.year}`;
+            document.getElementById('sidebar-uni').textContent = userObj.university;
+            document.getElementById('welcome-title').textContent = `Welcome back, ${userObj.name.split(' ')[0]}!`;
+
+            // Update balance and badges
+            const creditsVal = Math.round(userObj.balance * 10);
+            document.getElementById('hub-credits-badge').textContent = `${creditsVal.toLocaleString()} HC`;
+            document.getElementById('hub-credits-equiv').textContent = `Available: ₹${userObj.balance.toFixed(2)}`;
+
+            // Load purchased notes from backend
+            let purchases = [];
+            try {
+                const res = await apiFetch('/purchases?limit=50');
+                purchases = res.data.purchases || [];
+            } catch (err) {
+                console.error("Failed to load purchases from backend:", err);
+                showNotification("Could not fetch purchases from database.", "error");
+            }
+
+            document.getElementById('total-purchased-badge').textContent = purchases.length;
+            document.getElementById('items-count-indicator').textContent = `${purchases.length} Note${purchases.length !== 1 ? 's' : ''}`;
+
+            const tableBody = document.getElementById('purchased-notes-table-body');
+            const placeholder = document.getElementById('no-purchases-placeholder');
+
+            tableBody.innerHTML = '';
+            if (purchases.length === 0) {
+                placeholder.classList.remove('hidden');
+            } else {
+                placeholder.classList.add('hidden');
+                
+                purchases.forEach(purchase => {
+                    const note = purchase.notes;
+                    if (!note) return;
+
+                    const noteImage = resolveUrl(note.preview_url, 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600');
+                    const sellerName = note.seller ? `${note.seller.first_name || ''} ${note.seller.last_name || ''}`.trim() : 'Contributor';
+                    const collegeName = note.colleges ? note.colleges.name : 'University';
+                    const subjectText = note.subject || 'Study Material';
+
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-primary/5 transition-colors border-b border-outline-variant/10';
+                    row.innerHTML = `
+                        <td class="p-4">
+                            <div class="flex items-center gap-3">
+                                <img src="${noteImage}" class="w-10 h-10 rounded-lg object-cover border border-outline-variant/20">
+                                <div>
+                                    <p class="font-bold text-on-surface text-sm cursor-pointer hover:text-primary transition-all" onclick="window.location.href='details.html?id=${note.id}'">${note.title}</p>
+                                    <p class="text-xs text-on-surface-variant opacity-75">${collegeName} • By ${sellerName}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-4">
+                            <span class="px-2.5 py-0.5 bg-primary/10 text-primary text-[10px] font-bold rounded-full uppercase font-label-sm tracking-wide">${subjectText}</span>
+                        </td>
+                        <td class="p-4">
+                            <span class="text-xs text-secondary font-bold flex items-center gap-1">
+                                <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                                Available
+                            </span>
+                        </td>
+                        <td class="p-4 text-right">
+                            <button onclick="downloadNoteFile('${note.id}')" class="bg-surface border border-outline-variant/40 hover:bg-primary hover:text-on-primary hover:border-primary p-2 rounded-xl transition-all shadow-sm active:scale-95 text-primary">
+                                <span class="material-symbols-outlined text-sm flex items-center justify-center">download</span>
+                            </button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+
+            // Load trending/popular notes in left side list
+            const trendingContainer = document.getElementById('trending-container');
+            trendingContainer.innerHTML = '';
+            
+            // Just grab 3 sample notes that are not purchased yet
+            const catalog = JSON.parse(localStorage.getItem('notes_catalog')) || [];
+            const purchasedIds = purchases.map(p => p.notes?.id).filter(Boolean);
+            const unpurchasedNotes = catalog.filter(n => !purchasedIds.includes(n.id)).slice(0, 3);
+            const displayNotes = unpurchasedNotes.length > 0 ? unpurchasedNotes : catalog.slice(0, 3);
+
+            displayNotes.forEach(note => {
+                const item = document.createElement('div');
+                item.className = 'flex items-center gap-4 bg-surface-container-low p-3 rounded-2xl hover:bg-surface-container-high transition-all cursor-pointer group border border-transparent hover:border-primary/10';
+                item.onclick = () => { window.location.href = `details.html?id=${note.id}`; };
+                item.innerHTML = `
+                    <div class="w-16 h-16 rounded-xl overflow-hidden bg-outline-variant/20 flex-shrink-0">
+                        <img alt="${note.title}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" src="${note.image}"/>
+                    </div>
+                    <div class="flex-grow min-w-0">
+                        <h4 class="font-bold text-on-surface text-sm truncate">${note.title}</h4>
+                        <p class="text-xs text-on-surface-variant truncate font-medium opacity-85">${note.seller}</p>
+                        <div class="flex items-center justify-between mt-1">
+                            <span class="text-[10px] font-bold text-primary bg-primary/10 px-1.5 py-0.5 rounded font-label-sm uppercase">${note.category}</span>
+                            <span class="text-xs font-extrabold text-primary">₹${note.price.toFixed(2)}</span>
+                        </div>
+                    </div>
+                `;
+                trendingContainer.appendChild(item);
+            });
+
+            // Logout/Switch action
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                localStorage.removeItem('current_user');
+                window.location.href = "login.html";
+            });
+
+            // Nav search box bind
+            const navSearch = document.getElementById('nav-search');
+            navSearch.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && navSearch.value.trim() !== '') {
+                    window.location.href = `browse.html?search=${encodeURIComponent(navSearch.value.trim())}`;
+                }
+            });
+        }
+
+        function downloadNoteFile(noteId) {
+            const token = localStorage.getItem('accessToken');
+            const url = `http://localhost:5000/api/v1/notes/downloads/file/${noteId}${token ? `?token=${token}` : ''}`;
+            window.open(url, '_blank');
+        };
+
+        window.addEventListener('DOMContentLoaded', loadDashboard);
+    </script>
+</body>
+</html>

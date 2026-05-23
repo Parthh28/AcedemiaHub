@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Seller Dashboard | AcademiaHub</title>
+    
+    <!-- Tailwind CSS (Static Compiled Build) -->
+    <link href="css/tailwind.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    
+    <!-- Custom Style extensions -->
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body class="bg-surface text-on-surface font-body-md min-h-screen flex flex-col">
+
+    <!-- Top Navigation Bar -->
+    <header class="bg-surface/80 backdrop-blur-[20px] sticky top-0 z-50 border-b border-outline-variant/30 shadow-sm h-16 flex items-center">
+        <div class="flex justify-between items-center w-full px-gutter max-w-container-max mx-auto h-16">
+            <div class="flex items-center gap-8">
+                <a class="font-headline-md text-headline-md font-extrabold text-primary flex items-center gap-2" href="index.html">
+                    <span class="material-symbols-outlined text-primary text-3xl">school</span>
+                    <span>AcademiaHub</span>
+                </a>
+                <nav class="hidden md:flex items-center gap-6">
+                    <a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="browse.html">Browse</a>
+                    <a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="browse.html?ref=categories">Categories</a>
+                    <a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="browse.html?ref=sellers">Sellers</a>
+                </nav>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="relative hidden lg:block">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant opacity-60">search</span>
+                    <input id="nav-search" class="bg-surface-container-low border border-outline-variant/50 rounded-full pl-10 pr-4 py-2 w-64 focus:w-80 transition-all duration-300 text-body-md" placeholder="Search study notes..." type="text">
+                </div>
+                <button class="material-symbols-outlined text-on-surface-variant hover:bg-primary/5 p-2 rounded-full transition-all relative">
+                    notifications
+                </button>
+                <button class="material-symbols-outlined text-on-surface-variant hover:bg-primary/5 p-2 rounded-full transition-all cart-icon relative">
+                    shopping_cart
+                </button>
+                <div id="profile-picture-container" class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center overflow-hidden border-2 border-primary/10">
+                    <img id="header-avatar" alt="User profile" class="w-full h-full object-cover" src="">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex-grow flex max-w-container-max mx-auto w-full min-h-[calc(100vh-64px)]">
+        <!-- Side Navigation Bar -->
+        <aside class="hidden md:flex flex-col p-6 space-y-4 bg-surface/80 backdrop-blur-[20px] border-r border-outline-variant/20 w-64 sticky top-16 h-[calc(100vh-64px)] font-medium">
+            <div class="flex flex-col items-center py-6 border-b border-outline-variant/20 mb-4 text-center">
+                <img id="sidebar-avatar" alt="Student avatar" class="w-16 h-16 rounded-full mb-3 shadow-md border-2 border-primary/10 object-cover" src=""/>
+                <h3 id="sidebar-name" class="font-bold text-on-surface text-base">Alex Mercer</h3>
+                <p id="sidebar-major" class="text-xs text-on-surface-variant">Computer Science Junior</p>
+                <p id="sidebar-uni" class="text-[10px] text-primary font-bold uppercase mt-1">Stanford University</p>
+            </div>
+            <nav class="flex-grow space-y-1">
+                <a class="flex items-center gap-3 p-3 text-on-surface-variant hover:bg-primary/5 hover:text-primary transition-all duration-200 rounded-xl" href="buyer-dashboard.html">
+                    <span class="material-symbols-outlined">dashboard</span>
+                    <span class="text-sm font-semibold">My Study Hub</span>
+                </a>
+                <a class="flex items-center gap-3 p-3 bg-primary/10 text-primary font-bold rounded-xl transition-all duration-200" href="seller-dashboard.html">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">monetization_on</span>
+                    <span class="text-sm font-semibold">Seller Dashboard</span>
+                </a>
+                <a class="flex items-center gap-3 p-3 text-on-surface-variant hover:bg-primary/5 hover:text-primary transition-all duration-200 rounded-xl" href="upload.html">
+                    <span class="material-symbols-outlined">cloud_upload</span>
+                    <span class="text-sm font-semibold">Upload Materials</span>
+                </a>
+                <a class="flex items-center gap-3 p-3 text-on-surface-variant hover:bg-primary/5 hover:text-primary transition-all duration-200 rounded-xl" href="settings.html">
+                    <span class="material-symbols-outlined">settings</span>
+                    <span class="text-sm font-semibold">Settings</span>
+                </a>
+            </nav>
+            <div class="pt-4 space-y-1 border-t border-outline-variant/10">
+                <button id="logout-btn" class="w-full flex items-center gap-3 p-3 text-error hover:bg-error/5 rounded-xl transition-all text-left">
+                    <span class="material-symbols-outlined">logout</span>
+                    <span class="text-sm font-semibold">Switch Account</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Canvas -->
+        <main class="flex-grow p-gutter overflow-y-auto">
+            <header class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div>
+                    <h1 class="text-3xl font-extrabold text-on-surface tracking-tight font-headline-lg">Seller Dashboard</h1>
+                    <p class="text-on-surface-variant text-sm mt-1">Monitor your shop sales, uploaded study resources, and platform insights.</p>
+                </div>
+                <button onclick="window.location.href='upload.html'" class="bg-primary text-on-primary px-6 py-3 rounded-2xl font-bold btn-glow transition-all flex items-center justify-center gap-2">
+                    <span class="material-symbols-outlined text-sm">cloud_upload</span>
+                    <span>Upload New Note</span>
+                </button>
+            </header>
+
+            <!-- Stats Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <!-- Monthly Revenue Card -->
+                <div class="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/20 shadow-sm flex items-start justify-between">
+                    <div>
+                        <p class="text-on-surface-variant text-xs font-bold uppercase tracking-wider font-label-sm mb-1 opacity-70">Total Earnings</p>
+                        <h2 id="total-earnings-val" class="text-4xl font-extrabold text-primary">₹0.00</h2>
+                        <div class="flex items-center text-primary gap-1 mt-2 text-xs font-bold">
+                            <span class="material-symbols-outlined text-sm">trending_up</span>
+                            <span>+12.4% this month</span>
+                        </div>
+                    </div>
+                    <div class="bg-primary/10 p-3 rounded-2xl text-primary">
+                        <span class="material-symbols-outlined">payments</span>
+                    </div>
+                </div>
+
+                <!-- Total Sales Card -->
+                <div class="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/20 shadow-sm flex items-start justify-between">
+                    <div>
+                        <p class="text-on-surface-variant text-xs font-bold uppercase tracking-wider font-label-sm mb-1 opacity-70">Listed Guides</p>
+                        <h2 id="total-sales-val" class="text-4xl font-extrabold text-secondary">0</h2>
+                        <div class="flex items-center text-secondary gap-1 mt-2 text-xs font-bold">
+                            <span class="material-symbols-outlined text-sm">inventory_2</span>
+                            <span>Notes in Catalog</span>
+                        </div>
+                    </div>
+                    <div class="bg-secondary/10 p-3 rounded-2xl text-secondary">
+                        <span class="material-symbols-outlined">shopping_bag</span>
+                    </div>
+                </div>
+
+                <!-- Average Rating Card -->
+                <div class="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/20 shadow-sm flex items-start justify-between">
+                    <div>
+                        <p class="text-on-surface-variant text-xs font-bold uppercase tracking-wider font-label-sm mb-1 opacity-70">Average Rating</p>
+                        <h2 class="text-4xl font-extrabold text-tertiary">4.9<span class="text-base text-on-surface-variant font-medium"> /5</span></h2>
+                        <div class="flex gap-1 mt-2">
+                            <span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">star</span>
+                            <span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">star</span>
+                            <span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">star</span>
+                            <span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">star</span>
+                            <span class="material-symbols-outlined text-tertiary" style="font-variation-settings: 'FILL' 1;">star</span>
+                        </div>
+                    </div>
+                    <div class="bg-tertiary/10 p-3 rounded-2xl text-tertiary">
+                        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">star</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bento Chart & Activity Grid -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+                <!-- Analytics Chart -->
+                <div class="lg:col-span-2 bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/20 shadow-sm">
+                    <div class="flex items-center justify-between mb-8">
+                        <div>
+                            <h3 class="text-lg font-bold text-on-surface">Revenue Growth</h3>
+                            <p class="text-on-surface-variant text-xs">Platform actual sales vs projected target</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <span class="text-[10px] font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full uppercase tracking-wider font-label-sm">Actual</span>
+                            <span class="text-[10px] font-bold text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-full uppercase tracking-wider font-label-sm">Projected</span>
+                        </div>
+                    </div>
+                    
+                    <!-- SVG Chart -->
+                    <div class="relative h-[240px] w-full bg-surface-container-low/40 rounded-2xl border border-outline-variant/10 overflow-hidden">
+                        <div class="absolute inset-0 flex items-end justify-between p-4 pb-10">
+                            <svg class="w-full h-full" preserveAspectRatio="none" viewBox="0 0 1000 300">
+                                <defs>
+                                    <linearGradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
+                                        <stop offset="0%" stop-color="#3525cd" stop-opacity="0.25"></stop>
+                                        <stop offset="100%" stop-color="#3525cd" stop-opacity="0"></stop>
+                                    </linearGradient>
+                                </defs>
+                                <path d="M0,240 Q100,210 200,230 T400,160 T600,180 T800,90 T1000,110" fill="none" stroke="#3525cd" stroke-width="4"></path>
+                                <path d="M0,240 Q100,210 200,230 T400,160 T600,180 T800,90 T1000,110 V300 H0 Z" fill="url(#chartGradient)"></path>
+                                <path d="M0,270 Q200,260 400,200 T1000,130" fill="none" stroke="#c7c4d8" stroke-dasharray="8 4" stroke-width="2"></path>
+                            </svg>
+                        </div>
+                        <div class="absolute bottom-3 left-0 w-full flex justify-between px-6 text-[10px] font-bold text-on-surface-variant tracking-wider font-label-sm opacity-70">
+                            <span>JAN</span><span>FEB</span><span>MAR</span><span>APR</span><span>MAY</span><span>JUN</span><span>JUL</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Popular Categories Sidepanel -->
+                <div class="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/20 shadow-sm flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-lg font-bold text-on-surface mb-6">Subject Demand</h3>
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between p-3 bg-surface-container-low/50 rounded-2xl border border-outline-variant/10">
+                                <div class="flex items-center gap-3">
+                                    <span class="px-2 py-0.5 bg-primary/10 text-primary font-bold text-[10px] rounded uppercase font-label-sm">CS</span>
+                                    <span class="text-sm font-semibold text-on-surface">Computer Science</span>
+                                </div>
+                                <span class="text-sm font-bold text-primary">₹69,886.00</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-surface-container-low/50 rounded-2xl border border-outline-variant/10">
+                                <div class="flex items-center gap-3">
+                                    <span class="px-2 py-0.5 bg-tertiary/10 text-tertiary font-bold text-[10px] rounded uppercase font-label-sm">MA</span>
+                                    <span class="text-sm font-semibold text-on-surface">Mathematics</span>
+                                </div>
+                                <span class="text-sm font-bold text-primary">₹51,086.50</span>
+                            </div>
+                            <div class="flex items-center justify-between p-3 bg-surface-container-low/50 rounded-2xl border border-outline-variant/10">
+                                <div class="flex items-center gap-3">
+                                    <span class="px-2 py-0.5 bg-secondary/10 text-secondary font-bold text-[10px] rounded uppercase font-label-sm">EN</span>
+                                    <span class="text-sm font-semibold text-on-surface">Engineering</span>
+                                </div>
+                                <span class="text-sm font-bold text-primary">₹34,860.00</span>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="mt-6 w-full py-3 bg-surface hover:bg-primary hover:text-on-primary hover:border-primary border border-outline-variant/40 rounded-2xl font-bold text-xs transition-all flex items-center justify-center gap-2" onclick="showNotification('Detailed Analytics report generated!', 'success')">
+                        <span>Get Full Stats Report</span>
+                        <span class="material-symbols-outlined text-sm">chevron_right</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Manage Notes List -->
+            <div class="bg-surface-container-lowest rounded-3xl border border-outline-variant/20 shadow-sm overflow-hidden mb-12">
+                <div class="p-6 border-b border-outline-variant/10 flex items-center justify-between bg-surface">
+                    <h3 class="text-lg font-bold text-on-surface">My Uploaded Resources</h3>
+                    <span class="text-xs text-on-surface-variant font-bold uppercase bg-surface-container px-3 py-1 rounded-full animate-pulse" id="listed-count-badge">0 Items Listed</span>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-surface-container-low/30 border-b border-outline-variant/20 text-xs font-bold text-on-surface-variant font-label-sm uppercase tracking-wider">
+                                <th class="p-4">Resource Guide</th>
+                                <th class="p-4">Category</th>
+                                <th class="p-4 text-center">Status</th>
+                                <th class="p-4 text-right">Price</th>
+                                <th class="p-4 text-right">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="my-notes-table-body" class="divide-y divide-outline-variant/10">
+                            <!-- Dynamic items render -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="no-notes-placeholder" class="hidden p-12 text-center text-on-surface-variant">
+                    <span class="material-symbols-outlined text-4xl text-primary opacity-40 mb-2">cloud_upload</span>
+                    <p class="font-bold">No listed resources yet</p>
+                    <p class="text-xs mt-1 mb-4">Start earning by sharing your academic revision files and guides.</p>
+                    <button class="bg-primary text-on-primary px-4 py-2 rounded-xl text-xs font-bold hover:shadow-md transition-all" onclick="window.location.href='upload.html'">Publish Notes</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-surface-container-low border-t border-outline-variant/30 py-12 px-gutter mt-auto">
+        <div class="max-w-container-max mx-auto px-gutter flex justify-between items-center flex-col sm:flex-row gap-4">
+            <a class="font-headline-md text-headline-md font-extrabold text-primary" href="index.html">AcademiaHub</a>
+            <p class="font-label-sm text-xs text-on-surface-variant opacity-60">© 2026 AcademiaHub. Empowering academic success.</p>
+        </div>
+    </footer>
+
+    <!-- Shared application logic -->
+    <script src="js/app.js"></script>
+    <script>
+        function resolveUrl(url, fallback) {
+            if (!url) return fallback;
+            return url.startsWith('http') ? url : 'http://localhost:5000' + url;
+        }
+
+        async function loadSellerDashboard() {
+            // Retrieve session details
+            const userObj = JSON.parse(localStorage.getItem('current_user'));
+            if (!userObj) {
+                showNotification("Please log in to view seller dashboard.", "error");
+                setTimeout(() => { window.location.href = "login.html"; }, 1000);
+                return;
+            }
+
+            // Sync user UI details
+            document.getElementById('header-avatar').src = userObj.profileImage;
+            document.getElementById('sidebar-avatar').src = userObj.profileImage;
+            document.getElementById('sidebar-name').textContent = userObj.name;
+            document.getElementById('sidebar-major').textContent = `${userObj.major} • ${userObj.year}`;
+            document.getElementById('sidebar-uni').textContent = userObj.university;
+
+            // Sync dynamic metrics from backend dashboard stats
+            let totalEarnings = userObj.earnings || 0;
+            let totalNotesCount = 0;
+            let avgRating = 0;
+
+            try {
+                const statsJson = await apiFetch('/seller/dashboard');
+                if (statsJson.success && statsJson.data?.dashboard) {
+                    const stats = statsJson.data.dashboard;
+                    totalEarnings = stats.total_earnings || 0;
+                    totalNotesCount = stats.total_notes || 0;
+                    avgRating = stats.avg_rating || 0;
+
+                    // Update localStorage so userObj is up to date
+                    userObj.earnings = totalEarnings;
+                    userObj.soldCount = stats.total_sales || 0;
+                    userObj.balance = stats.available_earnings || 0;
+                    localStorage.setItem('current_user', JSON.stringify(userObj));
+                }
+            } catch (err) {
+                console.error("Failed to load seller dashboard stats:", err);
+            }
+
+            document.getElementById('total-earnings-val').textContent = `₹${totalEarnings.toFixed(2)}`;
+            document.getElementById('total-sales-val').textContent = totalNotesCount;
+
+            // Update average rating block dynamically
+            const ratingCard = document.querySelector('.text-tertiary')?.parentElement;
+            if (ratingCard) {
+                ratingCard.innerHTML = `
+                    <p class="text-on-surface-variant text-xs font-bold uppercase tracking-wider font-label-sm mb-1 opacity-70">Average Rating</p>
+                    <h2 class="text-4xl font-extrabold text-tertiary">${avgRating.toFixed(1)}<span class="text-base text-on-surface-variant font-medium"> /5</span></h2>
+                    <div class="flex gap-1 mt-2">
+                        ${Array.from({ length: 5 }, (_, i) => {
+                            const fill = i < Math.round(avgRating) ? "style=\"font-variation-settings: 'FILL' 1;\"" : "";
+                            return `<span class="material-symbols-outlined text-tertiary" ${fill}>star</span>`;
+                        }).join('')}
+                    </div>
+                `;
+            }
+
+            // Load and filter catalog for notes listed by this user
+            let myNotes = [];
+            try {
+                const notesJson = await apiFetch('/seller/notes?limit=100');
+                if (notesJson.success && notesJson.data?.notes) {
+                    myNotes = notesJson.data.notes;
+                }
+            } catch (err) {
+                console.error("Failed to fetch seller notes:", err);
+                showNotification("Could not fetch uploaded resources from database.", "error");
+            }
+
+            // Sync total sales indicator with actual notes count
+            document.getElementById('total-sales-val').textContent = myNotes.length;
+            document.getElementById('listed-count-badge').textContent = `${myNotes.length} Note${myNotes.length !== 1 ? 's' : ''} Listed`;
+
+            const tableBody = document.getElementById('my-notes-table-body');
+            const placeholder = document.getElementById('no-notes-placeholder');
+
+            tableBody.innerHTML = '';
+            if (myNotes.length === 0) {
+                placeholder.classList.remove('hidden');
+            } else {
+                placeholder.classList.add('hidden');
+                
+                myNotes.forEach(note => {
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-primary/5 transition-colors border-b border-outline-variant/10';
+
+                    const noteImage = resolveUrl(note.preview_url, 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600');
+                    const collegeName = note.colleges?.name || userObj.university || 'University';
+                    const deptOrSubject = note.departments?.name || note.subject || 'Notes';
+
+                    // Format status badge dynamically
+                    let statusHtml = '';
+                    if (note.status === 'live') {
+                        statusHtml = `
+                            <span class="text-xs text-secondary font-bold flex items-center justify-center gap-1">
+                                <span class="w-2.5 h-2.5 bg-secondary rounded-full"></span>
+                                Active
+                            </span>
+                        `;
+                    } else if (note.status === 'under_review') {
+                        statusHtml = `
+                            <span class="text-xs text-tertiary font-bold flex items-center justify-center gap-1">
+                                <span class="w-2.5 h-2.5 bg-tertiary rounded-full"></span>
+                                In Review
+                            </span>
+                        `;
+                    } else if (note.status === 'draft') {
+                        statusHtml = `
+                            <span class="text-xs text-on-surface-variant/70 font-bold flex items-center justify-center gap-1">
+                                <span class="w-2.5 h-2.5 bg-outline-variant rounded-full"></span>
+                                Draft
+                            </span>
+                        `;
+                    } else if (note.status === 'rejected') {
+                        statusHtml = `
+                            <span class="text-xs text-error font-bold flex items-center justify-center gap-1 cursor-help" title="${note.rejection_reason || 'No reason provided'}">
+                                <span class="w-2.5 h-2.5 bg-error rounded-full animate-pulse"></span>
+                                Rejected
+                            </span>
+                        `;
+                    } else {
+                        statusHtml = `
+                            <span class="text-xs text-on-surface-variant/70 font-bold flex items-center justify-center gap-1">
+                                <span class="w-2.5 h-2.5 bg-outline rounded-full"></span>
+                                ${note.status}
+                            </span>
+                        `;
+                    }
+
+                    const priceText = note.price === 0 || note.is_free ? 'Free' : '₹' + parseFloat(note.price).toFixed(2);
+
+                    row.innerHTML = `
+                        <td class="p-4">
+                            <div class="flex items-center gap-3">
+                                <img src="${noteImage}" class="w-10 h-10 rounded-lg object-cover border border-outline-variant/20">
+                                <div>
+                                    <p class="font-bold text-on-surface text-sm hover:text-primary transition-all cursor-pointer" onclick="window.location.href='details.html?id=${note.id}'">${note.title}</p>
+                                    <p class="text-xs text-on-surface-variant opacity-75">${collegeName} • ${note.subject || 'Study Guide'}</p>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-4">
+                            <span class="px-2.5 py-0.5 bg-primary/10 text-primary text-[10px] font-bold rounded-full uppercase font-label-sm tracking-wide">${deptOrSubject}</span>
+                        </td>
+                        <td class="p-4 text-center">
+                            ${statusHtml}
+                        </td>
+                        <td class="p-4 text-right font-bold text-primary text-sm">
+                            ${priceText}
+                        </td>
+                        <td class="p-4 text-right">
+                            <button onclick="editResource('${note.id}')" class="bg-surface border border-outline-variant/40 hover:bg-primary hover:text-on-primary hover:border-primary p-2 rounded-xl transition-all shadow-sm active:scale-95 text-primary">
+                                <span class="material-symbols-outlined text-sm flex items-center justify-center">edit</span>
+                            </button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+
+            // Bind log out
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                localStorage.removeItem('current_user');
+                window.location.href = "login.html";
+            });
+
+            // Nav search box bind
+            const navSearch = document.getElementById('nav-search');
+            navSearch.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && navSearch.value.trim() !== '') {
+                    window.location.href = `browse.html?search=${encodeURIComponent(navSearch.value.trim())}`;
+                }
+            });
+        }
+
+        function editResource(id) {
+            showNotification(`Resource edit dashboard loaded for Note #${id}`, "info");
+        }
+
+        window.addEventListener('DOMContentLoaded', loadSellerDashboard);
+    </script>
+</body>
+</html>

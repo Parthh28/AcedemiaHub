@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Shopping Cart - AcademiaHub</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-effect {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        @keyframes subtle-float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-4px); }
+            100% { transform: translateY(0px); }
+        }
+        .hover-float:hover {
+            animation: subtle-float 0.4s ease-out forwards;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed-variant": "#004c6e",
+                        "on-primary-fixed-variant": "#3323cc",
+                        "on-surface-variant": "#464555",
+                        "on-primary-container": "#dad7ff",
+                        "on-tertiary-fixed-variant": "#7b2f00",
+                        "on-error": "#ffffff",
+                        "surface-container-low": "#eff4ff",
+                        "surface-container-lowest": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed": "#ffdbcc",
+                        "inverse-surface": "#213145",
+                        "surface-container-highest": "#d3e4fe",
+                        "error-container": "#ffdad6",
+                        "surface": "#f8f9ff",
+                        "on-secondary-fixed": "#001e2f",
+                        "surface-dim": "#cbdbf5",
+                        "outline-variant": "#c7c4d8",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed-dim": "#89ceff",
+                        "secondary-container": "#39b8fd",
+                        "on-tertiary-container": "#ffd2be",
+                        "tertiary-fixed-dim": "#ffb695",
+                        "on-tertiary-fixed": "#351000",
+                        "tertiary-container": "#a44100",
+                        "on-secondary-container": "#004666",
+                        "on-primary": "#ffffff",
+                        "primary-container": "#4f46e5",
+                        "primary": "#3525cd",
+                        "tertiary": "#7e3000",
+                        "background": "#f8f9ff",
+                        "surface-container": "#e5eeff",
+                        "on-tertiary": "#ffffff",
+                        "error": "#ba1a1a",
+                        "surface-tint": "#4d44e3",
+                        "surface-container-high": "#dce9ff",
+                        "on-background": "#0b1c30",
+                        "inverse-on-surface": "#eaf1ff",
+                        "primary-fixed-dim": "#c3c0ff",
+                        "primary-fixed": "#e2dfff",
+                        "secondary": "#006591",
+                        "on-primary-fixed": "#0f0069",
+                        "outline": "#777587",
+                        "surface-bright": "#f8f9ff",
+                        "secondary-fixed": "#c9e6ff",
+                        "inverse-primary": "#c3c0ff",
+                        "on-surface": "#0b1c30",
+                        "surface-variant": "#d3e4fe"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "gutter": "24px",
+                        "margin-mobile": "16px",
+                        "margin-desktop": "40px",
+                        "unit": "8px",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Inter"],
+                        "headline-lg-mobile": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "display-lg": ["Inter"],
+                        "label-sm": ["JetBrains Mono"],
+                        "headline-lg": ["Inter"],
+                        "headline-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                        "label-sm": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background font-body-md text-on-surface">
+<!-- Top Navigation Bar -->
+<nav class="sticky top-0 z-50 flex justify-between items-center w-full px-margin-desktop max-w-container-max mx-auto bg-surface/80 backdrop-blur-xl border-b border-outline-variant/30 shadow-sm h-16">
+<div class="flex items-center gap-8">
+<span class="font-headline-md text-headline-md font-bold text-primary">AcademiaHub</span>
+<div class="hidden md:flex items-center gap-6">
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Marketplace</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Dashboard</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Revenue</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Settings</a>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-low/50 rounded-full transition-all">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<div class="relative p-2 text-primary font-bold border-b-2 border-primary">
+<span class="material-symbols-outlined" data-icon="shopping_cart">shopping_cart</span>
+<span class="absolute top-0 right-0 bg-primary text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center">2</span>
+</div>
+<button class="bg-primary text-on-primary px-6 py-2 rounded-xl font-body-md text-body-md font-semibold hover:scale-95 transition-transform duration-200">
+                Checkout
+            </button>
+<img alt="User profile" class="w-10 h-10 rounded-full border border-outline-variant" data-alt="A professional close-up portrait of a young male student with a friendly expression. He is set against a clean, minimalist studio background with soft high-key lighting that emphasizes a modern, intellectual brand aesthetic. The color palette is dominated by soft whites and subtle indigo tones, reflecting the premium design language of the marketplace." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfWFtU07Vuc8akFvsLxmrNnbgm6eYePdCxBaDrfnx_CpTy8GPUi5IZZLvJgmNusJbSk_95Kk5g44SZ3MTonOqUkXdvrMH-WZ-Xw_jmsavFUUFKEszDIA9jXMALCJ9GNIl7NO9sz2L4ZMDgUeC5Mg-MhIwGCorrqEcidIdo2G-CHWIuICU_fvV3hDBLRUFpPEmaBB4BdNzYJo-ZpS5SkuElCJhIar92AN3xG9Hkr_ehrXdGEQMoWSNufgoZCWOBJpuG5lYTn_s37MBa"/>
+</div>
+</nav>
+<main class="max-w-container-max mx-auto px-margin-desktop py-12">
+<div class="flex flex-col lg:flex-row gap-gutter">
+<!-- Left Column: Cart List -->
+<div class="flex-grow space-y-gutter">
+<div class="flex items-center justify-between mb-4">
+<h1 class="font-headline-lg text-headline-lg text-on-surface">Your Shopping Cart (2 items)</h1>
+</div>
+<!-- Cart Items Container -->
+<div class="bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-sm overflow-hidden">
+<!-- Item 1 -->
+<div class="p-6 border-b border-outline-variant/20 flex flex-col sm:flex-row gap-6 hover:bg-surface-container-low/20 transition-colors">
+<div class="w-full sm:w-32 h-40 sm:h-32 rounded-lg bg-surface-container overflow-hidden border border-outline-variant/30 flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A highly detailed close-up of premium, well-organized organic chemistry study notes with colorful structural diagrams and neat handwriting. The image is captured in bright, natural light on a clean white desk surface, creating a scholarly yet accessible mood. The color scheme features indigo and soft orange accents, maintaining a professional and high-quality educational atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAdF0T4XCQGrEWfgRJlKlaxbpt1vL7xib37aqeWA9SQngPU22LqAwqvrhSqX7fSL1q_rC8vlOu9A0I-1GRV2dzM9khf6tZtgFjZJI2q6Tb1psMYdTQihVtK5_y_TiZEDj6F4He6WXZh-w_9jcPvvgS7LcIz8tu3MQ5-DPnlF4E5DHz4NaVs1vWTLzMAh_F0QVwrPa8rElnVZZnHzmhWY8yRKyZQXGf0QERabLR2SS5K7HFEjc6ToXaLrJN7rgIzITASeuoucP2DwvXg"/>
+</div>
+<div class="flex-grow flex flex-col justify-between py-1">
+<div>
+<div class="flex justify-between items-start">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-1">Advanced Organic Chemistry: Synthesis &amp; Mechanisms</h3>
+<span class="font-headline-md text-headline-md text-primary">$24.99</span>
+</div>
+<p class="text-on-surface-variant font-body-md text-body-md">By <span class="text-secondary font-medium">Dr. Sarah Jenkins</span></p>
+<div class="mt-2 flex gap-2">
+<span class="font-label-sm text-label-sm px-3 py-1 bg-surface-container-high rounded-full border border-outline-variant/30 text-on-surface-variant">Chemistry</span>
+<span class="font-label-sm text-label-sm px-3 py-1 bg-surface-container-high rounded-full border border-outline-variant/30 text-on-surface-variant">PDF</span>
+</div>
+</div>
+<div class="flex items-center gap-4 mt-4">
+<button class="flex items-center gap-1 text-on-surface-variant hover:text-error transition-colors font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-lg" data-icon="delete">delete</span>
+                                    Remove
+                                </button>
+<button class="flex items-center gap-1 text-on-surface-variant hover:text-primary transition-colors font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-lg" data-icon="favorite">favorite</span>
+                                    Save for later
+                                </button>
+</div>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="p-6 flex flex-col sm:flex-row gap-6 hover:bg-surface-container-low/20 transition-colors">
+<div class="w-full sm:w-32 h-40 sm:h-32 rounded-lg bg-surface-container overflow-hidden border border-outline-variant/30 flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="A conceptual digital illustration of neural networks and human brain outlines representing cognitive psychology principles. The style is clean and modern, using a palette of indigo, teal, and soft greys with glassmorphism elements. The lighting is ethereal and diffused, creating a sense of intellectual depth and professional academic quality consistent with a high-end educational platform." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAPL1fUj-H2YSVEHfJmn56ozJkWMVLeTnWTXk3iF8Mv5PdXoUDoqwadlOfvMzOUtdIICJPbqSfc7UpuHYbHo4xPDMwSYv6V0rmbfmtB8r1sV7xBq1i0KbcRh8l5fcx4Es-_bGOjDHD_MkBF92kbgwky6lPbyKYe_eYqkcudV3JGpeY-xBL_V-9geGMMMKJmmL5YvxGSGxuldzMUK30vMg-apL1gNqyI8LxXf8Npg78KhvZVs2Gd9n0nsujZPpA2XG39YqCyb3a4Ld_o"/>
+</div>
+<div class="flex-grow flex flex-col justify-between py-1">
+<div>
+<div class="flex justify-between items-start">
+<h3 class="font-headline-md text-headline-md text-on-surface mb-1">Cognitive Psychology: Complete Exam Prep 2024</h3>
+<span class="font-headline-md text-headline-md text-primary">$18.50</span>
+</div>
+<p class="text-on-surface-variant font-body-md text-body-md">By <span class="text-secondary font-medium">Professor Marcus Thorne</span></p>
+<div class="mt-2 flex gap-2">
+<span class="font-label-sm text-label-sm px-3 py-1 bg-surface-container-high rounded-full border border-outline-variant/30 text-on-surface-variant">Psychology</span>
+<span class="font-label-sm text-label-sm px-3 py-1 bg-surface-container-high rounded-full border border-outline-variant/30 text-on-surface-variant">Annotated</span>
+</div>
+</div>
+<div class="flex items-center gap-4 mt-4">
+<button class="flex items-center gap-1 text-on-surface-variant hover:text-error transition-colors font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-lg" data-icon="delete">delete</span>
+                                    Remove
+                                </button>
+<button class="flex items-center gap-1 text-on-surface-variant hover:text-primary transition-colors font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-lg" data-icon="favorite">favorite</span>
+                                    Save for later
+                                </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Recommended Section (Bento Style) -->
+<div class="pt-8">
+<h2 class="font-headline-md text-headline-md text-on-surface mb-6">Recommended for You</h2>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<!-- Rec Card 1 -->
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-4 group hover:shadow-lg transition-all duration-300">
+<div class="aspect-video rounded-lg overflow-hidden bg-surface mb-4 border border-outline-variant/20 relative">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="A minimalist overhead shot of a sleek open notebook showing mathematical equations and diagrams on a light gray surface. The lighting is crisp and cool, emphasizing a modern scholarly aesthetic. Subtle indigo shadows provide depth, while the overall composition remains airy and focused, following the design principles of a premium academic marketplace." src="https://lh3.googleusercontent.com/aida-public/AB6AXuChhJteT7vWvWwUHflkTzNKLngKNtIiTK3koDgtlkx7Tt9YKjAaaCiAuWkV35oyuchspmuw63mlXAAp7gyRSWYxUU2KW3MJBjLFHs-K3YHe21uLXj2CdxhilBIPWDKiQ0LKDg9pWviGA3iAjevse7ZpwaULLsdGfcPscCoyaPrrlCq1VupUuRx9IbKyLGtKeTNR3hZF7PuyTULAUE7JWP7wCfuml-pEq8qbNGt_08p2DfjVQYWCuEhdCoGkuS0XerwzAJSCXsBeLrEH"/>
+<span class="absolute top-2 right-2 font-label-sm text-label-sm bg-primary/10 text-primary px-2 py-1 rounded backdrop-blur-md">Popular</span>
+</div>
+<h4 class="font-body-md text-body-md font-bold text-on-surface leading-tight mb-1">Quantum Physics 101: Summary Sheets</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-3">5.0 ★ (128 reviews)</p>
+<div class="flex items-center justify-between">
+<span class="font-body-md text-body-md font-bold text-primary">$12.00</span>
+<button class="p-2 bg-surface-container-high rounded-full hover:bg-primary hover:text-on-primary transition-all">
+<span class="material-symbols-outlined text-sm" data-icon="add_shopping_cart">add_shopping_cart</span>
+</button>
+</div>
+</div>
+<!-- Rec Card 2 -->
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-4 group hover:shadow-lg transition-all duration-300">
+<div class="aspect-video rounded-lg overflow-hidden bg-surface mb-4 border border-outline-variant/20">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="A clean, tech-focused flat lay featuring a modern tablet displaying data visualization charts and code snippets. The environment is a bright, minimalist workspace with soft daylight. The color palette is professional, focusing on primary indigo and secondary teal, perfectly aligning with a sophisticated and high-velocity digital creator and student marketplace aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDYPtevamy06S5yTJoTMnRXmM6srYkNJVhTPGmmTa5MvKSfPjzxyEPXN6jYl2MNA6MkN9C-9sRZpy93Hez1wYdx1L7nN0QkAoakJeT3HMJg_rnRVV6EU6VOMi-Fu1uqJg3DaRr73Mng_upjgcmhZMihcf0EyWINvbYyNEk5t9ckvTscHJoB4xe1WfpM7-g6aOPVOiuOIXFvT8Y_FHch15RFDu4HfL0yvtrWh05FllcGMgy7_hqcPu4zRke7BF57LfRgO47sokXfKcJ9"/>
+</div>
+<h4 class="font-body-md text-body-md font-bold text-on-surface leading-tight mb-1">Data Science with Python: Cheat Sheets</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-3">4.9 ★ (89 reviews)</p>
+<div class="flex items-center justify-between">
+<span class="font-body-md text-body-md font-bold text-primary">$15.99</span>
+<button class="p-2 bg-surface-container-high rounded-full hover:bg-primary hover:text-on-primary transition-all">
+<span class="material-symbols-outlined text-sm" data-icon="add_shopping_cart">add_shopping_cart</span>
+</button>
+</div>
+</div>
+<!-- Rec Card 3 -->
+<div class="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-4 group hover:shadow-lg transition-all duration-300">
+<div class="aspect-video rounded-lg overflow-hidden bg-surface mb-4 border border-outline-variant/20">
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" data-alt="An atmospheric photo of a student writing in a high-quality leather-bound journal in a modern, plant-filled library. The lighting is warm and intellectual, with soft sunbeams filtering through large windows. The scene captures the 'intellectual yet accessible' mood of the brand, featuring a palette of earthy tones balanced by clean, professional indigo highlights." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBy8GSH0WW9515CsRL7ctPByb4t3pJoZSVXIRmeonYuy8ikBLPoS6pQ-2aS9VdcGW5CjU69FTAhGW3f4b9VXhsfKH-NHP8CVfcBAPQaexExO1Cf-wAgGCyFRXikoVSE7sMxLpzMKJZf_8x6lRRMp6e7gAjzbxtIdxkrPbnYWFIK5ahpjKVoSMqPAnmMGXOibJV_SX8QEym6FS07wNjUjFK27ATkfw_sgesHpzTzcYjUvhWUeIZhaQiVcF5s4__MXYPwmBluORBf2teY"/>
+</div>
+<h4 class="font-body-md text-body-md font-bold text-on-surface leading-tight mb-1">Academic Writing Masterclass: Templates</h4>
+<p class="font-label-sm text-label-sm text-on-surface-variant mb-3">4.8 ★ (240 reviews)</p>
+<div class="flex items-center justify-between">
+<span class="font-body-md text-body-md font-bold text-primary">$9.50</span>
+<button class="p-2 bg-surface-container-high rounded-full hover:bg-primary hover:text-on-primary transition-all">
+<span class="material-symbols-outlined text-sm" data-icon="add_shopping_cart">add_shopping_cart</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: Summary Sidebar -->
+<aside class="w-full lg:w-[380px] flex-shrink-0">
+<div class="sticky top-24 bg-surface-container-lowest rounded-xl border border-outline-variant/30 shadow-lg p-8">
+<h2 class="font-headline-md text-headline-md text-on-surface mb-6">Order Summary</h2>
+<div class="space-y-4 mb-8">
+<div class="flex justify-between font-body-md text-body-md">
+<span class="text-on-surface-variant">Subtotal (2 items)</span>
+<span class="text-on-surface font-semibold">$43.49</span>
+</div>
+<div class="flex justify-between font-body-md text-body-md">
+<span class="text-on-surface-variant">Academic Credits</span>
+<span class="text-tertiary-container font-semibold">-$5.00</span>
+</div>
+<div class="flex justify-between font-body-md text-body-md">
+<span class="text-on-surface-variant">Taxes</span>
+<span class="text-on-surface font-semibold">$0.00</span>
+</div>
+<div class="pt-4 border-t border-outline-variant/20 flex justify-between items-center">
+<span class="font-headline-md text-headline-md text-on-surface">Total</span>
+<span class="font-headline-md text-headline-md text-primary">$38.49</span>
+</div>
+</div>
+<!-- Discount Code Input -->
+<div class="mb-8">
+<label class="font-label-sm text-label-sm text-on-surface-variant uppercase mb-2 block">Promo Code</label>
+<div class="flex gap-2">
+<input class="flex-grow bg-surface-container-low border border-outline-variant/30 rounded-lg px-4 py-2 font-body-md text-body-md focus:ring-2 focus:ring-primary focus:ring-offset-4 outline-none transition-all" placeholder="ACADEMIA10" type="text"/>
+<button class="bg-secondary text-on-secondary px-4 py-2 rounded-lg font-label-sm text-label-sm font-bold hover:brightness-110 transition-all">Apply</button>
+</div>
+</div>
+<button class="w-full bg-primary text-on-primary py-4 rounded-xl font-headline-md text-headline-md font-bold shadow-lg shadow-primary/20 hover:-translate-y-1 hover:brightness-110 active:scale-95 transition-all duration-200 flex items-center justify-center gap-3">
+                        Proceed to Checkout
+                        <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<div class="mt-6 flex flex-col items-center gap-3">
+<p class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-2">
+<span class="material-symbols-outlined text-[16px]" data-icon="lock" style="font-variation-settings: 'FILL' 1;">lock</span>
+                            Secure encrypted checkout
+                        </p>
+<div class="flex gap-4 opacity-40 grayscale group-hover:grayscale-0 transition-all">
+<span class="material-symbols-outlined text-3xl" data-icon="credit_card">credit_card</span>
+<span class="material-symbols-outlined text-3xl" data-icon="account_balance_wallet">account_balance_wallet</span>
+<span class="material-symbols-outlined text-3xl" data-icon="payments">payments</span>
+</div>
+</div>
+</div>
+</aside>
+</div>
+</main>
+<!-- Footer -->
+<footer class="w-full bg-surface py-12 px-margin-desktop border-t border-outline-variant/50">
+<div class="max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+<div class="flex flex-col items-center md:items-start">
+<span class="font-headline-md text-headline-md font-bold text-on-surface mb-2">AcademiaHub</span>
+<p class="text-on-surface-variant font-label-sm text-label-sm">© 2024 AcademiaHub Marketplace. All rights reserved.</p>
+</div>
+<div class="flex flex-wrap justify-center gap-8">
+<a class="text-on-surface-variant hover:text-primary transition-all font-label-sm text-label-sm hover:underline" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant hover:text-primary transition-all font-label-sm text-label-sm hover:underline" href="#">Terms of Service</a>
+<a class="text-on-surface-variant hover:text-primary transition-all font-label-sm text-label-sm hover:underline" href="#">Refunds</a>
+<a class="text-on-surface-variant hover:text-primary transition-all font-label-sm text-label-sm hover:underline" href="#">Contact Support</a>
+</div>
+</div>
+</footer>
+<script>
+        // Micro-interactions for cart removal (Visual feedback)
+        document.querySelectorAll('button').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                if(this.textContent.includes('Remove')) {
+                    const row = this.closest('.p-6');
+                    row.style.opacity = '0';
+                    row.style.transform = 'translateX(20px)';
+                    row.style.transition = 'all 0.4s ease';
+                    setTimeout(() => {
+                        row.style.display = 'none';
+                    }, 400);
+                }
+            });
+        });
+
+        // Sticky nav scroll effect
+        window.addEventListener('scroll', () => {
+            const nav = document.querySelector('nav');
+            if (window.scrollY > 10) {
+                nav.classList.add('shadow-md');
+                nav.classList.replace('bg-surface/80', 'bg-surface/95');
+            } else {
+                nav.classList.remove('shadow-md');
+                nav.classList.replace('bg-surface/95', 'bg-surface/80');
+            }
+        });
+    </script>
+</body></html>

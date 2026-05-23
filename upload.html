@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Upload Notes - AcademiaHub</title>
+    
+    <!-- Compiled Static Tailwind CSS -->
+    <link href="css/tailwind.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    
+    <!-- Custom Style extensions -->
+    <link href="css/style.css" rel="stylesheet">
+    <style>
+        .step-transition {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md min-h-screen flex flex-col">
+
+    <!-- Top Navigation Bar -->
+    <header class="bg-surface/80 backdrop-blur-[20px] sticky top-0 z-50 border-b border-outline-variant/30 shadow-sm h-16 flex items-center">
+        <div class="flex justify-between items-center w-full px-gutter max-w-container-max mx-auto h-16">
+            <div class="flex items-center gap-8">
+                <a class="font-headline-md text-headline-md font-extrabold text-primary flex items-center gap-2" href="index.html">
+                    <span class="material-symbols-outlined text-primary text-3xl">school</span>
+                    <span>AcademiaHub</span>
+                </a>
+                <nav class="hidden md:flex items-center gap-6">
+                    <a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="browse.html">Browse</a>
+                    <a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="browse.html?ref=categories">Categories</a>
+                    <a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="browse.html?ref=sellers">Sellers</a>
+                </nav>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="relative hidden lg:block">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant opacity-60">search</span>
+                    <input id="nav-search" class="bg-surface-container-low border border-outline-variant/50 rounded-full pl-10 pr-4 py-2 w-64 focus:w-80 transition-all duration-300 text-body-md" placeholder="Search study notes..." type="text">
+                </div>
+                <button class="material-symbols-outlined text-on-surface-variant hover:bg-primary/5 p-2 rounded-full transition-all relative">
+                    notifications
+                </button>
+                <button class="material-symbols-outlined text-on-surface-variant hover:bg-primary/5 p-2 rounded-full transition-all cart-icon relative">
+                    shopping_cart
+                </button>
+                <div id="profile-picture-container" class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center overflow-hidden border-2 border-primary/10">
+                    <img id="header-avatar" alt="User profile" class="w-full h-full object-cover" src="">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow flex flex-col items-center py-12 px-margin-mobile md:px-margin-desktop">
+        <div class="w-full max-w-3xl">
+            <!-- Stepper Indicator -->
+            <div class="flex items-center justify-between mb-12 relative">
+                <div class="absolute top-1/2 left-0 w-full h-0.5 bg-outline-variant/20 -translate-y-1/2 z-0"></div>
+                <!-- Step 1 Indicator -->
+                <div class="relative z-10 flex flex-col items-center">
+                    <div class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold shadow-lg shadow-primary/20 transition-all duration-300" id="step-dot-1">1</div>
+                    <span class="absolute -bottom-7 whitespace-nowrap font-label-sm text-xs font-bold text-primary uppercase font-label-sm tracking-wider">File</span>
+                </div>
+                <!-- Step 2 Indicator -->
+                <div class="relative z-10 flex flex-col items-center">
+                    <div class="w-10 h-10 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center font-bold transition-all duration-300" id="step-dot-2">2</div>
+                    <span class="absolute -bottom-7 whitespace-nowrap font-label-sm text-xs font-bold text-on-surface-variant uppercase font-label-sm tracking-wider">Details</span>
+                </div>
+                <!-- Step 3 Indicator -->
+                <div class="relative z-10 flex flex-col items-center">
+                    <div class="w-10 h-10 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center font-bold transition-all duration-300" id="step-dot-3">3</div>
+                    <span class="absolute -bottom-7 whitespace-nowrap font-label-sm text-xs font-bold text-on-surface-variant uppercase font-label-sm tracking-wider">Pricing</span>
+                </div>
+            </div>
+
+            <!-- Content Canvas -->
+            <div class="bg-surface-container-lowest rounded-3xl shadow-sm border border-outline-variant/20 overflow-hidden mt-8 min-h-[480px] flex flex-col">
+                <form id="upload-form" class="flex-grow flex flex-col" onsubmit="event.preventDefault(); publishNotes();">
+                    
+                    <!-- Step 1: Upload File -->
+                    <div class="step-transition p-8 flex flex-col flex-grow" id="step-1">
+                        <div class="mb-6">
+                            <h1 class="font-headline-lg text-2xl font-extrabold text-on-surface mb-2">Share your knowledge</h1>
+                            <p class="text-on-surface-variant text-sm">Upload your study notes, lecture summaries, or exam prep materials.</p>
+                        </div>
+                        <div class="flex-grow border-2 border-dashed border-outline-variant/50 rounded-2xl bg-surface-container-low/40 flex flex-col items-center justify-center p-12 hover:border-primary/50 hover:bg-primary/5 transition-all cursor-pointer group" id="drop-zone">
+                            <div class="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform text-primary">
+                                <span class="material-symbols-outlined text-primary text-4xl">upload_file</span>
+                            </div>
+                            <h3 class="font-bold text-on-surface text-lg mb-1">Drag and drop file here</h3>
+                            <p class="text-on-surface-variant text-xs mb-6">PDF, PPTX or DOCX up to 50MB</p>
+                            <span class="bg-primary text-on-primary px-8 py-3 rounded-xl font-bold shadow-md btn-glow transition-all">Select a Study File</span>
+                            <input type="file" id="file-input-hidden" class="hidden" accept=".pdf,.doc,.docx,.ppt,.pptx">
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Metadata Details -->
+                    <div class="step-transition hidden p-8 flex flex-col flex-grow" id="step-2">
+                        <div class="mb-8">
+                            <h1 class="font-headline-lg text-2xl font-extrabold text-on-surface mb-2">Resource Details</h1>
+                            <p class="text-on-surface-variant text-sm">Help students discover your guide with accurate details.</p>
+                        </div>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-on-surface-variant uppercase font-label-sm tracking-wide mb-2">Document Title</label>
+                                <input required id="note-title" class="w-full bg-surface border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:border-primary rounded-xl py-3 px-4 font-body-md outline-none transition-all" placeholder="e.g. Organic Chemistry Midterm Revision Pack" type="text"/>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-on-surface-variant uppercase font-label-sm tracking-wide mb-2">Detailed Description</label>
+                                <textarea required id="note-desc" rows="3" class="w-full bg-surface border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:border-primary rounded-xl py-3 px-4 font-body-md outline-none transition-all" placeholder="Outline exactly what study guides, topics, chapters, and cheat sheets are included in this bundle..."></textarea>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-on-surface-variant uppercase font-label-sm tracking-wide mb-2">Category Subject</label>
+                                    <select id="note-category" class="w-full bg-surface border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:border-primary rounded-xl py-3 px-4 font-body-md outline-none transition-all cursor-pointer">
+                                        <option>Computer Science</option>
+                                        <option>Mathematics</option>
+                                        <option>Engineering</option>
+                                        <option>Chemistry</option>
+                                        <option>Biology</option>
+                                        <option>Psychology</option>
+                                        <option>Cybersecurity</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-on-surface-variant uppercase font-label-sm tracking-wide mb-2">University / College</label>
+                                    <input required id="note-uni" class="w-full bg-surface border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:border-primary rounded-xl py-3 px-4 font-body-md outline-none transition-all" placeholder="e.g. Stanford University" type="text"/>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div>
+                                    <label class="block text-xs font-bold text-on-surface-variant uppercase font-label-sm tracking-wide mb-2">Course Code</label>
+                                    <input required id="note-course" class="w-full bg-surface border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:border-primary rounded-xl py-3 px-4 font-body-md outline-none transition-all" placeholder="e.g. CS 106B" type="text"/>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-on-surface-variant uppercase font-label-sm tracking-wide mb-2">Year / Class Level</label>
+                                    <select id="note-year" class="w-full bg-surface border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:border-primary rounded-xl py-3 px-4 font-body-md outline-none transition-all cursor-pointer">
+                                        <option>Freshman</option>
+                                        <option>Sophomore</option>
+                                        <option selected>Junior</option>
+                                        <option>Senior</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-on-surface-variant uppercase font-label-sm tracking-wide mb-2">Estimated Pages</label>
+                                    <input required id="note-pages" class="w-full bg-surface border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:border-primary rounded-xl py-3 px-4 font-body-md outline-none transition-all" placeholder="e.g. 24" type="number" min="1"/>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 p-4 rounded-2xl bg-surface-container flex items-center gap-4 border border-outline-variant/10">
+                            <div class="w-10 h-12 bg-white rounded-lg border border-outline-variant/20 flex items-center justify-center text-primary flex-shrink-0">
+                                <span class="material-symbols-outlined">description</span>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <p id="uploaded-filename" class="font-bold text-on-surface text-sm truncate">study_revision_draft.pdf</p>
+                                <p class="text-on-surface-variant text-[10px] font-bold uppercase tracking-wider font-label-sm mt-0.5">Ready for processing</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Pricing & Publishing -->
+                    <div class="step-transition hidden p-8 flex flex-col flex-grow" id="step-3">
+                        <div class="mb-8">
+                            <h1 class="font-headline-lg text-2xl font-extrabold text-on-surface mb-2">Set Your Price</h1>
+                            <p class="text-on-surface-variant text-sm">Select how you'd like to share this material with students.</p>
+                        </div>
+                        
+                        <div class="flex items-center p-1 bg-surface-container-high rounded-xl w-fit mb-8 border border-outline-variant/10">
+                            <button type="button" class="px-8 py-2 rounded-lg font-bold transition-all text-sm text-on-surface-variant" id="btn-free">Free</button>
+                            <button type="button" class="px-8 py-2 rounded-lg font-bold transition-all text-sm bg-white shadow-sm text-primary" id="btn-paid">Paid</button>
+                        </div>
+                        
+                        <div class="animate-in fade-in slide-in-from-top-2" id="pricing-details">
+                            <div class="flex flex-col gap-2 max-w-xs mb-8">
+                                <label class="block text-xs font-bold text-on-surface-variant uppercase font-label-sm tracking-wide">Listing Price (INR)</label>
+                                <div class="relative">
+                                    <span class="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant font-bold">₹</span>
+                                    <input id="note-price" step="0.01" min="40.00" class="w-full pl-8 pr-3 py-3 rounded-xl bg-surface border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:border-primary outline-none transition-all font-bold text-on-surface" type="number" value="414.00"/>
+                                </div>
+                                <p class="text-[11px] font-bold text-primary bg-primary/5 p-3 rounded-xl border border-primary/10 mt-1">
+                                    You will earn 70% of each sale (₹<span id="earnings-split">289.80</span>) after system fees.
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex flex-col gap-4">
+                            <h3 class="font-bold text-on-surface text-base">Select Document Preview Page</h3>
+                            <p class="text-on-surface-variant text-xs font-medium">This page will be visible for students to inspect before buying.</p>
+                            <div class="grid grid-cols-4 gap-4">
+                                <div class="aspect-[3/4] bg-surface-container-high/60 rounded-xl border-2 border-primary relative cursor-pointer overflow-hidden shadow-sm">
+                                    <img alt="Page 1 preview" class="w-full h-full object-cover opacity-80" src="https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=200&auto=format&fit=crop&q=80"/>
+                                    <div class="absolute inset-0 flex items-center justify-center bg-primary/10">
+                                        <span class="material-symbols-outlined text-primary text-3xl font-extrabold" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                                    </div>
+                                </div>
+                                <div class="aspect-[3/4] bg-surface-container-high/40 rounded-xl border-2 border-transparent hover:border-primary/30 transition-all cursor-pointer relative overflow-hidden group">
+                                    <img alt="Page 2 preview" class="w-full h-full object-cover opacity-50" src="https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=200&auto=format&fit=crop&q=80"/>
+                                    <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity bg-black/10">
+                                        <span class="material-symbols-outlined text-primary">visibility</span>
+                                    </div>
+                                </div>
+                                <div class="aspect-[3/4] bg-surface-container-high/20 rounded-xl border border-outline-variant/30 flex items-center justify-center text-on-surface-variant/40 text-xs font-bold uppercase tracking-wider font-label-sm">Page 3</div>
+                                <div class="aspect-[3/4] bg-surface-container-high/20 rounded-xl border border-outline-variant/30 flex items-center justify-center text-on-surface-variant/40 text-xs font-bold uppercase tracking-wider font-label-sm">Page 4</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Footer Buttons -->
+                    <div class="p-8 border-t border-outline-variant/20 bg-surface-container-low/30 flex justify-between items-center mt-auto">
+                        <button type="button" class="px-6 py-3 rounded-xl font-bold text-on-surface-variant hover:bg-surface-container transition-all invisible" id="btn-back">
+                            Back
+                        </button>
+                        <button type="button" class="bg-primary text-on-primary px-10 py-3 rounded-xl font-bold shadow-md btn-glow transition-all flex items-center gap-2" id="btn-continue">
+                            <span>Continue</span>
+                            <span class="material-symbols-outlined">arrow_forward</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-surface-container-low border-t border-outline-variant/30 py-12 px-gutter mt-auto">
+        <div class="max-w-container-max mx-auto px-gutter flex justify-between items-center flex-col sm:flex-row gap-4">
+            <a class="font-headline-md text-headline-md font-extrabold text-primary" href="index.html">AcademiaHub</a>
+            <p class="font-label-sm text-xs text-on-surface-variant opacity-60">© 2026 AcademiaHub. Empowering academic success.</p>
+        </div>
+    </footer>
+
+    <!-- Shared application logic -->
+    <script src="js/app.js"></script>
+    <script>
+        let currentStep = 1;
+        const totalSteps = 3;
+        let isFree = false;
+
+        const steps = {
+            1: document.getElementById('step-1'),
+            2: document.getElementById('step-2'),
+            3: document.getElementById('step-3')
+        };
+
+        const dots = {
+            1: document.getElementById('step-dot-1'),
+            2: document.getElementById('step-dot-2'),
+            3: document.getElementById('step-dot-3')
+        };
+
+        const btnContinue = document.getElementById('btn-continue');
+        const btnBack = document.getElementById('btn-back');
+
+        function updateUI() {
+            // Toggle visibility of step elements
+            Object.keys(steps).forEach(key => {
+                if (parseInt(key) === currentStep) {
+                    steps[key].classList.remove('hidden');
+                } else {
+                    steps[key].classList.add('hidden');
+                }
+            });
+
+            // Update steps dot indicators
+            Object.keys(dots).forEach(key => {
+                const stepNum = parseInt(key);
+                const dot = dots[key];
+                if (stepNum < currentStep) {
+                    dot.className = "w-10 h-10 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold transition-all duration-300";
+                    dot.innerHTML = '<span class="material-symbols-outlined text-lg flex items-center justify-center">check</span>';
+                } else if (stepNum === currentStep) {
+                    dot.className = "w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold shadow-md transition-all duration-300";
+                    dot.innerText = key;
+                } else {
+                    dot.className = "w-10 h-10 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center font-bold transition-all duration-300";
+                    dot.innerText = key;
+                }
+            });
+
+            // Back button toggle
+            if (currentStep === 1) {
+                btnBack.classList.add('invisible');
+            } else {
+                btnBack.classList.remove('invisible');
+            }
+
+            // Continue / Publish button text
+            if (currentStep === totalSteps) {
+                btnContinue.innerHTML = '<span>Publish Study Guide</span><span class="material-symbols-outlined">rocket_launch</span>';
+                btnContinue.onclick = publishNotes;
+            } else {
+                btnContinue.innerHTML = '<span>Continue</span><span class="material-symbols-outlined">arrow_forward</span>';
+                btnContinue.onclick = nextStep;
+            }
+        }
+
+        function nextStep() {
+            if (currentStep === 1) {
+                // If on Step 1, simulate selecting a file
+                simulateFileSelection();
+                return;
+            }
+            
+            if (currentStep === 2) {
+                // Validate fields in Step 2
+                const title = document.getElementById('note-title').value.trim();
+                const desc = document.getElementById('note-desc').value.trim();
+                const uni = document.getElementById('note-uni').value.trim();
+                const course = document.getElementById('note-course').value.trim();
+                const pages = document.getElementById('note-pages').value.trim();
+
+                if (!title || !desc || !uni || !course || !pages) {
+                    showNotification("Please fill in all details.", "error");
+                    return;
+                }
+            }
+
+            if (currentStep < totalSteps) {
+                currentStep++;
+                updateUI();
+            }
+        }
+
+        btnBack.addEventListener('click', () => {
+            if (currentStep > 1) {
+                currentStep--;
+                updateUI();
+            }
+        });
+
+        // Simulated File Select triggers
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input-hidden');
+
+        dropZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                document.getElementById('uploaded-filename').textContent = e.target.files[0].name;
+                currentStep = 2;
+                updateUI();
+                showNotification(`Selected file: ${e.target.files[0].name}`, "success");
+            }
+        });
+
+        function simulateFileSelection() {
+            // Helper if they click continue without selecting a file explicitly
+            document.getElementById('uploaded-filename').textContent = "biology_microbiology_cell_theory.pdf";
+            currentStep = 2;
+            updateUI();
+            showNotification("Uploaded draft cell_theory.pdf successfully!", "success");
+        }
+
+        // Price calculations
+        const notePriceInput = document.getElementById('note-price');
+        const earningsSplit = document.getElementById('earnings-split');
+        notePriceInput.addEventListener('input', (e) => {
+            let price = parseFloat(e.target.value) || 0;
+            earningsSplit.textContent = (price * 0.70).toFixed(2);
+        });
+
+        // Step 3 Toggles
+        const btnFree = document.getElementById('btn-free');
+        const btnPaid = document.getElementById('btn-paid');
+        const pricingDetails = document.getElementById('pricing-details');
+
+        btnFree.addEventListener('click', () => {
+            isFree = true;
+            btnFree.className = "px-8 py-2 rounded-lg font-bold transition-all text-sm bg-white shadow-sm text-primary";
+            btnPaid.className = "px-8 py-2 rounded-lg font-bold transition-all text-sm text-on-surface-variant";
+            pricingDetails.classList.add('hidden');
+        });
+
+        btnPaid.addEventListener('click', () => {
+            isFree = false;
+            btnPaid.className = "px-8 py-2 rounded-lg font-bold transition-all text-sm bg-white shadow-sm text-primary";
+            btnFree.className = "px-8 py-2 rounded-lg font-bold transition-all text-sm text-on-surface-variant";
+            pricingDetails.classList.remove('hidden');
+        });
+
+        // Publish Notes logic
+        function publishNotes() {
+            const userObj = JSON.parse(localStorage.getItem('current_user'));
+            if (!userObj) {
+                showNotification("Please log in to upload.", "error");
+                return;
+            }
+
+            const title = document.getElementById('note-title').value.trim();
+            const desc = document.getElementById('note-desc').value.trim();
+            const category = document.getElementById('note-category').value;
+            const uni = document.getElementById('note-uni').value.trim();
+            const course = document.getElementById('note-course').value.trim();
+            const year = document.getElementById('note-year').value;
+            const pages = parseInt(document.getElementById('note-pages').value) || 12;
+            const price = isFree ? 0 : parseFloat(notePriceInput.value) || 83.00;
+
+            if (!title || !desc || !uni || !course) {
+                showNotification("Please make sure all details are complete.", "error");
+                return;
+            }
+
+            // Create catalog element
+            const newNote = {
+                id: "uploaded_" + Date.now(),
+                title: title,
+                description: desc,
+                price: price,
+                seller: userObj.name,
+                sellerImage: userObj.profileImage,
+                rating: 5.0,
+                reviewsCount: 0,
+                category: category,
+                // Assign a beautiful unsplash image based on category keywords
+                image: getCategoryImage(category),
+                pages: pages,
+                university: uni,
+                course: course,
+                year: year,
+                uploadedDate: new Date().toISOString().split('T')[0]
+            };
+
+            // Write to catalog
+            const catalog = JSON.parse(localStorage.getItem('notes_catalog')) || [];
+            catalog.unshift(newNote);
+            localStorage.setItem('notes_catalog', JSON.stringify(catalog));
+
+            // Increment seller listed count
+            userObj.soldCount = (userObj.soldCount || 0) + 1;
+            localStorage.setItem('current_user', JSON.stringify(userObj));
+
+            // Notify
+            showNotification(`"${title}" published successfully!`, "success");
+
+            // Redirect
+            setTimeout(() => {
+                window.location.href = "browse.html?search=" + encodeURIComponent(title);
+            }, 1200);
+        }
+
+        function getCategoryImage(cat) {
+            const mapping = {
+                "Computer Science": "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&auto=format&fit=crop&q=80",
+                "Mathematics": "https://images.unsplash.com/photo-1509228468518-180dd4864904?w=600&auto=format&fit=crop&q=80",
+                "Engineering": "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&auto=format&fit=crop&q=80",
+                "Chemistry": "https://images.unsplash.com/photo-1507584991055-847a8952d1dc?w=600&auto=format&fit=crop&q=80",
+                "Biology": "https://images.unsplash.com/photo-1532187643603-ba119ca4109e?w=600&auto=format&fit=crop&q=80",
+                "Psychology": "https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=600&auto=format&fit=crop&q=80",
+                "Cybersecurity": "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?w=600&auto=format&fit=crop&q=80"
+            };
+            return mapping[cat] || "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=80";
+        }
+
+        // Initial setup
+        window.addEventListener('DOMContentLoaded', () => {
+            const userObj = JSON.parse(localStorage.getItem('current_user'));
+            if (userObj) {
+                document.getElementById('header-avatar').src = userObj.profileImage;
+                document.getElementById('note-uni').value = userObj.university;
+            }
+            updateUI();
+
+            // Search Bar enter
+            const navSearch = document.getElementById('nav-search');
+            navSearch.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && navSearch.value.trim() !== '') {
+                    window.location.href = `browse.html?search=${encodeURIComponent(navSearch.value.trim())}`;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

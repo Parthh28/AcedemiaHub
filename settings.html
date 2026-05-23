@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Account Settings | AcademiaHub</title>
+    
+    <!-- Compiled Static Tailwind CSS -->
+    <link href="css/tailwind.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    
+    <!-- Custom Style extensions -->
+    <link href="css/style.css" rel="stylesheet">
+    
+    <style>
+        .tab-active {
+            background-color: var(--primary);
+            color: var(--on-primary);
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none !important;
+            box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #4f46e5 !important;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md min-h-screen flex flex-col">
+
+    <!-- Top Navigation Bar -->
+    <header class="bg-surface/80 backdrop-blur-[20px] sticky top-0 z-50 border-b border-outline-variant/30 shadow-sm h-16 flex items-center">
+        <div class="flex justify-between items-center w-full px-gutter max-w-container-max mx-auto h-16">
+            <div class="flex items-center gap-8">
+                <a class="font-headline-md text-headline-md font-extrabold text-primary flex items-center gap-2" href="index.html">
+                    <span class="material-symbols-outlined text-primary text-3xl">school</span>
+                    <span>AcademiaHub</span>
+                </a>
+                <nav class="hidden md:flex items-center gap-6">
+                    <a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="browse.html">Browse</a>
+                    <a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="browse.html?ref=categories">Categories</a>
+                    <a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="browse.html?ref=sellers">Sellers</a>
+                </nav>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="relative hidden lg:block">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant opacity-60">search</span>
+                    <input id="nav-search" class="bg-surface-container-low border border-outline-variant/50 rounded-full pl-10 pr-4 py-2 w-64 focus:w-80 transition-all duration-300 text-body-md" placeholder="Search study notes..." type="text">
+                </div>
+                <button class="material-symbols-outlined text-on-surface-variant hover:bg-primary/5 p-2 rounded-full transition-all relative">
+                    notifications
+                </button>
+                <button class="material-symbols-outlined text-on-surface-variant hover:bg-primary/5 p-2 rounded-full transition-all cart-icon relative">
+                    shopping_cart
+                </button>
+                <div id="profile-picture-container" class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center overflow-hidden border-2 border-primary/10">
+                    <img id="header-avatar" alt="User profile" class="w-full h-full object-cover" src="">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex-grow flex max-w-container-max mx-auto w-full min-h-[calc(100vh-64px)]">
+        <!-- Side Navigation Bar -->
+        <aside class="hidden md:flex flex-col p-6 space-y-4 bg-surface/80 backdrop-blur-[20px] border-r border-outline-variant/20 w-64 sticky top-16 h-[calc(100vh-64px)] font-medium">
+            <div class="flex flex-col items-center py-6 border-b border-outline-variant/20 mb-4 text-center">
+                <img id="sidebar-avatar" alt="Student avatar" class="w-16 h-16 rounded-full mb-3 shadow-md border-2 border-primary/10 object-cover" src=""/>
+                <h3 id="sidebar-name" class="font-bold text-on-surface text-base">Alex Mercer</h3>
+                <p id="sidebar-major" class="text-xs text-on-surface-variant">Computer Science Junior</p>
+                <p id="sidebar-uni" class="text-[10px] text-primary font-bold uppercase mt-1">Stanford University</p>
+            </div>
+            <nav class="flex-grow space-y-1">
+                <a class="flex items-center gap-3 p-3 text-on-surface-variant hover:bg-primary/5 hover:text-primary transition-all duration-200 rounded-xl" href="buyer-dashboard.html">
+                    <span class="material-symbols-outlined">dashboard</span>
+                    <span class="text-sm font-semibold">My Study Hub</span>
+                </a>
+                <a class="flex items-center gap-3 p-3 text-on-surface-variant hover:bg-primary/5 hover:text-primary transition-all duration-200 rounded-xl" href="seller-dashboard.html">
+                    <span class="material-symbols-outlined">monetization_on</span>
+                    <span class="text-sm font-semibold">Seller Dashboard</span>
+                </a>
+                <a class="flex items-center gap-3 p-3 text-on-surface-variant hover:bg-primary/5 hover:text-primary transition-all duration-200 rounded-xl" href="upload.html">
+                    <span class="material-symbols-outlined">cloud_upload</span>
+                    <span class="text-sm font-semibold">Upload Materials</span>
+                </a>
+                <a class="flex items-center gap-3 p-3 bg-primary/10 text-primary font-bold rounded-xl transition-all duration-200" href="settings.html">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">settings</span>
+                    <span class="text-sm font-semibold">Settings</span>
+                </a>
+            </nav>
+            <div class="pt-4 space-y-1 border-t border-outline-variant/10">
+                <button id="logout-btn" class="w-full flex items-center gap-3 p-3 text-error hover:bg-error/5 rounded-xl transition-all text-left">
+                    <span class="material-symbols-outlined">logout</span>
+                    <span class="text-sm font-semibold">Switch Account</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content Canvas -->
+        <main class="flex-grow p-gutter overflow-y-auto">
+            <header class="mb-8">
+                <h1 class="text-3xl font-extrabold text-on-surface tracking-tight font-headline-lg">Account Settings</h1>
+                <p class="text-on-surface-variant text-sm mt-1">Configure your personal profile details, connected direct deposit information, and notifications.</p>
+            </header>
+
+            <div class="flex flex-col lg:flex-row gap-8">
+                <!-- Inner Sub-Tabs Navigation -->
+                <aside class="flex flex-row lg:flex-col overflow-x-auto lg:overflow-visible gap-2 pb-4 lg:pb-0 w-full lg:w-56 shrink-0 border-b lg:border-b-0 lg:border-r border-outline-variant/20 pr-0 lg:pr-6">
+                    <button id="nav-profile" onclick="switchSettingsTab('profile')" class="flex items-center gap-3 bg-primary text-on-primary rounded-xl px-4 py-3 text-left w-full transition-all shrink-0 hover:bg-primary/95">
+                        <span class="material-symbols-outlined">person</span>
+                        <span class="text-sm font-bold tracking-wide">Profile Settings</span>
+                    </button>
+                    <button id="nav-security" onclick="switchSettingsTab('security')" class="flex items-center gap-3 text-on-surface-variant hover:bg-primary/5 hover:text-primary rounded-xl px-4 py-3 text-left w-full transition-all shrink-0">
+                        <span class="material-symbols-outlined">security</span>
+                        <span class="text-sm font-bold tracking-wide">Security & 2FA</span>
+                    </button>
+                    <button id="nav-payment" onclick="switchSettingsTab('payment')" class="flex items-center gap-3 text-on-surface-variant hover:bg-primary/5 hover:text-primary rounded-xl px-4 py-3 text-left w-full transition-all shrink-0">
+                        <span class="material-symbols-outlined">payments</span>
+                        <span class="text-sm font-bold tracking-wide">Payout Details</span>
+                    </button>
+                    <button id="nav-notifications" onclick="switchSettingsTab('notifications')" class="flex items-center gap-3 text-on-surface-variant hover:bg-primary/5 hover:text-primary rounded-xl px-4 py-3 text-left w-full transition-all shrink-0">
+                        <span class="material-symbols-outlined">notifications</span>
+                        <span class="text-sm font-bold tracking-wide">Notifications</span>
+                    </button>
+                </aside>
+
+                <!-- Tabs Content Workspace -->
+                <div class="flex-grow">
+                    <!-- Profile Tab Panel -->
+                    <section id="tab-profile" class="settings-tab-panel block animate-in fade-in duration-300">
+                        <div class="bg-surface-container-lowest p-6 md:p-8 rounded-3xl border border-outline-variant/20 shadow-sm">
+                            <h2 class="text-xl font-bold text-on-surface mb-6">Personal Profile</h2>
+                            
+                            <div class="flex flex-col md:flex-row gap-8 items-start">
+                                <!-- Avatar Upload -->
+                                <div class="flex flex-col items-center">
+                                    <div class="relative group cursor-pointer" onclick="triggerAvatarChange()">
+                                        <div class="w-32 h-32 rounded-3xl overflow-hidden bg-surface-container-low border-2 border-outline-variant/30 flex items-center justify-center transition-all duration-300 group-hover:border-primary group-hover:shadow-lg group-hover:shadow-primary/20">
+                                            <img id="preview-avatar" alt="Avatar preview" class="w-full h-full object-cover" src="">
+                                            <div class="absolute inset-0 bg-on-background/60 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center transition-opacity rounded-3xl gap-1">
+                                                <span class="material-symbols-outlined text-surface text-3xl">photo_camera</span>
+                                                <span class="text-surface text-[10px] font-bold uppercase tracking-wider">Change</span>
+                                            </div>
+                                        </div>
+                                        <!-- Upload progress ring (shown during upload) -->
+                                        <div id="avatar-upload-ring" class="hidden absolute inset-0 rounded-3xl border-4 border-primary border-t-transparent animate-spin"></div>
+                                    </div>
+                                    <!-- Hidden file input -->
+                                    <input type="file" id="avatar-file-input" accept="image/jpeg,image/png,image/webp,image/gif" class="hidden">
+                                    <button onclick="triggerAvatarChange()" class="mt-3 text-xs text-primary font-bold hover:underline flex items-center gap-1">
+                                        <span class="material-symbols-outlined text-sm">upload</span>
+                                        Upload Photo
+                                    </button>
+                                    <p class="text-[10px] text-on-surface-variant mt-1 opacity-60">JPG, PNG, WebP · Max 2MB</p>
+                                </div>
+
+                                <!-- Form Grid -->
+                                <div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+                                    <div class="flex flex-col gap-2">
+                                        <label class="text-xs font-bold text-on-surface-variant uppercase tracking-wide">Full Name</label>
+                                        <input id="settings-name-input" class="bg-surface-container-low border border-outline-variant/30 focus:border-primary rounded-2xl px-4 py-3 text-on-surface text-sm transition-all" type="text" placeholder="Your name"/>
+                                    </div>
+                                    <div class="flex flex-col gap-2">
+                                        <label class="text-xs font-bold text-on-surface-variant uppercase tracking-wide">University</label>
+                                        <input id="settings-uni-input" class="bg-surface-container-low border border-outline-variant/30 focus:border-primary rounded-2xl px-4 py-3 text-on-surface text-sm transition-all" type="text" placeholder="Your university"/>
+                                    </div>
+                                    <div class="flex flex-col gap-2">
+                                        <label class="text-xs font-bold text-on-surface-variant uppercase tracking-wide">Major / Area of Study</label>
+                                        <input id="settings-major-input" class="bg-surface-container-low border border-outline-variant/30 focus:border-primary rounded-2xl px-4 py-3 text-on-surface text-sm transition-all" type="text" placeholder="Your major"/>
+                                    </div>
+                                    <div class="flex flex-col gap-2">
+                                        <label class="text-xs font-bold text-on-surface-variant uppercase tracking-wide">Academic Year</label>
+                                        <select id="settings-year-input" class="bg-surface-container-low border border-outline-variant/30 focus:border-primary rounded-2xl px-4 py-3 text-on-surface text-sm transition-all">
+                                            <option value="Freshman">Freshman</option>
+                                            <option value="Sophomore">Sophomore</option>
+                                            <option value="Junior">Junior</option>
+                                            <option value="Senior">Senior</option>
+                                            <option value="Graduate">Graduate</option>
+                                        </select>
+                                    </div>
+                                    <div class="flex flex-col gap-2 md:col-span-2">
+                                        <label class="text-xs font-bold text-on-surface-variant uppercase tracking-wide">University Email</label>
+                                        <div class="relative">
+                                            <input id="settings-email-input" class="w-full bg-surface-container/50 border border-outline-variant/20 rounded-2xl px-4 py-3 text-on-surface-variant text-sm cursor-not-allowed" disabled type="email"/>
+                                            <div class="absolute right-3 top-2.5 flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary rounded-full">
+                                                <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">verified</span>
+                                                <span class="text-[9px] uppercase font-bold tracking-wider">Verified Account</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex flex-col gap-2 md:col-span-2">
+                                        <label class="text-xs font-bold text-on-surface-variant uppercase tracking-wide">Bio Description</label>
+                                        <textarea id="settings-bio-input" class="bg-surface-container-low border border-outline-variant/30 focus:border-primary rounded-2xl px-4 py-3 text-on-surface text-sm transition-all" rows="3" placeholder="Share a short summary about your notes, courses, and educational background..."></textarea>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="mt-8 flex justify-end">
+                                <button onclick="saveUserProfile()" class="bg-primary text-on-primary px-8 py-3 rounded-2xl font-bold btn-glow transition-all">Save Profile Changes</button>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Security Tab Panel -->
+                    <section id="tab-security" class="settings-tab-panel hidden animate-in fade-in duration-300">
+                        <div class="bg-surface-container-lowest p-6 md:p-8 rounded-3xl border border-outline-variant/20 shadow-sm">
+                            <h2 class="text-xl font-bold text-on-surface mb-4">Security Settings</h2>
+                            <p class="text-on-surface-variant text-sm mb-6">Manage your account authentication protocols, passwords, and 2FA credentials.</p>
+                            
+                            <div class="space-y-6">
+                                <div class="flex items-center justify-between p-4 bg-surface-container-low/50 rounded-2xl border border-outline-variant/10">
+                                    <div>
+                                        <p class="font-bold text-on-surface text-sm">Two-Factor Authentication (2FA)</p>
+                                        <p class="text-xs text-on-surface-variant mt-0.5">Secure your transaction payouts and profile updates with an authenticator app.</p>
+                                    </div>
+                                    <button id="tfa-btn" onclick="toggleTwoFactor()" class="bg-primary text-on-primary px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-primary-hover">Enable 2FA</button>
+                                </div>
+
+                                <div class="flex items-center justify-between p-4 bg-surface-container-low/50 rounded-2xl border border-outline-variant/10">
+                                    <div>
+                                        <p class="font-bold text-on-surface text-sm">Change Account Password</p>
+                                        <p class="text-xs text-on-surface-variant mt-0.5">It's recommended to rotate your university-linked login passwords periodically.</p>
+                                    </div>
+                                    <button onclick="showNotification('A password reset link has been dispatched to your email.', 'info')" class="bg-surface hover:bg-primary/5 border border-outline-variant/30 text-primary px-5 py-2 rounded-xl text-xs font-bold transition-all">Reset Password</button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Payment Tab Panel -->
+                    <section id="tab-payment" class="settings-tab-panel hidden animate-in fade-in duration-300">
+                        <div class="bg-surface-container-lowest p-6 md:p-8 rounded-3xl border border-outline-variant/20 shadow-sm">
+                            <div class="flex justify-between items-center mb-6">
+                                <h2 class="text-xl font-bold text-on-surface">Payment & Direct Payouts</h2>
+                                <button onclick="showNotification('Adding a secondary payment method is disabled during hackathon demo.', 'info')" class="flex items-center gap-2 text-primary hover:text-primary-hover font-bold text-xs uppercase transition-all">
+                                    <span class="material-symbols-outlined text-sm">add_circle</span>
+                                    <span>Link Secondary Card</span>
+                                </button>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                                <!-- Visa representation card -->
+                                <div class="p-6 rounded-3xl bg-gradient-to-br from-primary-container to-primary text-on-primary relative overflow-hidden group shadow-md border border-primary/20">
+                                    <div class="absolute top-0 right-0 p-4 opacity-10 transform translate-x-4 -translate-y-4 group-hover:translate-x-2 group-hover:-translate-y-2 transition-transform">
+                                        <span class="material-symbols-outlined text-[120px]">payments</span>
+                                    </div>
+                                    <div class="relative z-10 flex flex-col justify-between h-36">
+                                        <div class="flex justify-between items-start">
+                                            <div class="px-2 py-0.5 bg-white/20 rounded-md font-mono text-[9px] uppercase tracking-widest font-bold">Seller Credit Card</div>
+                                            <span class="text-[10px] font-bold uppercase bg-white/10 px-2 py-0.5 rounded-full">Primary</span>
+                                        </div>
+                                        <div class="space-y-3">
+                                            <p class="font-mono text-sm tracking-[0.25em] font-medium">•••• •••• •••• 4242</p>
+                                            <div class="flex justify-between items-end">
+                                                <div>
+                                                    <p class="text-[8px] opacity-70 uppercase tracking-wider font-semibold">Card Holder</p>
+                                                    <p id="card-holder-name" class="font-bold text-xs font-sans">ALEX MERCER</p>
+                                                </div>
+                                                <div class="text-right">
+                                                    <p class="text-[8px] opacity-70 uppercase tracking-wider font-semibold">Expires</p>
+                                                    <p class="font-bold text-xs font-sans">11/28</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Add State link card -->
+                                <button onclick="showNotification('Connecting a new card is blocked in offline testing.', 'info')" class="border-2 border-dashed border-outline-variant/35 rounded-3xl p-6 flex flex-col items-center justify-center gap-3 text-on-surface-variant hover:border-primary hover:text-primary transition-all group min-h-36 bg-surface/20">
+                                    <div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+                                        <span class="material-symbols-outlined">add</span>
+                                    </div>
+                                    <p class="text-xs font-bold">Link New Bank Account or Card</p>
+                                </button>
+                            </div>
+
+                            <div class="border-t border-outline-variant/20 pt-6">
+                                <h3 class="font-bold text-on-surface text-base mb-4">Direct Deposit Setup</h3>
+                                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 bg-surface-container-low/50 rounded-2xl border border-outline-variant/10">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-12 h-12 bg-secondary/10 text-secondary rounded-2xl flex items-center justify-center">
+                                            <span class="material-symbols-outlined text-2xl">account_balance</span>
+                                        </div>
+                                        <div>
+                                            <p class="font-bold text-on-surface text-sm">Direct Deposit (ACH)</p>
+                                            <p class="text-xs text-on-surface-variant mt-0.5">Connected to Chase Bank checking account ending in ...9012</p>
+                                        </div>
+                                    </div>
+                                    <span class="bg-secondary text-on-secondary px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider font-sans">Active</span>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Notifications Tab Panel -->
+                    <section id="tab-notifications" class="settings-tab-panel hidden animate-in fade-in duration-300">
+                        <div class="bg-surface-container-lowest p-6 md:p-8 rounded-3xl border border-outline-variant/20 shadow-sm">
+                            <h2 class="text-xl font-bold text-on-surface mb-4">Notification Preferences</h2>
+                            <p class="text-on-surface-variant text-sm mb-6">Manage how you receive alerts, email logs, and transactional receipts.</p>
+                            
+                            <div class="space-y-6">
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="font-bold text-on-surface text-sm">Sales Alerts</p>
+                                        <p class="text-xs text-on-surface-variant mt-0.5">Receive immediate notifications when another student downloads your notes.</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" checked class="sr-only peer" id="pref-sales">
+                                        <div class="w-11 h-6 bg-outline-variant/50 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                    </label>
+                                </div>
+
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="font-bold text-on-surface text-sm">Review Flag Updates</p>
+                                        <p class="text-xs text-on-surface-variant mt-0.5">Get notified if your notes get flagged or cleared by system moderators.</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" checked class="sr-only peer" id="pref-flags">
+                                        <div class="w-11 h-6 bg-outline-variant/50 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                    </label>
+                                </div>
+
+                                <div class="flex items-center justify-between">
+                                    <div>
+                                        <p class="font-bold text-on-surface text-sm">Weekly Market Digest</p>
+                                        <p class="text-xs text-on-surface-variant mt-0.5">A recap of what course notes are currently trending at your university.</p>
+                                    </div>
+                                    <label class="relative inline-flex items-center cursor-pointer">
+                                        <input type="checkbox" class="sr-only peer" id="pref-digest">
+                                        <div class="w-11 h-6 bg-outline-variant/50 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-surface-container-low border-t border-outline-variant/30 py-12 px-gutter mt-auto">
+        <div class="max-w-container-max mx-auto px-gutter flex justify-between items-center flex-col sm:flex-row gap-4">
+            <a class="font-headline-md text-headline-md font-extrabold text-primary" href="index.html">AcademiaHub</a>
+            <p class="font-label-sm text-xs text-on-surface-variant opacity-60">© 2026 AcademiaHub. Empowering academic success.</p>
+        </div>
+    </footer>
+
+    <!-- Shared application logic -->
+    <script src="js/app.js"></script>
+    <script>
+        // Tab switching logic for settings panels
+        function switchSettingsTab(tabId) {
+            // Hide all tab panels
+            document.querySelectorAll('.settings-tab-panel').forEach(panel => {
+                panel.classList.add('hidden');
+                panel.classList.remove('block');
+            });
+
+            // Show selected tab panel
+            const activePanel = document.getElementById('tab-' + tabId);
+            activePanel.classList.remove('hidden');
+            activePanel.classList.add('block');
+
+            // Reset tab button states
+            document.querySelectorAll('aside button').forEach(btn => {
+                if (btn.id.startsWith('nav-')) {
+                    btn.className = "flex items-center gap-3 text-on-surface-variant hover:bg-primary/5 hover:text-primary rounded-xl px-4 py-3 text-left w-full transition-all shrink-0";
+                }
+            });
+
+            // Highlight selected button
+            const activeBtn = document.getElementById('nav-' + tabId);
+            activeBtn.className = "flex items-center gap-3 bg-primary text-on-primary rounded-xl px-4 py-3 text-left w-full transition-all shrink-0 hover:bg-primary/95";
+        }
+
+        // Load active user settings on load
+        function loadSettings() {
+            const userObj = JSON.parse(localStorage.getItem('current_user'));
+            if (!userObj) {
+                showNotification("Please log in to view account settings.", "error");
+                setTimeout(() => { window.location.href = "login.html"; }, 1000);
+                return;
+            }
+
+            // Bind top-nav avatar and sidebar avatar/details
+            document.getElementById('header-avatar').src = userObj.profileImage;
+            document.getElementById('sidebar-avatar').src = userObj.profileImage;
+            document.getElementById('sidebar-name').textContent = userObj.name;
+            document.getElementById('sidebar-major').textContent = `${userObj.major} • ${userObj.year}`;
+            document.getElementById('sidebar-uni').textContent = userObj.university;
+
+            // Bind form inputs
+            document.getElementById('preview-avatar').src = userObj.profileImage;
+            document.getElementById('settings-name-input').value = userObj.name;
+            document.getElementById('settings-uni-input').value = userObj.university;
+            document.getElementById('settings-major-input').value = userObj.major;
+            document.getElementById('settings-year-input').value = userObj.year || "Junior";
+            document.getElementById('settings-email-input').value = userObj.email;
+            
+            // Connected cards text
+            document.getElementById('card-holder-name').textContent = userObj.name.toUpperCase();
+
+            // Setup default bio if not already saved in localStorage
+            if (userObj.bio) {
+                document.getElementById('settings-bio-input').value = userObj.bio;
+            } else {
+                document.getElementById('settings-bio-input').value = "Honors student sharing structured lecture summaries, diagrams, and proof guides to ease course reviews.";
+            }
+
+            // Sync 2FA state if stored
+            const tfaEnabled = localStorage.getItem('2fa_enabled') === 'true';
+            const tfaBtn = document.getElementById('tfa-btn');
+            if (tfaEnabled) {
+                tfaBtn.textContent = 'Disable 2FA';
+                tfaBtn.className = 'bg-error text-on-error px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-error-container hover:text-error';
+            } else {
+                tfaBtn.textContent = 'Enable 2FA';
+                tfaBtn.className = 'bg-primary text-on-primary px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-primary-hover';
+            }
+
+            // Bind switch user logout
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                localStorage.removeItem('current_user');
+                window.location.href = "login.html";
+            });
+
+            // Nav search box bind
+            const navSearch = document.getElementById('nav-search');
+            navSearch.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && navSearch.value.trim() !== '') {
+                    window.location.href = `browse.html?search=${encodeURIComponent(navSearch.value.trim())}`;
+                }
+            });
+        }
+
+        // Save profile modifications back to localStorage
+        function saveUserProfile() {
+            const userObj = JSON.parse(localStorage.getItem('current_user'));
+            if (!userObj) return;
+
+            // Retrieve updated fields
+            const newName = document.getElementById('settings-name-input').value.trim();
+            const newUni = document.getElementById('settings-uni-input').value.trim();
+            const newMajor = document.getElementById('settings-major-input').value.trim();
+            const newYear = document.getElementById('settings-year-input').value;
+            const newBio = document.getElementById('settings-bio-input').value.trim();
+            const newAvatar = document.getElementById('preview-avatar').src;
+
+            if (newName === "") {
+                showNotification("Name field cannot be left blank.", "error");
+                return;
+            }
+
+            // Save to object
+            userObj.name = newName;
+            userObj.university = newUni;
+            userObj.major = newMajor;
+            userObj.year = newYear;
+            userObj.bio = newBio;
+            userObj.profileImage = newAvatar;
+
+            localStorage.setItem('current_user', JSON.stringify(userObj));
+
+            // Dynamically update page components instantly
+            document.getElementById('header-avatar').src = newAvatar;
+            document.getElementById('sidebar-avatar').src = newAvatar;
+            document.getElementById('sidebar-name').textContent = newName;
+            document.getElementById('sidebar-major').textContent = `${newMajor} • ${newYear}`;
+            document.getElementById('sidebar-uni').textContent = newUni;
+            document.getElementById('card-holder-name').textContent = newName.toUpperCase();
+
+            // Dispatch profile change notification
+            showNotification("Your profile changes have been saved successfully!", "success");
+
+            // Dispatch event to redraw dynamic parts (like top dropdown menu name/image if clicked)
+            window.dispatchEvent(new CustomEvent('userUpdated'));
+        }
+
+        // Toggle 2FA mock security state
+        function toggleTwoFactor() {
+            const tfaEnabled = localStorage.getItem('2fa_enabled') === 'true';
+            const tfaBtn = document.getElementById('tfa-btn');
+
+            if (tfaEnabled) {
+                localStorage.setItem('2fa_enabled', 'false');
+                tfaBtn.textContent = 'Enable 2FA';
+                tfaBtn.className = 'bg-primary text-on-primary px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-primary-hover';
+                showNotification("Two-Factor Authentication deactivated.", "info");
+            } else {
+                localStorage.setItem('2fa_enabled', 'true');
+                tfaBtn.textContent = 'Disable 2FA';
+                tfaBtn.className = 'bg-error text-on-error px-5 py-2 rounded-xl text-xs font-bold transition-all hover:bg-error-container hover:text-error';
+                showNotification("Two-Factor Authentication activated!", "success");
+            }
+        }
+
+        // ── Profile Picture Upload ─────────────────────────────────────────────
+        function triggerAvatarChange() {
+            document.getElementById('avatar-file-input').click();
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const fileInput = document.getElementById('avatar-file-input');
+            if (!fileInput) return;
+
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                // Validate type
+                const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+                if (!allowedTypes.includes(file.type)) {
+                    showNotification('Only JPG, PNG, WebP, or GIF images are allowed.', 'error');
+                    fileInput.value = '';
+                    return;
+                }
+
+                // Validate size (max 2MB)
+                const maxBytes = 2 * 1024 * 1024;
+                if (file.size > maxBytes) {
+                    showNotification(`Image is too large (${(file.size / 1024 / 1024).toFixed(1)}MB). Max is 2MB.`, 'error');
+                    fileInput.value = '';
+                    return;
+                }
+
+                // Show spinner
+                const ring = document.getElementById('avatar-upload-ring');
+                if (ring) ring.classList.remove('hidden');
+
+                // Read and convert to base64
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const base64 = event.target.result;
+
+                    // Live preview update
+                    const previewImg = document.getElementById('preview-avatar');
+                    previewImg.style.opacity = '0';
+                    previewImg.src = base64;
+                    previewImg.onload = () => {
+                        previewImg.style.transition = 'opacity 0.4s ease';
+                        previewImg.style.opacity = '1';
+                    };
+
+                    // Also update header + sidebar avatars immediately
+                    const headerAvatar = document.getElementById('header-avatar');
+                    const sidebarAvatar = document.getElementById('sidebar-avatar');
+                    if (headerAvatar) headerAvatar.src = base64;
+                    if (sidebarAvatar) sidebarAvatar.src = base64;
+
+                    // Hide spinner
+                    if (ring) ring.classList.add('hidden');
+
+                    showNotification('Photo loaded! Click "Save Profile Changes" to apply.', 'info');
+
+                    // Reset input so same file can be selected again
+                    fileInput.value = '';
+                };
+
+                reader.onerror = function() {
+                    if (ring) ring.classList.add('hidden');
+                    showNotification('Failed to read image file. Please try again.', 'error');
+                };
+
+                reader.readAsDataURL(file);
+            });
+        });
+
+        window.addEventListener('DOMContentLoaded', loadSettings);
+    </script>
+</body>
+</html>

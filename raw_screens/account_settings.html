@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Settings - AcademiaHub</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-secondary-fixed-variant": "#004c6e",
+                    "on-primary-fixed-variant": "#3323cc",
+                    "on-surface-variant": "#464555",
+                    "on-primary-container": "#dad7ff",
+                    "on-tertiary-fixed-variant": "#7b2f00",
+                    "on-error": "#ffffff",
+                    "surface-container-low": "#eff4ff",
+                    "surface-container-lowest": "#ffffff",
+                    "on-error-container": "#93000a",
+                    "tertiary-fixed": "#ffdbcc",
+                    "inverse-surface": "#213145",
+                    "surface-container-highest": "#d3e4fe",
+                    "error-container": "#ffdad6",
+                    "surface": "#f8f9ff",
+                    "on-secondary-fixed": "#001e2f",
+                    "surface-dim": "#cbdbf5",
+                    "outline-variant": "#c7c4d8",
+                    "on-secondary": "#ffffff",
+                    "secondary-fixed-dim": "#89ceff",
+                    "secondary-container": "#39b8fd",
+                    "on-tertiary-container": "#ffd2be",
+                    "tertiary-fixed-dim": "#ffb695",
+                    "on-tertiary-fixed": "#351000",
+                    "tertiary-container": "#a44100",
+                    "on-secondary-container": "#004666",
+                    "on-primary": "#ffffff",
+                    "primary-container": "#4f46e5",
+                    "primary": "#3525cd",
+                    "tertiary": "#7e3000",
+                    "background": "#f8f9ff",
+                    "surface-container": "#e5eeff",
+                    "on-tertiary": "#ffffff",
+                    "error": "#ba1a1a",
+                    "surface-tint": "#4d44e3",
+                    "surface-container-high": "#dce9ff",
+                    "on-background": "#0b1c30",
+                    "inverse-on-surface": "#eaf1ff",
+                    "primary-fixed-dim": "#c3c0ff",
+                    "primary-fixed": "#e2dfff",
+                    "secondary": "#006591",
+                    "on-primary-fixed": "#0f0069",
+                    "outline": "#777587",
+                    "surface-bright": "#f8f9ff",
+                    "secondary-fixed": "#c9e6ff",
+                    "inverse-primary": "#c3c0ff",
+                    "on-surface": "#0b1c30",
+                    "surface-variant": "#d3e4fe"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "24px",
+                    "margin-mobile": "16px",
+                    "margin-desktop": "40px",
+                    "unit": "8px",
+                    "container-max": "1280px"
+            },
+            "fontFamily": {
+                    "body-md": ["Inter"],
+                    "headline-lg-mobile": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "label-sm": ["JetBrains Mono"],
+                    "headline-lg": ["Inter"],
+                    "headline-md": ["Inter"]
+            },
+            "fontSize": {
+                    "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                    "headline-lg-mobile": ["24px", {"lineHeight": "1.2", "fontWeight": "700"}],
+                    "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                    "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+                    "label-sm": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "500"}],
+                    "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+                    "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .glass-sidebar {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .card-shadow {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            transition: all 200ms ease-out;
+        }
+        .card-shadow:hover {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
+        }
+        .tab-active {
+            position: relative;
+        }
+        .tab-active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #3525cd;
+        }
+        input:focus {
+            outline: none !important;
+            box-shadow: 0 0 0 2px #ffffff, 0 0 0 4px #4f46e5 !important;
+        }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md text-body-md min-h-screen">
+<!-- Top Navigation Bar -->
+<header class="sticky top-0 z-50 flex justify-between items-center w-full px-margin-desktop max-w-container-max mx-auto bg-surface/80 backdrop-blur-xl border-b border-outline-variant/30 h-16 shadow-sm">
+<div class="flex items-center gap-8">
+<span class="font-headline-md text-headline-md font-bold text-primary">AcademiaHub</span>
+<nav class="hidden md:flex items-center gap-6">
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Marketplace</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Dashboard</a>
+<a class="text-on-surface-variant hover:text-primary transition-colors font-body-md text-body-md" href="#">Revenue</a>
+<a class="text-primary font-bold border-b-2 border-primary font-body-md text-body-md" href="#">Settings</a>
+</nav>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 hover:bg-surface-container-low/50 rounded-full transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 hover:bg-surface-container-low/50 rounded-full transition-all duration-200">
+<span class="material-symbols-outlined" data-icon="shopping_cart">shopping_cart</span>
+</button>
+<div class="w-8 h-8 rounded-full bg-primary-fixed overflow-hidden border border-outline-variant/30 cursor-pointer">
+<img alt="User profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDqIsd9A9cJ3_4kgj57_Hg5vJGV4u1ICIXXaMIpNZNehX9arHq_EbYdx0Zr3ELEKkXEoZ-UcwM6bTgqUiXvaqThtrDLmmtRzY8skAdH7ob1_1mjERKvb63EpK9gDd_Q1lTU_LJWTLSYGmxxDg9_d5Fr_N9QjcMKq4qox3RKTEtn7dRTauV0uchCJTyzqtNDYZ4bV_r1aneomQDqzNte7Lfyl226s_LSGTvH1KvH8ZiK6KmIEkC97ZjS5M6c4CdqlgqveWE7QLqVy4nT"/>
+</div>
+</div>
+</header>
+<main class="max-w-container-max mx-auto px-margin-desktop py-12 flex flex-col md:flex-row gap-12">
+<!-- Sidebar Navigation (Desktop) -->
+<aside class="hidden md:flex flex-col w-64 gap-2">
+<h1 class="font-headline-md text-headline-md font-bold mb-6 text-on-background">Settings</h1>
+<nav class="flex flex-col gap-1">
+<button class="flex items-center gap-3 bg-primary-container text-on-primary-container rounded-xl px-4 py-3 transition-all scale-98" id="nav-profile" onclick="switchTab('profile')">
+<span class="material-symbols-outlined" data-icon="person">person</span>
+<span class="font-label-sm text-label-sm">Profile</span>
+</button>
+<button class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container-high rounded-xl px-4 py-3 transition-all hover:translate-x-1" id="nav-security" onclick="switchTab('security')">
+<span class="material-symbols-outlined" data-icon="security">security</span>
+<span class="font-label-sm text-label-sm">Security</span>
+</button>
+<button class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container-high rounded-xl px-4 py-3 transition-all hover:translate-x-1" id="nav-payment" onclick="switchTab('payment')">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+<span class="font-label-sm text-label-sm">Payment Methods</span>
+</button>
+<button class="flex items-center gap-3 text-on-surface-variant hover:bg-surface-container-high rounded-xl px-4 py-3 transition-all hover:translate-x-1" id="nav-notifications" onclick="switchTab('notifications')">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="font-label-sm text-label-sm">Notifications</span>
+</button>
+</nav>
+</aside>
+<!-- Content Canvas -->
+<div class="flex-1 space-y-8">
+<!-- Profile Tab Content -->
+<section class="tab-content block animate-in fade-in duration-500" id="tab-profile">
+<div class="space-y-8">
+<!-- Profile Header Card -->
+<div class="bg-surface-container-lowest p-gutter rounded-xl card-shadow border border-outline-variant/20">
+<h2 class="font-headline-md text-headline-md font-semibold mb-6">Profile Settings</h2>
+<div class="flex flex-col md:flex-row items-start gap-8">
+<!-- Avatar Upload Section -->
+<div class="relative group cursor-pointer">
+<div class="w-32 h-32 rounded-2xl overflow-hidden bg-surface-container-high border-2 border-dashed border-outline-variant flex items-center justify-center transition-all group-hover:border-primary">
+<img alt="User Avatar" class="w-full h-full object-cover" id="preview-avatar" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBycOJHYaBXE-9rE0jqiI7idXHop3SSpbmjiwi6u1UwxUp7V6a7cX55zh-RJMskYsHQFdGYBtHD8UYYj1abpubGiDkEqJXGrzVDAMq-dMp8F0oGto34ufYyIONa_8oe4cvyCn6uIu8bp7_GAQBD7_jmRMP45MTs_UjWr0N4Hbbqec58hl3DtoF_pMvQkL5LvYkTLZnvA3u_x8YDau5OWsy7IYipeCitMgL-ybQwkJggoCnWTsS-DKpoqJo0YvA26aHDJFsi6Q8F_p3M"/>
+<div class="absolute inset-0 bg-on-background/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+<span class="material-symbols-outlined text-surface" data-icon="photo_camera">photo_camera</span>
+</div>
+</div>
+<p class="mt-2 text-center font-label-sm text-label-sm text-on-surface-variant">Change Photo</p>
+</div>
+<!-- Personal Info Form -->
+<div class="flex-1 grid grid-cols-1 md:grid-cols-2 gap-6 w-full">
+<div class="flex flex-col gap-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Full Name</label>
+<input class="bg-surface-container-low border-none rounded-lg px-4 py-2.5 font-body-md text-body-md text-on-surface" type="text" value="Felix Thompson"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant">University</label>
+<input class="bg-surface-container-low border-none rounded-lg px-4 py-2.5 font-body-md text-body-md text-on-surface" type="text" value="Stanford University"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Major</label>
+<input class="bg-surface-container-low border-none rounded-lg px-4 py-2.5 font-body-md text-body-md text-on-surface" type="text" value="Computer Science &amp; Data Ethics"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant">University Email</label>
+<div class="relative">
+<input class="w-full bg-surface-container/50 border-none rounded-lg px-4 py-2.5 font-body-md text-body-md text-on-surface-variant cursor-not-allowed" disabled="" type="email" value="fthompson@stanford.edu"/>
+<div class="absolute right-3 top-2.5 flex items-center gap-1 px-2 py-0.5 bg-primary-container text-on-primary-container rounded-full">
+<span class="material-symbols-outlined text-[14px]" data-icon="verified" style="font-variation-settings: 'FILL' 1;">verified</span>
+<span class="font-label-sm text-[10px] uppercase font-bold">Verified</span>
+</div>
+</div>
+</div>
+<div class="flex flex-col gap-2 md:col-span-2">
+<label class="font-label-sm text-label-sm text-on-surface-variant">Bio</label>
+<textarea class="bg-surface-container-low border-none rounded-lg px-4 py-2.5 font-body-md text-body-md text-on-surface" rows="3">Specializing in undergraduate algorithms and ethical AI. Sharing my Stanford notes to help fellow CS students navigate through complex theory with simplified visualizations.</textarea>
+</div>
+</div>
+</div>
+<div class="mt-8 flex justify-end">
+<button class="bg-primary text-on-primary px-8 py-3 rounded-xl font-body-md font-semibold hover:-translate-y-0.5 hover:shadow-lg transition-all active:scale-95">Save Changes</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Payment Tab Content -->
+<section class="tab-content hidden animate-in slide-in-from-bottom-4 duration-500" id="tab-payment">
+<div class="space-y-8">
+<div class="bg-surface-container-lowest p-gutter rounded-xl card-shadow border border-outline-variant/20">
+<div class="flex justify-between items-center mb-8">
+<h2 class="font-headline-md text-headline-md font-semibold">Payment Methods</h2>
+<button class="flex items-center gap-2 text-primary font-bold hover:underline transition-all">
+<span class="material-symbols-outlined" data-icon="add_circle">add_circle</span>
+<span class="font-label-sm text-label-sm">Add New</span>
+</button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<!-- Visa Card -->
+<div class="p-6 rounded-2xl bg-gradient-to-br from-inverse-surface to-on-background text-inverse-on-surface relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-20 transform translate-x-4 -translate-y-4 group-hover:translate-x-2 group-hover:-translate-y-2 transition-transform">
+<span class="material-symbols-outlined text-8xl" data-icon="payments">payments</span>
+</div>
+<div class="relative z-10">
+<div class="flex justify-between items-start mb-12">
+<div class="w-12 h-8 bg-white/20 rounded flex items-center justify-center">
+<div class="w-8 h-5 bg-tertiary-fixed rounded-sm"></div>
+</div>
+<span class="font-label-sm text-label-sm opacity-60">Primary</span>
+</div>
+<div class="space-y-4">
+<p class="font-label-sm text-label-sm tracking-[0.2em]">•••• •••• •••• 4242</p>
+<div class="flex justify-between items-end">
+<div>
+<p class="text-[10px] opacity-60 uppercase">Card Holder</p>
+<p class="font-label-sm text-label-sm">FELIX THOMPSON</p>
+</div>
+<div>
+<p class="text-[10px] opacity-60 uppercase">Expires</p>
+<p class="font-label-sm text-label-sm">05/26</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Empty/Add State -->
+<button class="border-2 border-dashed border-outline-variant rounded-2xl p-6 flex flex-col items-center justify-center gap-3 text-on-surface-variant hover:border-primary hover:text-primary transition-all group">
+<div class="w-12 h-12 rounded-full bg-surface-container flex items-center justify-center group-hover:bg-primary-container transition-colors">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</div>
+<p class="font-label-sm text-label-sm font-bold">Link New Bank Account or Card</p>
+</button>
+</div>
+<div class="mt-12 pt-8 border-t border-outline-variant/30">
+<h3 class="font-headline-md text-headline-md font-semibold mb-4 text-sm">Payout Preferences</h3>
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 bg-secondary-container text-on-secondary-container rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined" data-icon="account_balance">account_balance</span>
+</div>
+<div>
+<p class="font-body-md text-body-md font-bold">Direct Deposit (ACH)</p>
+<p class="text-[12px] text-on-surface-variant">Connected to Chase Bank ending in ...9012</p>
+</div>
+</div>
+<span class="bg-tertiary text-on-tertiary px-3 py-1 rounded-full text-[10px] font-bold uppercase">Active</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Placeholder Tabs (Security/Notifications) -->
+<section class="tab-content hidden animate-in slide-in-from-bottom-4 duration-500" id="tab-security">
+<div class="bg-surface-container-lowest p-gutter rounded-xl card-shadow border border-outline-variant/20">
+<h2 class="font-headline-md text-headline-md font-semibold mb-6">Security Settings</h2>
+<p class="text-on-surface-variant mb-4">Manage your account protection and login methods.</p>
+<div class="space-y-4">
+<div class="flex items-center justify-between p-4 bg-surface-container-low rounded-xl">
+<div>
+<p class="font-body-md text-body-md font-bold">Two-Factor Authentication</p>
+<p class="text-sm text-on-surface-variant">Protect your account with an extra layer of security.</p>
+</div>
+<button class="bg-primary text-on-primary px-4 py-2 rounded-lg font-label-sm text-label-sm">Enable</button>
+</div>
+</div>
+</div>
+</section>
+<section class="tab-content hidden animate-in slide-in-from-bottom-4 duration-500" id="tab-notifications">
+<div class="bg-surface-container-lowest p-gutter rounded-xl card-shadow border border-outline-variant/20">
+<h2 class="font-headline-md text-headline-md font-semibold mb-6">Notification Preferences</h2>
+<div class="space-y-6">
+<div class="flex items-center justify-between">
+<div>
+<p class="font-body-md text-body-md font-bold">Sales Alerts</p>
+<p class="text-sm text-on-surface-variant">Notify me whenever someone purchases my materials.</p>
+</div>
+<input checked="" class="w-10 h-6 bg-primary-fixed rounded-full border-none focus:ring-primary appearance-none cursor-pointer relative checked:bg-primary after:content-[''] after:absolute after:left-1 after:top-1 after:w-4 after:h-4 after:bg-white after:rounded-full after:transition-all checked:after:translate-x-4" type="checkbox"/>
+</div>
+<div class="flex items-center justify-between">
+<div>
+<p class="font-body-md text-body-md font-bold">Marketplace Updates</p>
+<p class="text-sm text-on-surface-variant">Weekly digest of top performing study guides.</p>
+</div>
+<input class="w-10 h-6 bg-surface-variant rounded-full border-none focus:ring-primary appearance-none cursor-pointer relative checked:bg-primary after:content-[''] after:absolute after:left-1 after:top-1 after:w-4 after:h-4 after:bg-white after:rounded-full after:transition-all checked:after:translate-x-4" type="checkbox"/>
+</div>
+</div>
+</div>
+</section>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-lowest border-t border-outline-variant/50 mt-20">
+<div class="w-full py-12 px-margin-desktop max-w-container-max mx-auto flex flex-col md:flex-row justify-between items-center">
+<div class="mb-6 md:mb-0">
+<span class="font-headline-md text-headline-md font-bold text-on-surface">AcademiaHub</span>
+<p class="text-on-surface-variant mt-2 font-body-md text-body-md max-w-sm">The intellectual marketplace for students and researchers to share knowledge.</p>
+</div>
+<div class="flex flex-wrap justify-center gap-6">
+<a class="text-on-surface-variant hover:text-primary transition-all font-label-sm text-label-sm" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant hover:text-primary transition-all font-label-sm text-label-sm" href="#">Terms of Service</a>
+<a class="text-on-surface-variant hover:text-primary transition-all font-label-sm text-label-sm" href="#">Refunds</a>
+<a class="text-on-surface-variant hover:text-primary transition-all font-label-sm text-label-sm" href="#">Contact Support</a>
+</div>
+</div>
+<div class="text-center pb-8 opacity-80">
+<p class="font-label-sm text-label-sm">© 2024 AcademiaHub Marketplace. All rights reserved.</p>
+</div>
+</footer>
+<!-- Mobile Bottom Navigation -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 bg-surface/80 backdrop-blur-xl border-t border-outline-variant/20 h-16 flex justify-around items-center z-50">
+<button class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="text-[10px] font-bold">Home</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="search">search</span>
+<span class="text-[10px] font-bold">Search</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined" data-icon="settings" style="font-variation-settings: 'FILL' 1;">settings</span>
+<span class="text-[10px] font-bold">Settings</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+<span class="text-[10px] font-bold">Profile</span>
+</button>
+</nav>
+<script>
+        function switchTab(tabId) {
+            // Hide all tab content
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.add('hidden');
+                el.classList.remove('block');
+            });
+
+            // Show selected tab content
+            const activeTab = document.getElementById('tab-' + tabId);
+            activeTab.classList.remove('hidden');
+            activeTab.classList.add('block');
+
+            // Update sidebar navigation styles
+            document.querySelectorAll('aside button').forEach(btn => {
+                btn.classList.remove('bg-primary-container', 'text-on-primary-container', 'scale-98');
+                btn.classList.add('text-on-surface-variant', 'hover:bg-surface-container-high', 'hover:translate-x-1');
+            });
+
+            const activeBtn = document.getElementById('nav-' + tabId);
+            activeBtn.classList.add('bg-primary-container', 'text-on-primary-container', 'scale-98');
+            activeBtn.classList.remove('text-on-surface-variant', 'hover:bg-surface-container-high', 'hover:translate-x-1');
+        }
+
+        // Add micro-interaction for the avatar upload
+        document.querySelector('.group.cursor-pointer').addEventListener('click', () => {
+            alert('Opening system file picker for avatar upload...');
+        });
+    </script>
+</body></html>

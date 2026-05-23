@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Purchase Success | AcademiaHub</title>
+    
+    <!-- Tailwind CSS (Static Compiled Build) -->
+    <link href="css/tailwind.css" rel="stylesheet">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    
+    <!-- Custom Style extensions -->
+    <link href="css/style.css" rel="stylesheet">
+    
+    <style>
+        .success-animation {
+            animation: bounceIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes bounceIn {
+            0% { transform: scale(0.3); opacity: 0; }
+            50% { transform: scale(1.05); opacity: 1; }
+            70% { transform: scale(0.9); }
+            100% { transform: scale(1); }
+        }
+        @media print {
+            header, footer, nav, button, .no-print {
+                display: none !important;
+            }
+            main {
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+            .print-card {
+                border: none !important;
+                box-shadow: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md min-h-screen flex flex-col">
+
+    <!-- Top Navigation Bar -->
+    <header class="bg-surface/80 backdrop-blur-[20px] sticky top-0 z-50 border-b border-outline-variant/30 shadow-sm h-16 flex items-center no-print">
+        <div class="flex justify-between items-center w-full px-gutter max-w-container-max mx-auto h-16">
+            <div class="flex items-center gap-8">
+                <a class="font-headline-md text-headline-md font-extrabold text-primary flex items-center gap-2" href="index.html">
+                    <span class="material-symbols-outlined text-primary text-3xl">school</span>
+                    <span>AcademiaHub</span>
+                </a>
+                <nav class="hidden md:flex items-center gap-6">
+                    <a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="browse.html">Browse</a>
+                    <a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="browse.html?ref=categories">Categories</a>
+                    <a class="text-on-surface-variant hover:text-primary transition-colors duration-200" href="browse.html?ref=sellers">Sellers</a>
+                </nav>
+            </div>
+            <div class="flex items-center gap-4">
+                <div class="relative hidden lg:block">
+                    <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant opacity-60">search</span>
+                    <input id="nav-search" class="bg-surface-container-low border border-outline-variant/50 rounded-full pl-10 pr-4 py-2 w-64 focus:w-80 transition-all duration-300 text-body-md" placeholder="Search study notes..." type="text">
+                </div>
+                <button class="material-symbols-outlined text-on-surface-variant hover:bg-primary/5 p-2 rounded-full transition-all relative">
+                    notifications
+                </button>
+                <button class="material-symbols-outlined text-on-surface-variant hover:bg-primary/5 p-2 rounded-full transition-all cart-icon relative">
+                    shopping_cart
+                </button>
+                <button class="hidden md:flex bg-primary text-on-primary px-6 py-2 rounded-full font-bold btn-glow transition-all duration-200">
+                    Upload Notes
+                </button>
+                <div id="profile-picture-container" class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center overflow-hidden border-2 border-primary/10">
+                    <img id="header-avatar" alt="User profile" class="w-full h-full object-cover" src="">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-grow max-w-container-max mx-auto px-gutter py-12 w-full">
+        <!-- Success Hero -->
+        <section class="flex flex-col items-center text-center mb-16 success-animation no-print">
+            <div class="w-24 h-24 bg-primary/10 text-primary rounded-full flex items-center justify-center mb-6 shadow-lg shadow-primary/10">
+                <span class="material-symbols-outlined !text-5xl" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+            </div>
+            <h1 class="text-4xl font-extrabold text-on-surface mb-4">Purchase Confirmed!</h1>
+            <p id="success-hero-message" class="text-lg text-on-surface-variant max-w-2xl">
+                Great choice! Your new study materials are now available in your hub. Get ready to master your upcoming exams with these premium resources.
+            </p>
+            <div class="flex flex-wrap justify-center gap-4 mt-8">
+                <a href="buyer-dashboard.html" class="bg-primary text-on-primary px-8 py-4 rounded-2xl font-bold flex items-center gap-2 hover:shadow-xl hover:-translate-y-1 transition-all duration-200 active:scale-95">
+                    <span>Go to My Study Hub</span>
+                    <span class="material-symbols-outlined">arrow_forward</span>
+                </a>
+                <button onclick="window.print()" class="bg-surface-container-lowest text-primary border border-outline-variant/50 px-8 py-4 rounded-2xl font-bold hover:bg-surface-container-low transition-all active:scale-95">
+                    View & Print Receipt
+                </button>
+            </div>
+        </section>
+
+        <!-- Summary & Details Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16 print-card">
+            <!-- Items Summary -->
+            <div class="lg:col-span-2 bg-surface-container-lowest rounded-3xl p-8 border border-outline-variant/30 shadow-sm print-card">
+                <h2 class="text-xl font-bold mb-6 flex items-center gap-3 text-on-surface">
+                    <span class="material-symbols-outlined text-primary">receipt_long</span>
+                    <span>Order Summary</span>
+                </h2>
+                <div id="order-items-list" class="space-y-6">
+                    <!-- Dynamic Items list -->
+                </div>
+                <div class="mt-8 pt-6 border-t border-outline-variant/30 flex justify-between items-center">
+                    <span class="text-on-surface-variant font-semibold">Total Amount Paid</span>
+                    <span id="order-total-price" class="text-3xl font-extrabold text-primary">₹0.00</span>
+                </div>
+            </div>
+
+            <!-- Transaction Details -->
+            <div class="bg-primary text-on-primary rounded-3xl p-8 flex flex-col justify-between shadow-xl">
+                <div>
+                    <h2 class="text-xl font-bold mb-6">Transaction Details</h2>
+                    <ul class="space-y-5">
+                        <li class="flex flex-col">
+                            <span class="text-xs uppercase font-semibold tracking-wider opacity-70">Order ID</span>
+                            <span id="txn-order-id" class="text-lg font-bold">#AH-00000-00X</span>
+                        </li>
+                        <li class="flex flex-col">
+                            <span class="text-xs uppercase font-semibold tracking-wider opacity-70">Date</span>
+                            <span id="txn-date" class="text-lg font-bold">October 24, 2026</span>
+                        </li>
+                        <li class="flex flex-col">
+                            <span class="text-xs uppercase font-semibold tracking-wider opacity-70">Payment Method</span>
+                            <div class="flex items-center gap-2 mt-0.5">
+                                <span class="material-symbols-outlined text-md">credit_card</span>
+                                <span id="txn-payment-method" class="text-lg font-bold">Visa ending in 4242</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div class="mt-8 p-4 bg-white/10 rounded-2xl border border-white/20">
+                    <p class="text-sm text-on-primary/95 leading-relaxed">
+                        A confirmation details and receipt have been recorded. You can view all your purchases and download files directly in your <strong>Study Hub</strong>.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recommended For You Section -->
+        <section class="mt-20 no-print">
+            <div class="flex justify-between items-end mb-8">
+                <div>
+                    <h2 class="text-2xl font-extrabold text-on-surface">Recommended for You</h2>
+                    <p class="text-on-surface-variant mt-1">Based on your academic interests</p>
+                </div>
+                <a class="text-primary font-bold hover:underline flex items-center gap-1 text-sm" href="browse.html">
+                    <span>Explore Catalog</span>
+                    <span class="material-symbols-outlined text-sm">open_in_new</span>
+                </a>
+            </div>
+            <div id="recommended-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Loaded dynamically -->
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-surface-container-low py-8 px-gutter border-t border-outline-variant/30 mt-auto no-print">
+        <div class="max-w-container-max mx-auto px-gutter flex justify-between items-center flex-col sm:flex-row gap-4">
+            <a class="font-headline-md text-headline-md font-extrabold text-primary" href="index.html">AcademiaHub</a>
+            <p class="font-label-sm text-xs text-on-surface-variant opacity-60">© 2026 AcademiaHub. Empowering academic success.</p>
+        </div>
+    </footer>
+
+    <!-- Shared application logic -->
+    <script src="js/app.js"></script>
+    <script>
+        function initSuccessPage() {
+            const purchaseData = JSON.parse(localStorage.getItem('latest_purchase'));
+            const user = JSON.parse(localStorage.getItem('current_user'));
+
+            if (!purchaseData || !purchaseData.cart || purchaseData.cart.length === 0) {
+                // Fallback if no purchase data exists
+                showNotification("No recent purchase records found.", "info");
+                document.getElementById('order-items-list').innerHTML = `
+                    <div class="text-center py-12 text-on-surface-variant">
+                        <span class="material-symbols-outlined text-5xl opacity-40 mb-3">receipt</span>
+                        <p class="text-sm">No transaction details found.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // 1. Dynamic Hero Message
+            if (user) {
+                const firstName = user.name.split(' ')[0];
+                document.getElementById('success-hero-message').textContent = 
+                    `Great choice, ${firstName}! Your new study materials are now available in your hub. Get ready to master your upcoming exams with these premium resources.`;
+            }
+
+            // 2. Render Order Summary
+            const itemsList = document.getElementById('order-items-list');
+            itemsList.innerHTML = '';
+            purchaseData.cart.forEach(note => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'flex items-center gap-6 p-4 rounded-2xl hover:bg-surface-container-low/30 transition-all border border-transparent hover:border-outline-variant/20';
+                
+                const isFree = note.price === 0 || note.is_free;
+                const priceText = isFree ? 'Free' : `₹${note.price.toFixed(2)}`;
+
+                itemDiv.innerHTML = `
+                    <div class="w-16 h-20 rounded-xl overflow-hidden flex-shrink-0 border border-outline-variant/20 bg-surface-dim">
+                        <img class="w-full h-full object-cover" src="${note.image}" alt="${note.title}"/>
+                    </div>
+                    <div class="flex-grow min-w-0">
+                        <span class="font-label-sm text-[10px] text-primary uppercase bg-primary/10 px-2 py-0.5 rounded-full mb-1.5 inline-block">${note.subject || 'Study Notes'}</span>
+                        <h3 class="font-bold text-on-surface text-sm truncate">${note.title}</h3>
+                        <p class="text-xs text-on-surface-variant truncate">By ${note.seller} • ${note.university || 'IIT Bombay'}</p>
+                    </div>
+                    <div class="text-right flex-shrink-0">
+                        <span class="font-bold text-primary text-sm">${priceText}</span>
+                    </div>
+                `;
+                itemsList.appendChild(itemDiv);
+            });
+
+            // 3. Render Totals
+            const totalVal = purchaseData.totals ? purchaseData.totals.total : purchaseData.cart.reduce((sum, item) => sum + item.price, 0);
+            document.getElementById('order-total-price').textContent = `₹${totalVal.toFixed(2)}`;
+
+            // 4. Render Transaction Details
+            document.getElementById('txn-order-id').textContent = `#${purchaseData.orderId || 'AH-MOCK-101'}`;
+            document.getElementById('txn-date').textContent = new Date().toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            const methodIcon = document.querySelector('#txn-payment-method').previousElementSibling;
+            if (purchaseData.paymentMethod === 'credits') {
+                document.getElementById('txn-payment-method').textContent = 'Hub Credits Wallet';
+                if (methodIcon) methodIcon.textContent = 'token';
+            } else if (purchaseData.paymentMethod === 'free') {
+                document.getElementById('txn-payment-method').textContent = 'Free Direct Acquire';
+                if (methodIcon) methodIcon.textContent = 'download_done';
+            } else {
+                document.getElementById('txn-payment-method').textContent = 'Credit Card (Mocked)';
+                if (methodIcon) methodIcon.textContent = 'credit_card';
+            }
+
+            // Load Recommended Products
+            loadRecommendations();
+        }
+
+        let lastRecommendationsList = [];
+
+        async function loadRecommendations() {
+            try {
+                const response = await apiFetch('/notes?limit=4&status=live');
+                lastRecommendationsList = response.data?.notes || [];
+                renderRecommendations(lastRecommendationsList);
+            } catch (err) {
+                console.error("Failed to load recommendations:", err);
+                const grid = document.getElementById('recommended-grid');
+                grid.innerHTML = '<p class="col-span-full text-center text-sm text-on-surface-variant">Could not load recommendations.</p>';
+            }
+        }
+
+        function renderRecommendations(notes) {
+            const grid = document.getElementById('recommended-grid');
+            if (!notes || notes.length === 0) {
+                grid.innerHTML = '<p class="col-span-full text-center text-sm text-on-surface-variant">No recommendations available at this time.</p>';
+                return;
+            }
+
+            grid.innerHTML = '';
+            
+            const userObj = JSON.parse(localStorage.getItem('current_user'));
+            const currentUserId = userObj ? userObj.id : null;
+            const isLoggedIn = !!localStorage.getItem('accessToken');
+            const accessToken = localStorage.getItem('accessToken');
+            const cartIds = getCart().map(item => item.id);
+            const purchasedIds = getPurchasedNotes();
+
+            notes.forEach(note => {
+                const card = document.createElement('div');
+                card.className = 'group bg-surface-container-lowest rounded-2xl overflow-hidden border border-outline-variant/30 hover:shadow-xl transition-all duration-300 flex flex-col cursor-pointer';
+                card.onclick = () => window.location.href = `details.html?id=${note.id}`;
+
+                const priceText = note.price === 0 || note.is_free ? 'Free' : `₹${note.price.toFixed(2)}`;
+                const imgUrl = note.preview_url ? (note.preview_url.startsWith('http') ? note.preview_url : 'http://localhost:5000' + note.preview_url) : 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600';
+                const sellerName = note.seller ? `${note.seller.first_name || ''} ${note.seller.last_name || ''}`.trim() : 'Scholar';
+
+                let actionButtonHtml = '';
+                if (isLoggedIn && note.seller?.id === currentUserId) {
+                    actionButtonHtml = `
+                        <button class="p-2 bg-outline/10 text-on-surface/40 rounded-xl cursor-not-allowed flex items-center justify-center" onclick="event.stopPropagation(); showNotification('This is your own listed note!', 'info')" title="My Listing">
+                            <span class="material-symbols-outlined text-sm">person</span>
+                        </button>
+                    `;
+                } else if (purchasedIds.includes(note.id)) {
+                    actionButtonHtml = `
+                        <button onclick="event.stopPropagation(); window.open('http://localhost:5000/api/v1/notes/downloads/file/${note.id}${accessToken ? '?token='+accessToken : ''}', '_blank')" class="p-2 bg-secondary/15 text-secondary rounded-xl hover:bg-secondary hover:text-on-secondary transition-all active:scale-90 flex items-center justify-center" title="Download Purchased Note">
+                            <span class="material-symbols-outlined text-sm">download</span>
+                        </button>
+                    `;
+                } else if (note.is_free || note.price === 0) {
+                    actionButtonHtml = `
+                        <button onclick="event.stopPropagation(); window.open('http://localhost:5000/api/v1/notes/downloads/file/${note.id}${accessToken ? '?token='+accessToken : ''}', '_blank')" class="p-2 bg-secondary/15 text-secondary rounded-xl hover:bg-secondary hover:text-on-secondary transition-all active:scale-90 flex items-center justify-center" title="Download Free Note">
+                            <span class="material-symbols-outlined text-sm">download</span>
+                        </button>
+                    `;
+                } else if (cartIds.includes(note.id)) {
+                    actionButtonHtml = `
+                        <button onclick="event.stopPropagation(); window.location.href='cart.html'" class="p-2 bg-success/15 text-success rounded-xl hover:bg-success hover:text-on-success transition-all active:scale-90 flex items-center justify-center" title="Already in Cart - Go to Checkout">
+                            <span class="material-symbols-outlined text-sm">shopping_cart_checkout</span>
+                        </button>
+                    `;
+                } else {
+                    actionButtonHtml = `
+                        <button onclick="event.stopPropagation(); addToCart('${note.id}')" class="p-2 bg-primary/10 text-primary rounded-xl hover:bg-primary hover:text-on-primary transition-all active:scale-90 flex items-center justify-center" title="Add to Cart">
+                            <span class="material-symbols-outlined text-sm">add_shopping_cart</span>
+                        </button>
+                    `;
+                }
+
+                card.innerHTML = `
+                    <div class="h-40 overflow-hidden relative">
+                        <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" src="${imgUrl}" alt="${note.title}"/>
+                        <div class="absolute top-3 left-3">
+                            <span class="bg-surface/90 backdrop-blur-md text-primary font-bold text-[10px] px-2.5 py-0.5 rounded-full shadow-sm uppercase tracking-wider">${note.subject || 'Study Notes'}</span>
+                        </div>
+                    </div>
+                    <div class="p-5 flex-grow flex flex-col justify-between">
+                        <div>
+                            <h4 class="font-bold text-on-surface text-sm mb-1 line-clamp-1">${note.title}</h4>
+                            <p class="text-on-surface-variant text-xs mb-3">By ${sellerName}</p>
+                        </div>
+                        <div class="flex justify-between items-center pt-3 border-t border-outline-variant/10">
+                            <span class="font-bold text-primary text-sm">${priceText}</span>
+                            ${actionButtonHtml}
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        window.addEventListener('DOMContentLoaded', initSuccessPage);
+        window.addEventListener('cartUpdated', () => {
+            if (lastRecommendationsList && lastRecommendationsList.length > 0) {
+                renderRecommendations(lastRecommendationsList);
+            }
+        });
+        window.addEventListener('purchasesUpdated', () => {
+            if (lastRecommendationsList && lastRecommendationsList.length > 0) {
+                renderRecommendations(lastRecommendationsList);
+            }
+        });
+        window.addEventListener('userUpdated', () => {
+            if (lastRecommendationsList && lastRecommendationsList.length > 0) {
+                renderRecommendations(lastRecommendationsList);
+            }
+        });
+    </script>
+</body>
+</html>
