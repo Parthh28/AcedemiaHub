@@ -352,8 +352,8 @@
                     card.className = 'bg-surface-container-lowest rounded-3xl overflow-hidden border border-outline-variant/30 card-hover-premium group cursor-pointer shadow-sm flex flex-col justify-between';
                     card.onclick = () => window.location.href = `details.html?id=${note.id}`;
                     
-                    const noteImage = note.preview_url ? (note.preview_url.startsWith('http') ? note.preview_url : 'http://localhost:5000' + note.preview_url) : "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600";
-                    const sellerImage = note.seller?.profile_pic_url ? (note.seller.profile_pic_url.startsWith('http') ? note.seller.profile_pic_url : 'http://localhost:5000' + note.seller.profile_pic_url) : "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120";
+                    const noteImage = note.preview_url ? (note.preview_url.startsWith('http') ? note.preview_url : 'https://academiahub-backend-k2cq.onrender.com' + note.preview_url) : "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600";
+                    const sellerImage = note.seller?.profile_pic_url ? (note.seller.profile_pic_url.startsWith('http') ? note.seller.profile_pic_url : 'https://academiahub-backend-k2cq.onrender.com' + note.seller.profile_pic_url) : "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120";
                     const sellerName = note.seller ? `${note.seller.first_name || ''} ${note.seller.last_name || ''}`.trim() : 'Contributor';
                     const courseDept = note.subject || note.departments?.name || 'Study Material';
                     const rating = note.rating !== undefined && note.rating !== null ? parseFloat(note.rating).toFixed(1) : '5.0';

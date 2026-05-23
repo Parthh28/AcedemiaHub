@@ -229,7 +229,7 @@
     <script>
         function resolveUrl(url, fallback) {
             if (!url) return fallback;
-            return url.startsWith('http') ? url : 'http://localhost:5000' + url;
+            return url.startsWith('http') ? url : 'https://academiahub-backend-k2cq.onrender.com' + url;
         }
 
         async function loadDashboard() {
@@ -371,7 +371,7 @@
 
         function downloadNoteFile(noteId) {
             const token = localStorage.getItem('accessToken');
-            const url = `http://localhost:5000/api/v1/notes/downloads/file/${noteId}${token ? `?token=${token}` : ''}`;
+            const url = `https://academiahub-backend-k2cq.onrender.com/api/v1/notes/downloads/file/${noteId}${token ? `?token=${token}` : ''}`;
             window.open(url, '_blank');
         };
 

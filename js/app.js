@@ -822,7 +822,7 @@ async function syncUserWithBackend() {
       phone: dbUser.phone || '',
       upiId: dbUser.upi_id || '',
       role: dbUser.role || 'buyer',
-      profileImage: dbUser.profile_pic_url ? (dbUser.profile_pic_url.startsWith('http') ? dbUser.profile_pic_url : 'http://localhost:5000' + dbUser.profile_pic_url) : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80',
+      profileImage: dbUser.profile_pic_url ? (dbUser.profile_pic_url.startsWith('http') ? dbUser.profile_pic_url : 'https://academiahub-backend-k2cq.onrender.com' + dbUser.profile_pic_url) : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80',
       earnings: 0.0,
       soldCount: 0,
       balance: dbUser.balance || 0.0

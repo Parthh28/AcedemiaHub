@@ -287,7 +287,7 @@
                 card.onclick = () => window.location.href = `details.html?id=${note.id}`;
 
                 const priceText = note.price === 0 || note.is_free ? 'Free' : `₹${note.price.toFixed(2)}`;
-                const imgUrl = note.preview_url ? (note.preview_url.startsWith('http') ? note.preview_url : 'http://localhost:5000' + note.preview_url) : 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600';
+                const imgUrl = note.preview_url ? (note.preview_url.startsWith('http') ? note.preview_url : 'https://academiahub-backend-k2cq.onrender.com' + note.preview_url) : 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600';
                 const sellerName = note.seller ? `${note.seller.first_name || ''} ${note.seller.last_name || ''}`.trim() : 'Scholar';
 
                 let actionButtonHtml = '';
@@ -299,13 +299,13 @@
                     `;
                 } else if (purchasedIds.includes(note.id)) {
                     actionButtonHtml = `
-                        <button onclick="event.stopPropagation(); window.open('http://localhost:5000/api/v1/notes/downloads/file/${note.id}${accessToken ? '?token='+accessToken : ''}', '_blank')" class="p-2 bg-secondary/15 text-secondary rounded-xl hover:bg-secondary hover:text-on-secondary transition-all active:scale-90 flex items-center justify-center" title="Download Purchased Note">
+                        <button onclick="event.stopPropagation(); window.open('https://academiahub-backend-k2cq.onrender.com/api/v1/notes/downloads/file/${note.id}${accessToken ? '?token='+accessToken : ''}', '_blank')" class="p-2 bg-secondary/15 text-secondary rounded-xl hover:bg-secondary hover:text-on-secondary transition-all active:scale-90 flex items-center justify-center" title="Download Purchased Note">
                             <span class="material-symbols-outlined text-sm">download</span>
                         </button>
                     `;
                 } else if (note.is_free || note.price === 0) {
                     actionButtonHtml = `
-                        <button onclick="event.stopPropagation(); window.open('http://localhost:5000/api/v1/notes/downloads/file/${note.id}${accessToken ? '?token='+accessToken : ''}', '_blank')" class="p-2 bg-secondary/15 text-secondary rounded-xl hover:bg-secondary hover:text-on-secondary transition-all active:scale-90 flex items-center justify-center" title="Download Free Note">
+                        <button onclick="event.stopPropagation(); window.open('https://academiahub-backend-k2cq.onrender.com/api/v1/notes/downloads/file/${note.id}${accessToken ? '?token='+accessToken : ''}', '_blank')" class="p-2 bg-secondary/15 text-secondary rounded-xl hover:bg-secondary hover:text-on-secondary transition-all active:scale-90 flex items-center justify-center" title="Download Free Note">
                             <span class="material-symbols-outlined text-sm">download</span>
                         </button>
                     `;

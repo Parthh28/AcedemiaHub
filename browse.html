@@ -266,7 +266,7 @@
         // Helper: resolve image URLs
         function resolveUrl(url, fallback) {
             if (!url) return fallback;
-            return url.startsWith('http') ? url : 'http://localhost:5000' + url;
+            return url.startsWith('http') ? url : 'https://academiahub-backend-k2cq.onrender.com' + url;
         }
 
         // Build query params and fetch notes from the backend
@@ -397,13 +397,13 @@
                     `;
                 } else if (purchasedIds.includes(note.id)) {
                     actionButtonHtml = `
-                        <button class="w-8 h-8 rounded-full bg-secondary/15 text-secondary hover:bg-secondary hover:text-on-secondary flex items-center justify-center transition-all" onclick="event.stopPropagation(); window.open('http://localhost:5000/api/v1/notes/downloads/file/${note.id}${accessToken ? '?token='+accessToken : ''}', '_blank')" title="Download Purchased Note">
+                        <button class="w-8 h-8 rounded-full bg-secondary/15 text-secondary hover:bg-secondary hover:text-on-secondary flex items-center justify-center transition-all" onclick="event.stopPropagation(); window.open('https://academiahub-backend-k2cq.onrender.com/api/v1/notes/downloads/file/${note.id}${accessToken ? '?token='+accessToken : ''}', '_blank')" title="Download Purchased Note">
                             <span class="material-symbols-outlined text-base">download</span>
                         </button>
                     `;
                 } else if (note.is_free || note.price === 0) {
                     actionButtonHtml = `
-                        <button class="w-8 h-8 rounded-full bg-secondary/15 text-secondary hover:bg-secondary hover:text-on-secondary flex items-center justify-center transition-all" onclick="event.stopPropagation(); window.open('http://localhost:5000/api/v1/notes/downloads/file/${note.id}${accessToken ? '?token='+accessToken : ''}', '_blank')" title="Download Free Note">
+                        <button class="w-8 h-8 rounded-full bg-secondary/15 text-secondary hover:bg-secondary hover:text-on-secondary flex items-center justify-center transition-all" onclick="event.stopPropagation(); window.open('https://academiahub-backend-k2cq.onrender.com/api/v1/notes/downloads/file/${note.id}${accessToken ? '?token='+accessToken : ''}', '_blank')" title="Download Free Note">
                             <span class="material-symbols-outlined text-base">download</span>
                         </button>
                     `;

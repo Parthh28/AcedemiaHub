@@ -258,7 +258,7 @@
 
         function resolveUrl(url, fallback) {
             if (!url) return fallback;
-            return url.startsWith('http') ? url : 'http://localhost:5000' + url;
+            return url.startsWith('http') ? url : 'https://academiahub-backend-k2cq.onrender.com' + url;
         }
 
         function timeAgo(dateStr) {
@@ -380,7 +380,7 @@
                 addBtn.innerHTML = '<span class="material-symbols-outlined">download</span><span>Download Notes</span>';
                 addBtn.onclick = () => {
                     const token = localStorage.getItem('accessToken');
-                    const url = `http://localhost:5000/api/v1/notes/downloads/file/${activeNote.id}${token ? `?token=${token}` : ''}`;
+                    const url = `https://academiahub-backend-k2cq.onrender.com/api/v1/notes/downloads/file/${activeNote.id}${token ? `?token=${token}` : ''}`;
                     window.open(url, '_blank');
                 };
                 buyBtn.classList.add('hidden');
@@ -392,7 +392,7 @@
                 addBtn.innerHTML = '<span class="material-symbols-outlined">download</span><span>Download Free Notes</span>';
                 addBtn.onclick = () => {
                     const token = localStorage.getItem('accessToken');
-                    const url = `http://localhost:5000/api/v1/notes/downloads/file/${activeNote.id}${token ? `?token=${token}` : ''}`;
+                    const url = `https://academiahub-backend-k2cq.onrender.com/api/v1/notes/downloads/file/${activeNote.id}${token ? `?token=${token}` : ''}`;
                     window.open(url, '_blank');
                 };
                 buyBtn.classList.add('hidden');

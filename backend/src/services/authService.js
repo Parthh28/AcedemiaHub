@@ -166,10 +166,27 @@ async function updateProfile(userId, { firstName, lastName, phone, upiId, colleg
   return data;
 }
 
-async function updateAvatar(userId, avatarPath) {
+async function updateAvatar(userId, file) {
+  const ext = file.originalname.split('.').pop();
+  const fileName = `${userId}-${Date.now()}.${ext}`;
+
+  // Upload to Supabase Storage
+  const { data: uploadData, error: uploadError } = await supabase.storage
+    .from('avatars')
+    .upload(fileName, file.buffer, {
+      contentType: file.mimetype,
+      upsert: true
+    });
+
+  if (uploadError) throw uploadError;
+
+  // Get public URL
+  const { data: publicUrlData } = supabase.storage.from('avatars').getPublicUrl(fileName);
+  const avatarUrl = publicUrlData.publicUrl;
+
   const { data, error } = await supabase
     .from('users')
-    .update({ profile_pic_url: avatarPath, updated_at: new Date().toISOString() })
+    .update({ profile_pic_url: avatarUrl, updated_at: new Date().toISOString() })
     .eq('id', userId)
     .select('id, profile_pic_url')
     .single();

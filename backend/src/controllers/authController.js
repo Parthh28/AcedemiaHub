@@ -109,8 +109,7 @@ async function updateAvatar(req, res, next) {
     if (!req.file) {
       return badRequest(res, 'No avatar file uploaded');
     }
-    const avatarUrl = `/uploads/avatars/${req.file.filename}`;
-    const result = await authService.updateAvatar(req.user.id, avatarUrl);
+    const result = await authService.updateAvatar(req.user.id, req.file);
     return success(res, { profile_pic_url: result.profile_pic_url }, 'Avatar updated successfully');
   } catch (err) { next(err); }
 }

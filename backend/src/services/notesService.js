@@ -108,7 +108,26 @@ async function getNoteById(id, userId = null) {
 
 async function createNote({ sellerId, title, description, subject, departmentId, collegeId, year, price, isFree, tags, file, pageCount }) {
   const id = uuidv4();
-  const fileUrl = file ? `/uploads/notes/${file.filename}` : null;
+  let fileUrl = null;
+
+  if (file) {
+    const ext = file.originalname.split('.').pop();
+    const fileName = `${id}.${ext}`;
+    
+    // Upload to Supabase Storage
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('notes')
+      .upload(fileName, file.buffer, {
+        contentType: file.mimetype,
+        upsert: true
+      });
+
+    if (uploadError) throw uploadError;
+
+    // Get public URL
+    const { data: publicUrlData } = supabase.storage.from('notes').getPublicUrl(fileName);
+    fileUrl = publicUrlData.publicUrl;
+  }
 
   const { data: note, error } = await supabase
     .from('notes')

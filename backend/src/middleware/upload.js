@@ -1,28 +1,8 @@
-// src/middleware/upload.js — Multer file upload configuration
+// src/middleware/upload.js — Multer file upload configuration (Memory for Supabase Storage)
 const multer = require('multer');
 const path = require('path');
-const fs = require('fs');
 
-const UPLOAD_DIR = process.env.UPLOAD_DIR || './uploads';
-
-// Ensure directories exist
-['notes', 'previews', 'avatars'].forEach(dir => {
-  const fullPath = path.join(UPLOAD_DIR, dir);
-  if (!fs.existsSync(fullPath)) fs.mkdirSync(fullPath, { recursive: true });
-});
-
-function createStorage(subfolder) {
-  return multer.diskStorage({
-    destination: (req, file, cb) => {
-      cb(null, path.join(UPLOAD_DIR, subfolder));
-    },
-    filename: (req, file, cb) => {
-      const ext = path.extname(file.originalname);
-      const uniqueName = `${Date.now()}-${Math.random().toString(36).slice(2)}${ext}`;
-      cb(null, uniqueName);
-    }
-  });
-}
+const MAX_FILE_SIZE = parseInt(process.env.MAX_FILE_SIZE) || 52428800; // 50MB
 
 function fileFilter(allowedMimes) {
   return (req, file, cb) => {
@@ -34,10 +14,8 @@ function fileFilter(allowedMimes) {
   };
 }
 
-const MAX_FILE_SIZE = parseInt(process.env.MAX_FILE_SIZE) || 52428800; // 50MB
-
 const uploadNote = multer({
-  storage: createStorage('notes'),
+  storage: multer.memoryStorage(),
   limits: { fileSize: MAX_FILE_SIZE },
   fileFilter: fileFilter([
     'application/pdf',
@@ -49,8 +27,8 @@ const uploadNote = multer({
 });
 
 const uploadAvatar = multer({
-  storage: createStorage('avatars'),
-  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5MB limit for avatars
   fileFilter: fileFilter(['image/jpeg', 'image/png', 'image/webp'])
 });
 
