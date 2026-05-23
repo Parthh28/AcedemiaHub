@@ -22,7 +22,7 @@ const app = express();
 // ─── CORS ─────────────────────────────────────────────────────────────────────
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://127.0.0.1:5500';
 app.use(cors({
-  origin: [FRONTEND_URL, 'http://localhost:3000', 'http://localhost:5173'],
+  origin: [FRONTEND_URL, 'http://localhost:3000', 'http://localhost:5173', 'https://acedemia-hub.vercel.app'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
