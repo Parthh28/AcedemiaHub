@@ -260,7 +260,7 @@ const DEFAULT_NOTES = [
 ];
 
 // express API Configuration
-const API_BASE_URL = 'http://localhost:5000/api/v1';
+const API_BASE_URL = 'https://academiahub-backend-k2cq.onrender.com/api/v1';
 
 async function apiFetch(endpoint, options = {}) {
   const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`;
