@@ -15,7 +15,9 @@ const razorpayInstance = new Razorpay({
  * Helper: Verify Razorpay Signature
  */
 function verifySignature(orderId, paymentId, signature) {
-  if (process.env.RAZORPAY_KEY_SECRET === 'mock_rzp_secret') return true; // mock bypass
+  if (!process.env.RAZORPAY_KEY_SECRET || process.env.RAZORPAY_KEY_SECRET === 'mock_rzp_secret' || process.env.RAZORPAY_KEY_SECRET === 'mock') {
+    return true; // mock bypass
+  }
   
   const body = orderId + "|" + paymentId;
   const expectedSignature = crypto

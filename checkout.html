@@ -395,16 +395,42 @@
                         }
                     };
                     
-                    const rzp = new Razorpay(options);
-                    rzp.on('payment.failed', function (response){
-                        showNotification("Payment failed: " + response.error.description, "error");
-                        if (submitBtn) {
-                            submitBtn.disabled = false;
-                            submitBtn.innerHTML = '<span>Pay and Complete Order</span><span class="material-symbols-outlined">shopping_bag</span>';
-                        }
-                    });
-                    rzp.open();
-                }
+                    if (!paymentData.key || paymentData.key === 'mock_rzp_key' || paymentData.key === 'mock') {
+                        // Mock Gateway Flow for Hackathon
+                        showNotification("Mock Gateway: Auto-approving payment...", "info");
+                        setTimeout(async () => {
+                            try {
+                                showNotification("Payment authorized. Verifying...", "info");
+                                await apiFetch('/payments/verify-cart', {
+                                    method: 'POST',
+                                    body: {
+                                        razorpayOrderId: paymentData.razorpay_order_id,
+                                        razorpayPaymentId: "pay_MOCK_" + Date.now(),
+                                        razorpaySignature: "mock_signature"
+                                    }
+                                });
+                                await handlePaymentSuccess();
+                            } catch (verifyErr) {
+                                console.error("Verification failed:", verifyErr);
+                                showNotification(verifyErr.error?.message || "Payment verification failed.", "error");
+                                if (submitBtn) {
+                                    submitBtn.disabled = false;
+                                    submitBtn.innerHTML = '<span>Pay and Complete Order</span><span class="material-symbols-outlined">shopping_bag</span>';
+                                }
+                            }
+                        }, 1000);
+                    } else {
+                        // Real Razorpay Flow
+                        const rzp = new Razorpay(options);
+                        rzp.on('payment.failed', function (response){
+                            showNotification("Payment failed: " + response.error.description, "error");
+                            if (submitBtn) {
+                                submitBtn.disabled = false;
+                                submitBtn.innerHTML = '<span>Pay and Complete Order</span><span class="material-symbols-outlined">shopping_bag</span>';
+                            }
+                        });
+                        rzp.open();
+                    }
 
             } catch (err) {
                 console.error("Payment submission error:", err);
