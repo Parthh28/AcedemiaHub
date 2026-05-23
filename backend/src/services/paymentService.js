@@ -40,7 +40,7 @@ async function initiateCartPayment({ userId, amount }) {
       receipt: `rcpt_${uuidv4().substring(0,8)}`
     });
   } catch (err) {
-    if (process.env.RAZORPAY_KEY_ID === 'mock_rzp_key') {
+    if (!process.env.RAZORPAY_KEY_ID || process.env.RAZORPAY_KEY_ID === 'mock_rzp_key' || process.env.RAZORPAY_KEY_ID === 'mock') {
       order = { id: `order_MOCK_${Date.now()}` }; // Mock fallback for dev
     } else {
       throw err;
@@ -176,8 +176,8 @@ async function initiatePayment({ userId, notesId, amount }) {
       receipt: `rcpt_${uuidv4().substring(0,8)}`
     });
   } catch (err) {
-    if (process.env.RAZORPAY_KEY_ID === 'mock_rzp_key') {
-      order = { id: `order_MOCK_${Date.now()}` };
+    if (!process.env.RAZORPAY_KEY_ID || process.env.RAZORPAY_KEY_ID === 'mock_rzp_key' || process.env.RAZORPAY_KEY_ID === 'mock') {
+      order = { id: `order_MOCK_${Date.now()}` }; // Mock fallback for dev
     } else {
       throw err;
     }
