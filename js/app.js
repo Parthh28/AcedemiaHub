@@ -281,7 +281,7 @@ const isLocalhost = window.location.hostname === 'localhost' || window.location.
 const isLanOrTailscale = window.location.hostname.startsWith('192.168.') || window.location.hostname.startsWith('10.') || window.location.hostname.startsWith('100.');
 const IS_LOCAL = isLocalhost || isLanOrTailscale;
 const localBackendHost = window.location.hostname || '127.0.0.1';
-window.BACKEND_URL = IS_LOCAL ? (window.location.port === '5000' ? window.location.origin : `http://${localBackendHost}:5000`) : 'https://your-production-backend.com'; // REPLACE THIS with your actual live backend URL
+window.BACKEND_URL = IS_LOCAL ? (window.location.port === '5000' ? window.location.origin : `http://${localBackendHost}:5000`) : 'https://academiahub-backend-k2cq.onrender.com';
 const API_BASE_URL = `${window.BACKEND_URL}/api/v1`;
 
 async function apiFetch(endpoint, options = {}) {
