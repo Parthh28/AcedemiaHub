@@ -60,6 +60,13 @@
   background: var(--outline);
 }
 
+/* Sidebar scroll area */
+.filter-sidebar-scroll {
+  max-height: calc(100vh - 6rem);
+  overflow-y: auto;
+  padding-bottom: 1rem;
+}
+
 /* Glassmorphic Classes */
 .glass-card {
   background: rgba(255, 255, 255, 0.7) !important;

@@ -43,7 +43,7 @@
 <body class="bg-background text-on-surface font-body-md min-h-screen flex flex-col">
 
     <!-- Top Navigation Bar -->
-    <header class="bg-surface/80 backdrop-blur-[20px] sticky top-0 z-50 border-b border-outline-variant/30 shadow-sm h-16 flex items-center no-print">
+    <header class="bg-surface sticky top-0 z-50 border-b border-outline-variant/30 shadow-sm h-16 flex items-center no-print">
         <div class="flex justify-between items-center w-full px-gutter max-w-container-max mx-auto h-16">
             <div class="flex items-center gap-8">
                 <a class="font-headline-md text-headline-md font-extrabold text-primary flex items-center gap-2" href="index.html">
@@ -207,14 +207,19 @@
                 const isFree = note.price === 0 || note.is_free;
                 const priceText = isFree ? 'Free' : `₹${note.price.toFixed(2)}`;
 
+                const safeTitle = escapeHTML(note.title);
+                const safeSeller = escapeHTML(note.seller);
+                const safeUniversity = escapeHTML(note.university || 'IIT Bombay');
+                const safeSubject = escapeHTML(note.subject || 'Study Notes');
+
                 itemDiv.innerHTML = `
                     <div class="w-16 h-20 rounded-xl overflow-hidden flex-shrink-0 border border-outline-variant/20 bg-surface-dim">
-                        <img class="w-full h-full object-cover" src="${note.image}" alt="${note.title}"/>
+                        <img class="w-full h-full object-cover" src="${note.image}" alt="${safeTitle}"/>
                     </div>
                     <div class="flex-grow min-w-0">
-                        <span class="font-label-sm text-[10px] text-primary uppercase bg-primary/10 px-2 py-0.5 rounded-full mb-1.5 inline-block">${note.subject || 'Study Notes'}</span>
-                        <h3 class="font-bold text-on-surface text-sm truncate">${note.title}</h3>
-                        <p class="text-xs text-on-surface-variant truncate">By ${note.seller} • ${note.university || 'IIT Bombay'}</p>
+                        <span class="font-label-sm text-[10px] text-primary uppercase bg-primary/10 px-2 py-0.5 rounded-full mb-1.5 inline-block">${safeSubject}</span>
+                        <h3 class="font-bold text-on-surface text-sm truncate">${safeTitle}</h3>
+                        <p class="text-xs text-on-surface-variant truncate">By ${safeSeller} • ${safeUniversity}</p>
                     </div>
                     <div class="text-right flex-shrink-0">
                         <span class="font-bold text-primary text-sm">${priceText}</span>
@@ -237,13 +242,19 @@
 
             const methodIcon = document.querySelector('#txn-payment-method').previousElementSibling;
             if (purchaseData.paymentMethod === 'credits') {
-                document.getElementById('txn-payment-method').textContent = 'Hub Credits Wallet';
+                document.getElementById('txn-payment-method').textContent = 'Hub Credits';
                 if (methodIcon) methodIcon.textContent = 'token';
+            } else if (purchaseData.paymentMethod === 'upi') {
+                document.getElementById('txn-payment-method').textContent = 'Online';
+                if (methodIcon) methodIcon.textContent = 'qr_code_scanner';
+            } else if (purchaseData.paymentMethod === 'card') {
+                document.getElementById('txn-payment-method').textContent = 'Card';
+                if (methodIcon) methodIcon.textContent = 'credit_card';
             } else if (purchaseData.paymentMethod === 'free') {
                 document.getElementById('txn-payment-method').textContent = 'Free Direct Acquire';
                 if (methodIcon) methodIcon.textContent = 'download_done';
             } else {
-                document.getElementById('txn-payment-method').textContent = 'Credit Card (Mocked)';
+                document.getElementById('txn-payment-method').textContent = 'Online';
                 if (methodIcon) methodIcon.textContent = 'credit_card';
             }
 
@@ -287,8 +298,10 @@
                 card.onclick = () => window.location.href = `details.html?id=${note.id}`;
 
                 const priceText = note.price === 0 || note.is_free ? 'Free' : `₹${note.price.toFixed(2)}`;
-                const imgUrl = note.preview_url ? (note.preview_url.startsWith('http') ? note.preview_url : 'https://academiahub-backend-k2cq.onrender.com' + note.preview_url) : 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600';
-                const sellerName = note.seller ? `${note.seller.first_name || ''} ${note.seller.last_name || ''}`.trim() : 'Scholar';
+                const imgUrl = note.preview_url ? (note.preview_url.startsWith('http') ? note.preview_url : window.BACKEND_URL + note.preview_url) : 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600';
+                const sellerName = escapeHTML(note.seller ? `${note.seller.first_name || ''} ${note.seller.last_name || ''}`.trim() : 'Scholar');
+                const safeTitle = escapeHTML(note.title);
+                const safeSubject = escapeHTML(note.subject || 'Study Notes');
 
                 let actionButtonHtml = '';
                 if (isLoggedIn && note.seller?.id === currentUserId) {
@@ -299,13 +312,13 @@
                     `;
                 } else if (purchasedIds.includes(note.id)) {
                     actionButtonHtml = `
-                        <button onclick="event.stopPropagation(); window.open('https://academiahub-backend-k2cq.onrender.com/api/v1/notes/downloads/file/${note.id}${accessToken ? '?token='+accessToken : ''}', '_blank')" class="p-2 bg-secondary/15 text-secondary rounded-xl hover:bg-secondary hover:text-on-secondary transition-all active:scale-90 flex items-center justify-center" title="Download Purchased Note">
+                        <button onclick="event.stopPropagation(); downloadNote('${note.id}')" class="p-2 bg-secondary/15 text-secondary rounded-xl hover:bg-secondary hover:text-on-secondary transition-all active:scale-90 flex items-center justify-center" title="Download Purchased Note">
                             <span class="material-symbols-outlined text-sm">download</span>
                         </button>
                     `;
                 } else if (note.is_free || note.price === 0) {
                     actionButtonHtml = `
-                        <button onclick="event.stopPropagation(); window.open('https://academiahub-backend-k2cq.onrender.com/api/v1/notes/downloads/file/${note.id}${accessToken ? '?token='+accessToken : ''}', '_blank')" class="p-2 bg-secondary/15 text-secondary rounded-xl hover:bg-secondary hover:text-on-secondary transition-all active:scale-90 flex items-center justify-center" title="Download Free Note">
+                        <button onclick="event.stopPropagation(); downloadNote('${note.id}')" class="p-2 bg-secondary/15 text-secondary rounded-xl hover:bg-secondary hover:text-on-secondary transition-all active:scale-90 flex items-center justify-center" title="Download Free Note">
                             <span class="material-symbols-outlined text-sm">download</span>
                         </button>
                     `;
@@ -325,14 +338,14 @@
 
                 card.innerHTML = `
                     <div class="h-40 overflow-hidden relative">
-                        <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" src="${imgUrl}" alt="${note.title}"/>
+                        <img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" src="${imgUrl}" alt="${safeTitle}"/>
                         <div class="absolute top-3 left-3">
-                            <span class="bg-surface/90 backdrop-blur-md text-primary font-bold text-[10px] px-2.5 py-0.5 rounded-full shadow-sm uppercase tracking-wider">${note.subject || 'Study Notes'}</span>
+                            <span class="bg-surface/90 backdrop-blur-md text-primary font-bold text-[10px] px-2.5 py-0.5 rounded-full shadow-sm uppercase tracking-wider">${safeSubject}</span>
                         </div>
                     </div>
                     <div class="p-5 flex-grow flex flex-col justify-between">
                         <div>
-                            <h4 class="font-bold text-on-surface text-sm mb-1 line-clamp-1">${note.title}</h4>
+                            <h4 class="font-bold text-on-surface text-sm mb-1 line-clamp-1">${safeTitle}</h4>
                             <p class="text-on-surface-variant text-xs mb-3">By ${sellerName}</p>
                         </div>
                         <div class="flex justify-between items-center pt-3 border-t border-outline-variant/10">

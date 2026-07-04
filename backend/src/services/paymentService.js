@@ -3,6 +3,7 @@ const { v4: uuidv4 } = require('uuid');
 const supabase = require('../config/supabase');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
+const emailService = require('./emailService');
 
 const PLATFORM_COMMISSION = parseFloat(process.env.PLATFORM_COMMISSION) || 0.20;
 
@@ -31,7 +32,7 @@ function verifySignature(orderId, paymentId, signature) {
 /**
  * Initiate Cart Payment
  */
-async function initiateCartPayment({ userId, amount }) {
+async function initiateCartPayment({ userId, amount, transfers }) {
   if (amount <= 0) throw Object.assign(new Error('Amount must be greater than 0'), { status: 400 });
 
   let order;
@@ -39,7 +40,8 @@ async function initiateCartPayment({ userId, amount }) {
     order = await razorpayInstance.orders.create({
       amount: Math.round(amount * 100), // convert to paisa
       currency: 'INR',
-      receipt: `rcpt_${uuidv4().substring(0,8)}`
+      receipt: `rcpt_${uuidv4().substring(0,8)}`,
+      ...(transfers && transfers.length > 0 ? { transfers } : {})
     });
   } catch (err) {
     if (!process.env.RAZORPAY_KEY_ID || process.env.RAZORPAY_KEY_ID === 'mock_rzp_key' || process.env.RAZORPAY_KEY_ID === 'mock') {
@@ -93,7 +95,7 @@ async function verifyAndCompleteCartPurchase({ userId, razorpayOrderId, razorpay
   // 2. Fetch User Cart Items securely from backend
   const { data: cartItems, error: cartErr } = await supabase
     .from('cart_items')
-    .select(`id, notes_id, notes(id, price, is_free, seller_id, title, download_count)`)
+    .select(`id, notes_id, notes(id, price, is_free, seller_id, title, download_count, seller:users!seller_id(first_name, last_name))`)
     .eq('user_id', userId);
     
   if (cartErr || !cartItems || cartItems.length === 0) {
@@ -123,7 +125,11 @@ async function verifyAndCompleteCartPurchase({ userId, razorpayOrderId, razorpay
       status: 'completed'
     });
 
-    if (pErr && pErr.code === '23505') continue; // Skip if already purchased
+    if (pErr) {
+      if (pErr.code === '23505') continue; // Skip if already purchased
+      console.error("Purchase insert error:", pErr);
+      throw Object.assign(new Error(`Purchase failed: ${pErr.message}`), { status: 500 });
+    }
 
     // Earnings & Notifications for seller
     if (!note.is_free && note.seller_id !== userId) {
@@ -131,7 +137,7 @@ async function verifyAndCompleteCartPurchase({ userId, razorpayOrderId, razorpay
       const commission = grossAmount * PLATFORM_COMMISSION;
       const netAmount = grossAmount - commission;
 
-      await supabase.from('seller_earnings').insert({
+      const { error: earnErr } = await supabase.from('seller_earnings').insert({
         id: uuidv4(),
         seller_id: note.seller_id,
         notes_id: note.id,
@@ -141,6 +147,10 @@ async function verifyAndCompleteCartPurchase({ userId, razorpayOrderId, razorpay
         net_amount: netAmount,
         status: 'available'
       });
+      if (earnErr) {
+        console.error("Earnings insert error:", earnErr);
+        throw Object.assign(new Error(`Earnings failed: ${earnErr.message}`), { status: 500 });
+      }
 
       await supabase.from('notifications').insert({
         id: uuidv4(),
@@ -163,19 +173,39 @@ async function verifyAndCompleteCartPurchase({ userId, razorpayOrderId, razorpay
   // 5. Clear cart
   await supabase.from('cart_items').delete().eq('user_id', userId);
 
+  // Send purchase bill/receipt email asynchronously
+  try {
+    const { data: buyer } = await supabase.from('users').select('email, first_name, last_name').eq('id', userId).single();
+    if (buyer) {
+      const purchasedItems = cartItems.map(item => ({
+        title: item.notes.title,
+        price: item.notes.is_free ? 0 : item.notes.price,
+        sellerName: item.notes.seller ? `${item.notes.seller.first_name || ''} ${item.notes.seller.last_name || ''}`.trim() : 'Contributor'
+      }));
+      const totalAmount = cartItems.reduce((sum, item) => sum + (item.notes.is_free ? 0 : item.notes.price), 0);
+      const buyerName = `${buyer.first_name || ''} ${buyer.last_name || ''}`.trim() || buyer.email;
+      
+      emailService.sendPurchaseReceipt(buyer.email, buyerName, payment.id, new Date().toISOString(), purchasedItems, totalAmount)
+        .catch(err => console.error('Failed to send cart purchase receipt email:', err));
+    }
+  } catch (emailErr) {
+    console.error('Error initiating cart purchase receipt email:', emailErr);
+  }
+
   return { status: 'completed', items_processed: cartItems.length };
 }
 
 /**
  * Initiate Payment (Legacy single item checkout)
  */
-async function initiatePayment({ userId, notesId, amount }) {
+async function initiatePayment({ userId, notesId, amount, transfers }) {
   let order;
   try {
     order = await razorpayInstance.orders.create({
       amount: Math.round(amount * 100),
       currency: 'INR',
-      receipt: `rcpt_${uuidv4().substring(0,8)}`
+      receipt: `rcpt_${uuidv4().substring(0,8)}`,
+      ...(transfers && transfers.length > 0 ? { transfers } : {})
     });
   } catch (err) {
     if (!process.env.RAZORPAY_KEY_ID || process.env.RAZORPAY_KEY_ID === 'mock_rzp_key' || process.env.RAZORPAY_KEY_ID === 'mock') {
@@ -224,7 +254,7 @@ async function verifyAndCompletePurchase({ userId, notesId, razorpayOrderId, raz
     if (purchase) return { purchase_id: purchase.id, status: 'completed' };
   }
 
-  const { data: note } = await supabase.from('notes').select('id, seller_id, price, title, is_free, download_count').eq('id', notesId).single();
+  const { data: note } = await supabase.from('notes').select('id, seller_id, price, title, is_free, download_count, seller:users!seller_id(first_name, last_name)').eq('id', notesId).single();
   if (!note) throw Object.assign(new Error('Note not found'), { status: 404 });
 
   const purchaseId = uuidv4();
@@ -256,6 +286,24 @@ async function verifyAndCompletePurchase({ userId, notesId, razorpayOrderId, raz
 
   try { await supabase.rpc('increment_download_count', { note_id: notesId }); } 
   catch (err) { await supabase.from('notes').update({ download_count: (note.download_count || 0) + 1 }).eq('id', notesId); }
+
+  // Send purchase bill/receipt email asynchronously
+  try {
+    const { data: buyer } = await supabase.from('users').select('email, first_name, last_name').eq('id', userId).single();
+    if (buyer) {
+      const buyerName = `${buyer.first_name || ''} ${buyer.last_name || ''}`.trim() || buyer.email;
+      const purchasedItems = [{
+        title: note.title,
+        price: amountPaid,
+        sellerName: note.seller ? `${note.seller.first_name || ''} ${note.seller.last_name || ''}`.trim() : 'Contributor'
+      }];
+      
+      emailService.sendPurchaseReceipt(buyer.email, buyerName, purchaseId, new Date().toISOString(), purchasedItems, amountPaid)
+        .catch(err => console.error('Failed to send single purchase receipt email:', err));
+    }
+  } catch (emailErr) {
+    console.error('Error initiating single purchase receipt email:', emailErr);
+  }
 
   return { purchase_id: purchaseId, status: 'completed' };
 }

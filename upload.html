@@ -23,7 +23,7 @@
 <body class="bg-background text-on-background font-body-md min-h-screen flex flex-col">
 
     <!-- Top Navigation Bar -->
-    <header class="bg-surface/80 backdrop-blur-[20px] sticky top-0 z-50 border-b border-outline-variant/30 shadow-sm h-16 flex items-center">
+    <header class="bg-surface sticky top-0 z-50 border-b border-outline-variant/30 shadow-sm h-16 flex items-center">
         <div class="flex justify-between items-center w-full px-gutter max-w-container-max mx-auto h-16">
             <div class="flex items-center gap-8">
                 <a class="font-headline-md text-headline-md font-extrabold text-primary flex items-center gap-2" href="index.html">
@@ -140,10 +140,10 @@
                                 <div>
                                     <label class="block text-xs font-bold text-on-surface-variant uppercase font-label-sm tracking-wide mb-2">Year / Class Level</label>
                                     <select id="note-year" class="w-full bg-surface border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:border-primary rounded-xl py-3 px-4 font-body-md outline-none transition-all cursor-pointer">
-                                        <option>Freshman</option>
-                                        <option>Sophomore</option>
-                                        <option selected>Junior</option>
-                                        <option>Senior</option>
+                                        <option value="1">1st year</option>
+                                        <option value="2">2nd year</option>
+                                        <option value="3">3rd year</option>
+                                        <option value="4">4th year</option>
                                     </select>
                                 </div>
                                 <div>

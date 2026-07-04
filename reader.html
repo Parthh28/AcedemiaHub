@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Reader - Notes Marketplace</title>
+    
+    <!-- PDF.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+
+    <!-- Tailwind via CDN for quick styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3525cd',
+                        surface: '#121212',
+                        'on-surface': '#ffffff'
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Anti-Piracy Protections */
+        
+        /* 1. Disable text selection globally */
+        body {
+            -webkit-user-select: none; /* Safari */
+            -moz-user-select: none; /* Firefox */
+            -ms-user-select: none; /* IE10+/Edge */
+            user-select: none; /* Standard */
+            background-color: #121212;
+            color: #fff;
+            margin: 0;
+            overflow-x: hidden;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* 2. Print blocking: completely hide content when printing */
+        @media print {
+            body * {
+                display: none !important;
+            }
+            body::after {
+                content: "Printing is disabled for this secure document.";
+                display: block;
+                color: black;
+                font-size: 24px;
+                text-align: center;
+                padding-top: 50px;
+            }
+            body {
+                background-color: white !important;
+            }
+        }
+
+        /* Reader Layout */
+        #pdf-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            padding-top: 80px; /* Space for navbar */
+        }
+        
+        .pdf-page-canvas {
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            max-width: 100%;
+            background-color: white;
+            border-radius: 4px;
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: rgba(18, 18, 18, 0.9);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            z-index: 50;
+            justify-content: space-between;
+        }
+        
+        .loader {
+            border: 4px solid rgba(255,255,255,0.1);
+            border-top: 4px solid #3525cd;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 100px auto;
+        }
+
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        #watermark {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 5vw;
+            color: rgba(255, 255, 255, 0.03);
+            pointer-events: none;
+            z-index: 100;
+            white-space: nowrap;
+            user-select: none;
+        }
+    </style>
+</head>
+<body oncontextmenu="return false;"> <!-- Disable Right Click -->
+    
+    <div class="navbar">
+        <div class="flex items-center gap-4">
+            <button onclick="window.history.back()" class="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-bold transition-all">
+                &larr; Back
+            </button>
+            <h1 class="font-bold text-sm opacity-80">Secure Reader</h1>
+        </div>
+        <div class="text-xs opacity-50 font-mono">Protected by NotesMarketplace</div>
+    </div>
+
+    <div id="loading" class="loader"></div>
+    <div id="error-message" class="hidden text-center text-red-400 mt-20 font-bold p-4"></div>
+    
+    <div id="pdf-container"></div>
+    <div id="watermark"></div>
+
+    <script>
+        // Disable right-click explicitly via JS as well
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        // Keyboard shortcuts prevention (Ctrl+S, Ctrl+P, Ctrl+C)
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                const key = String.fromCharCode(e.which).toLowerCase();
+                if (['s', 'p', 'c', 'u'].includes(key)) {
+                    e.preventDefault();
+                    console.log('Action disabled');
+                }
+            }
+        });
+
+        // Set worker
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js';
+
+        async function loadPdf() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const noteId = urlParams.get('id');
+            const token = localStorage.getItem('accessToken');
+            
+            if (!noteId) {
+                showError("No document specified.");
+                return;
+            }
+            if (!token) {
+                showError("Authentication required. Please log in.");
+                return;
+            }
+
+            // Set watermark to user's email if possible, else generic
+            try {
+                const payload = JSON.parse(atob(token.split('.')[1]));
+                document.getElementById('watermark').innerText = payload.email || 'Protected Document';
+            } catch(e) {
+                document.getElementById('watermark').innerText = 'Protected Document';
+            }
+
+            try {
+                const apiUrl = `${window.BACKEND_URL}/api/v1/notes/downloads/file/${noteId}`;
+                
+                // Fetch the PDF using the token.
+                // The backend redirects to a signed URL. Fetch will follow the redirect.
+                const response = await fetch(apiUrl, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (!response.ok) {
+                    if (response.status === 403) throw new Error("You haven't purchased this document.");
+                    if (response.status === 401) throw new Error("Authentication failed.");
+                    throw new Error("Failed to load document.");
+                }
+
+                // Get binary data
+                const blob = await response.blob();
+                const arrayBuffer = await blob.arrayBuffer();
+                
+                document.getElementById('loading').style.display = 'none';
+
+                // Load the PDF document
+                const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+                const pdf = await loadingTask.promise;
+
+                const container = document.getElementById('pdf-container');
+                
+                // Render all pages
+                for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                    const page = await pdf.getPage(pageNum);
+                    
+                    // Determine scale based on screen width
+                    const viewport = page.getViewport({ scale: 1.5 });
+                    const canvas = document.createElement('canvas');
+                    canvas.className = 'pdf-page-canvas';
+                    const ctx = canvas.getContext('2d');
+                    
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+
+                    const renderContext = {
+                        canvasContext: ctx,
+                        viewport: viewport
+                    };
+                    
+                    container.appendChild(canvas);
+                    await page.render(renderContext).promise;
+                }
+                
+            } catch (err) {
+                document.getElementById('loading').style.display = 'none';
+                showError(err.message);
+            }
+        }
+
+        function showError(msg) {
+            const el = document.getElementById('error-message');
+            el.innerText = msg;
+            el.classList.remove('hidden');
+        }
+
+        window.addEventListener('DOMContentLoaded', loadPdf);
+    </script>
+</body>
+</html>

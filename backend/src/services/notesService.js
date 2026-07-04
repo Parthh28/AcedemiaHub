@@ -6,7 +6,7 @@ const NOTE_SELECT = `
   id, title, description, subject, year, price, is_free, status,
   file_url, file_size, page_count, preview_url, tags,
   rating, rating_count, download_count, created_at, published_at,
-  seller:users!seller_id(id, first_name, last_name, profile_pic_url, role),
+  seller:users!seller_id(id, first_name, last_name, profile_pic_url, role, college),
   department:departments(id, name, code, college_id),
   colleges(id, name, city)
 `;
@@ -37,7 +37,12 @@ async function listNotes({ page = 1, limit = 20, department, year, subject, minP
   }
 
   const { data, error, count } = await query;
-  if (error) throw error;
+  if (error) {
+    if (error.code === 'PGRST103' || error.message.includes('range not satisfiable')) {
+      return { notes: [], total: 0 };
+    }
+    throw error;
+  }
   return { notes: data, total: count };
 }
 
@@ -48,7 +53,7 @@ async function searchNotes({ q, department, year, sort, page = 1, limit = 20 }) 
     .from('notes')
     .select(NOTE_SELECT, { count: 'exact' })
     .eq('status', 'live')
-    .or(`title.ilike.%${q}%,description.ilike.%${q}%,subject.ilike.%${q}%,tags.ilike.%${q}%`)
+    .or(`title.ilike.%${q}%,description.ilike.%${q}%,subject.ilike.%${q}%`)
     .range(offset, offset + limit - 1);
 
   if (department) query = query.eq('department_id', department);
@@ -61,7 +66,12 @@ async function searchNotes({ q, department, year, sort, page = 1, limit = 20 }) 
   }
 
   const { data, error, count } = await query;
-  if (error) throw error;
+  if (error) {
+    if (error.code === 'PGRST103' || error.message.includes('range not satisfiable')) {
+      return { notes: [], total: 0 };
+    }
+    throw error;
+  }
   return { notes: data, total: count };
 }
 
@@ -78,7 +88,7 @@ async function getTrending({ limit = 10 }) {
   return data;
 }
 
-async function getNoteById(id, userId = null) {
+async function getNoteById(id, userId = null, userRole = null) {
   const { data: note, error } = await supabase
     .from('notes')
     .select(`${NOTE_SELECT}, rejection_reason`)
@@ -86,7 +96,7 @@ async function getNoteById(id, userId = null) {
     .single();
 
   if (error || !note) throw Object.assign(new Error('Note not found'), { status: 404 });
-  if (note.status !== 'live' && note.seller?.id !== userId) {
+  if (note.status !== 'live' && note.seller?.id !== userId && userRole !== 'admin') {
     throw Object.assign(new Error('Note not available'), { status: 403 });
   }
 
@@ -106,27 +116,37 @@ async function getNoteById(id, userId = null) {
   return { ...note, is_purchased: isPurchased };
 }
 
-async function createNote({ sellerId, title, description, subject, departmentId, collegeId, year, price, isFree, tags, file, pageCount }) {
+async function createNote({ sellerId, title, description, subject, departmentId, collegeId, year, price, isFree, tags, file, preview1, preview2, pageCount }) {
   const id = uuidv4();
   let fileUrl = null;
+  let previewUrls = [];
 
-  if (file) {
-    const ext = file.originalname.split('.').pop();
-    const fileName = `${id}.${ext}`;
-    
-    // Upload to Supabase Storage
-    const { data: uploadData, error: uploadError } = await supabase.storage
+  // Helper function to upload files
+  const uploadToSupabase = async (uploadFile, prefix) => {
+    const originalName = uploadFile.originalname || 'file.jpg';
+    const ext = originalName.split('.').pop();
+    const fileName = `${id}_${prefix}.${ext}`;
+    const { error: uploadError } = await supabase.storage
       .from('notes')
-      .upload(fileName, file.buffer, {
-        contentType: file.mimetype,
+      .upload(fileName, uploadFile.buffer, {
+        contentType: uploadFile.mimetype,
         upsert: true
       });
-
     if (uploadError) throw uploadError;
-
-    // Get public URL
     const { data: publicUrlData } = supabase.storage.from('notes').getPublicUrl(fileName);
-    fileUrl = publicUrlData.publicUrl;
+    return publicUrlData.publicUrl;
+  };
+
+  if (file) {
+    fileUrl = await uploadToSupabase(file, 'main');
+  }
+
+  if (preview1) {
+    previewUrls.push(await uploadToSupabase(preview1, 'prev1'));
+  }
+  
+  if (preview2) {
+    previewUrls.push(await uploadToSupabase(preview2, 'prev2'));
   }
 
   const { data: note, error } = await supabase
@@ -144,6 +164,7 @@ async function createNote({ sellerId, title, description, subject, departmentId,
       is_free: !!isFree,
       tags: JSON.stringify(tags || []),
       file_url: fileUrl,
+      preview_url: previewUrls.length > 0 ? JSON.stringify(previewUrls) : null,
       file_size: file?.size || 0,
       page_count: parseInt(pageCount) || 0,
       status: 'under_review'
@@ -154,12 +175,18 @@ async function createNote({ sellerId, title, description, subject, departmentId,
   if (error) throw error;
 
   // Add to moderation queue
-  await supabase.from('moderation_queue').insert({
-    id: uuidv4(),
-    notes_id: id,
-    status: 'pending',
-    submitted_at: new Date().toISOString()
-  });
+  const { error: modError } = await supabase
+    .from('moderation_queue')
+    .insert({
+      id: uuidv4(),
+      notes_id: id,
+      status: 'pending',
+      submitted_at: new Date().toISOString()
+    });
+
+  if (modError) console.error('Failed to add note to moderation queue:', modError);
+
+  if (error) throw error;
 
   return note;
 }
@@ -175,7 +202,7 @@ async function updateNote({ noteId, sellerId, updates }) {
   if (!existing) throw Object.assign(new Error('Note not found'), { status: 404 });
   if (existing.seller_id !== sellerId) throw Object.assign(new Error('Not authorized'), { status: 403 });
 
-  const allowedUpdates = ['title', 'description', 'subject', 'year', 'price', 'is_free', 'tags'];
+  const allowedUpdates = ['title', 'description', 'subject', 'year', 'price', 'is_free', 'tags', 'status'];
   const cleanUpdates = {};
   allowedUpdates.forEach(key => { if (updates[key] !== undefined) cleanUpdates[key] = updates[key]; });
   cleanUpdates.updated_at = new Date().toISOString();

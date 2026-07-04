@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS users (
   email_verified BOOLEAN DEFAULT false,
   phone VARCHAR(15),
   upi_id VARCHAR(100),
+  razorpay_account_id VARCHAR(100),
   bank_account_verified BOOLEAN DEFAULT false,
   refresh_token TEXT,
   reset_token TEXT,

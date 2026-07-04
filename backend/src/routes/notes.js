@@ -12,7 +12,11 @@ router.get('/by-department/:deptId', optionalAuth, ctrl.getNotesByDepartment);
 router.get('/:id', optionalAuth, ctrl.getNoteById);
 router.get('/:id/preview', ctrl.getNotePreview);
 
-router.post('/', authenticate, requireRole('seller'), uploadNote.single('file'), ctrl.createNote);
+router.post('/', authenticate, requireRole('seller'), uploadNote.fields([
+  { name: 'file', maxCount: 1 },
+  { name: 'preview1', maxCount: 1 },
+  { name: 'preview2', maxCount: 1 }
+]), ctrl.createNote);
 router.put('/:id', authenticate, requireRole('seller'), ctrl.updateNote);
 router.delete('/:id', authenticate, ctrl.deleteNote);
 

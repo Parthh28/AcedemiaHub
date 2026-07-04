@@ -85,7 +85,7 @@ async function seed() {
     },
     {
       id: uuidv4(), email: 'sneha@student.iitb.ac.in', password_hash,
-      first_name: 'Sneha', last_name: 'Patel', role: 'buyer',
+      first_name: 'Sneha', last_name: 'Patel', role: 'both',
       status: 'active', email_verified: true, college_id: iitBombay.id,
       department_id: cseDept.id, year: 2
     },
@@ -103,8 +103,8 @@ async function seed() {
 
   // ─── Notes ─────────────────────────────────────────────────────────────────
   const seller1 = users[1]; // Priya
-  const seller2 = users[2]; // Rahul
-  const seller3 = users[4]; // Arjun
+  const seller2 = users[3]; // Sneha
+  const seller3 = users[1]; // Fallback to Priya
 
   const notes = [
     {
@@ -258,46 +258,9 @@ async function seed() {
     id: uuidv4(), notes_id: mlNote.id, status: 'pending', submitted_at: new Date().toISOString()
   }], { onConflict: 'id' });
 
-  // ─── Sample Purchases ──────────────────────────────────────────────────────
-  const buyer = users[3]; // Sneha
-  const dbmsNote = notes[0];
-  const purchaseId = uuidv4();
+    // Removed dummy sales generation per user request
 
-  const { error: purchaseErr } = await supabase.from('purchases').upsert([{
-    id: purchaseId, buyer_id: buyer.id, notes_id: dbmsNote.id,
-    amount_paid: dbmsNote.price, payment_method: 'upi', status: 'completed'
-  }], { onConflict: 'buyer_id,notes_id' });
 
-  if (!purchaseErr) {
-    // Seller earnings for this purchase
-    const commission = dbmsNote.price * 0.20;
-    await supabase.from('seller_earnings').upsert([{
-      id: uuidv4(), seller_id: seller1.id, notes_id: dbmsNote.id, purchase_id: purchaseId,
-      gross_amount: dbmsNote.price, platform_commission: commission,
-      net_amount: dbmsNote.price - commission, status: 'available'
-    }], { onConflict: 'id' });
-
-    // Seed starting credits of 1500 (15,000 HC) for Sneha to allow testing credit purchases
-    await supabase.from('seller_earnings').upsert([{
-      id: uuidv4(), seller_id: buyer.id, notes_id: dbmsNote.id, purchase_id: purchaseId,
-      gross_amount: 1500, platform_commission: 0,
-      net_amount: 1500, status: 'available'
-    }], { onConflict: 'id' });
-
-    // Sample review
-    await supabase.from('reviews').upsert([{
-      id: uuidv4(), notes_id: dbmsNote.id, reviewer_id: buyer.id,
-      rating: 5, review_text: 'Excellent notes! Very clear explanations with perfect examples. Helped me ace my semester exam.'
-    }], { onConflict: 'notes_id,reviewer_id' });
-
-    console.log('✅ Seeded sample purchase + earnings (including Sneha wallet balance) + review');
-  }
-
-  // ─── Sample Notifications ──────────────────────────────────────────────────
-  await supabase.from('notifications').upsert([
-    { id: uuidv4(), user_id: seller1.id, type: 'sale', title: 'New Sale! 🎉', message: 'Sneha Patel purchased "DBMS Complete Notes" for ₹249.', related_id: purchaseId, read: false },
-    { id: uuidv4(), user_id: seller1.id, type: 'review', title: 'New Review Received ⭐', message: '"DBMS Complete Notes" got a 5-star review!', read: false }
-  ], { onConflict: 'id' });
 
   console.log('\n🎉 Seed complete!\n');
   console.log('📌 Test accounts (password: Password@123):');

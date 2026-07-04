@@ -14,11 +14,19 @@
     
     <!-- Custom Style extensions -->
     <link href="css/style.css" rel="stylesheet">
+    
+    <!-- PDF Export Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body class="bg-surface text-on-surface font-body-md min-h-screen flex flex-col">
 
     <!-- Top Navigation Bar -->
-    <header class="bg-surface/80 backdrop-blur-[20px] sticky top-0 z-50 border-b border-outline-variant/30 shadow-sm h-16 flex items-center">
+    <header class="bg-surface sticky top-0 z-50 border-b border-outline-variant/30 shadow-sm h-16 flex items-center">
         <div class="flex justify-between items-center w-full px-gutter max-w-container-max mx-auto h-16">
             <div class="flex items-center gap-8">
                 <a class="font-headline-md text-headline-md font-extrabold text-primary flex items-center gap-2" href="index.html">
@@ -51,7 +59,7 @@
 
     <div class="flex-grow flex max-w-container-max mx-auto w-full min-h-[calc(100vh-64px)]">
         <!-- Side Navigation Bar -->
-        <aside class="hidden md:flex flex-col p-6 space-y-4 bg-surface/80 backdrop-blur-[20px] border-r border-outline-variant/20 w-64 sticky top-16 h-[calc(100vh-64px)] font-medium">
+        <aside class="hidden md:flex flex-col p-6 space-y-4 bg-surface border-r border-outline-variant/20 w-64 sticky top-16 h-[calc(100vh-64px)] font-medium overflow-y-auto custom-scrollbar">
             <div class="flex flex-col items-center py-6 border-b border-outline-variant/20 mb-4 text-center">
                 <img id="sidebar-avatar" alt="Student avatar" class="w-16 h-16 rounded-full mb-3 shadow-md border-2 border-primary/10 object-cover" src=""/>
                 <h3 id="sidebar-name" class="font-bold text-on-surface text-base">Alex Mercer</h3>
@@ -65,7 +73,7 @@
                 </a>
                 <a class="flex items-center gap-3 p-3 bg-primary/10 text-primary font-bold rounded-xl transition-all duration-200" href="seller-dashboard.html">
                     <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">monetization_on</span>
-                    <span class="text-sm font-semibold">Seller Dashboard</span>
+                    <span class="text-sm font-semibold">Earnings & Sales</span>
                 </a>
                 <a class="flex items-center gap-3 p-3 text-on-surface-variant hover:bg-primary/5 hover:text-primary transition-all duration-200 rounded-xl" href="upload.html">
                     <span class="material-symbols-outlined">cloud_upload</span>
@@ -85,10 +93,10 @@
         </aside>
 
         <!-- Main Content Canvas -->
-        <main class="flex-grow p-gutter overflow-y-auto">
-            <header class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <main class="flex-grow p-8 overflow-y-auto">
+            <header class="flex justify-between items-center mb-8">
                 <div>
-                    <h1 class="text-3xl font-extrabold text-on-surface tracking-tight font-headline-lg">Seller Dashboard</h1>
+                    <h1 class="text-3xl font-extrabold text-on-surface tracking-tight font-headline-lg">Earnings & Sales</h1>
                     <p class="text-on-surface-variant text-sm mt-1">Monitor your shop sales, uploaded study resources, and platform insights.</p>
                 </div>
                 <button onclick="window.location.href='upload.html'" class="bg-primary text-on-primary px-6 py-3 rounded-2xl font-bold btn-glow transition-all flex items-center justify-center gap-2">
@@ -98,7 +106,7 @@
             </header>
 
             <!-- Stats Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
                 <!-- Monthly Revenue Card -->
                 <div class="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/20 shadow-sm flex items-start justify-between">
                     <div>
@@ -109,8 +117,17 @@
                             <span>+12.4% this month</span>
                         </div>
                     </div>
-                    <div class="bg-primary/10 p-3 rounded-2xl text-primary">
-                        <span class="material-symbols-outlined">payments</span>
+                </div>
+
+                <!-- Total Spent Card -->
+                <div class="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/20 shadow-sm flex items-start justify-between">
+                    <div>
+                        <p class="text-on-surface-variant text-xs font-bold uppercase tracking-wider font-label-sm mb-1 opacity-70">Total Spent</p>
+                        <h2 id="total-spent-val" class="text-4xl font-extrabold text-error">₹0.00</h2>
+                        <div class="flex items-center text-error gap-1 mt-2 text-xs font-bold">
+                            <span class="material-symbols-outlined text-sm">shopping_cart</span>
+                            <span>Notes purchased</span>
+                        </div>
                     </div>
                 </div>
 
@@ -163,24 +180,9 @@
                         </div>
                     </div>
                     
-                    <!-- SVG Chart -->
-                    <div class="relative h-[240px] w-full bg-surface-container-low/40 rounded-2xl border border-outline-variant/10 overflow-hidden">
-                        <div class="absolute inset-0 flex items-end justify-between p-4 pb-10">
-                            <svg class="w-full h-full" preserveAspectRatio="none" viewBox="0 0 1000 300">
-                                <defs>
-                                    <linearGradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
-                                        <stop offset="0%" stop-color="#3525cd" stop-opacity="0.25"></stop>
-                                        <stop offset="100%" stop-color="#3525cd" stop-opacity="0"></stop>
-                                    </linearGradient>
-                                </defs>
-                                <path d="M0,240 Q100,210 200,230 T400,160 T600,180 T800,90 T1000,110" fill="none" stroke="#3525cd" stroke-width="4"></path>
-                                <path d="M0,240 Q100,210 200,230 T400,160 T600,180 T800,90 T1000,110 V300 H0 Z" fill="url(#chartGradient)"></path>
-                                <path d="M0,270 Q200,260 400,200 T1000,130" fill="none" stroke="#c7c4d8" stroke-dasharray="8 4" stroke-width="2"></path>
-                            </svg>
-                        </div>
-                        <div class="absolute bottom-3 left-0 w-full flex justify-between px-6 text-[10px] font-bold text-on-surface-variant tracking-wider font-label-sm opacity-70">
-                            <span>JAN</span><span>FEB</span><span>MAR</span><span>APR</span><span>MAY</span><span>JUN</span><span>JUL</span>
-                        </div>
+                    <!-- SVG Chart (Dynamically rendered via JS) -->
+                    <div id="revenue-chart-container" class="relative h-[240px] w-full bg-surface-container-low/40 rounded-2xl border border-outline-variant/10 overflow-x-auto overflow-y-hidden">
+                        <!-- Chart will be injected here -->
                     </div>
                 </div>
 
@@ -188,34 +190,68 @@
                 <div class="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/20 shadow-sm flex flex-col justify-between">
                     <div>
                         <h3 class="text-lg font-bold text-on-surface mb-6">Subject Demand</h3>
-                        <div class="space-y-4">
-                            <div class="flex items-center justify-between p-3 bg-surface-container-low/50 rounded-2xl border border-outline-variant/10">
-                                <div class="flex items-center gap-3">
-                                    <span class="px-2 py-0.5 bg-primary/10 text-primary font-bold text-[10px] rounded uppercase font-label-sm">CS</span>
-                                    <span class="text-sm font-semibold text-on-surface">Computer Science</span>
-                                </div>
-                                <span class="text-sm font-bold text-primary">₹69,886.00</span>
-                            </div>
-                            <div class="flex items-center justify-between p-3 bg-surface-container-low/50 rounded-2xl border border-outline-variant/10">
-                                <div class="flex items-center gap-3">
-                                    <span class="px-2 py-0.5 bg-tertiary/10 text-tertiary font-bold text-[10px] rounded uppercase font-label-sm">MA</span>
-                                    <span class="text-sm font-semibold text-on-surface">Mathematics</span>
-                                </div>
-                                <span class="text-sm font-bold text-primary">₹51,086.50</span>
-                            </div>
-                            <div class="flex items-center justify-between p-3 bg-surface-container-low/50 rounded-2xl border border-outline-variant/10">
-                                <div class="flex items-center gap-3">
-                                    <span class="px-2 py-0.5 bg-secondary/10 text-secondary font-bold text-[10px] rounded uppercase font-label-sm">EN</span>
-                                    <span class="text-sm font-semibold text-on-surface">Engineering</span>
-                                </div>
-                                <span class="text-sm font-bold text-primary">₹34,860.00</span>
-                            </div>
+                        <div id="subject-demand-list" class="space-y-4">
+                            <!-- Dynamic Subject Demand injected here -->
+                            <div class="text-center text-on-surface-variant text-sm p-4">Loading trending subjects...</div>
                         </div>
                     </div>
-                    <button class="mt-6 w-full py-3 bg-surface hover:bg-primary hover:text-on-primary hover:border-primary border border-outline-variant/40 rounded-2xl font-bold text-xs transition-all flex items-center justify-center gap-2" onclick="showNotification('Detailed Analytics report generated!', 'success')">
-                        <span>Get Full Stats Report</span>
-                        <span class="material-symbols-outlined text-sm">chevron_right</span>
-                    </button>
+                    <div class="mt-6 flex flex-col xl:flex-row gap-3">
+                        <button id="download-report-btn" class="w-full py-3 bg-surface hover:bg-primary hover:text-on-primary hover:border-primary border border-outline-variant/40 rounded-2xl font-bold text-xs transition-all flex items-center justify-center gap-2" onclick="downloadStatsReport()">
+                            <span>PDF Report</span>
+                            <span class="material-symbols-outlined text-sm">picture_as_pdf</span>
+                        </button>
+                        <button id="download-csv-btn" class="w-full py-3 bg-surface hover:bg-primary hover:text-on-primary hover:border-primary border border-outline-variant/40 rounded-2xl font-bold text-xs transition-all flex items-center justify-center gap-2" onclick="downloadCsvReport()">
+                            <span>Export CSV</span>
+                            <span class="material-symbols-outlined text-sm">table_view</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Payout Settings (Bank Account) -->
+            <div class="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/20 shadow-sm mb-8">
+                <div class="flex items-center justify-between mb-4">
+                    <div>
+                        <h3 class="text-lg font-bold text-on-surface">Payout Settings</h3>
+                        <p class="text-on-surface-variant text-xs mt-1">Connect your bank account to receive automated payouts directly from Razorpay Route.</p>
+                    </div>
+                    <div id="payout-status-badge" class="hidden">
+                        <span class="bg-secondary/10 text-secondary text-xs font-bold px-3 py-1 rounded-full flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[14px]">verified</span> Account Connected
+                        </span>
+                    </div>
+                </div>
+
+                <div id="payout-connect-form" class="bg-surface-container-low/30 border border-outline-variant/10 rounded-2xl p-6">
+                    <form onsubmit="event.preventDefault(); connectBankAccount();" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block font-label-sm text-xs font-bold text-on-surface-variant mb-2">Account Number</label>
+                            <input required id="bank-acc-num" class="w-full bg-surface border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:border-primary rounded-xl py-3 px-4 font-body-md outline-none transition-all" placeholder="e.g. 1234567890" type="text" pattern="[0-9]{9,18}"/>
+                        </div>
+                        <div>
+                            <label class="block font-label-sm text-xs font-bold text-on-surface-variant mb-2">IFSC Code</label>
+                            <input required id="bank-ifsc" class="w-full bg-surface border border-outline-variant/40 focus:ring-2 focus:ring-primary focus:border-primary rounded-xl py-3 px-4 font-body-md outline-none transition-all uppercase" placeholder="e.g. HDFC0001234" type="text" pattern="[A-Za-z]{4}0[A-Za-z0-9]{6}"/>
+                        </div>
+                        <div class="md:col-span-2 flex items-center gap-4 mt-2">
+                            <button type="submit" id="connect-bank-btn" class="bg-primary text-on-primary px-6 py-3 rounded-2xl font-bold hover:shadow-md transition-all flex items-center gap-2">
+                                <span class="material-symbols-outlined text-sm">account_balance</span>
+                                <span>Connect Account</span>
+                            </button>
+                            <span class="text-[10px] text-on-surface-variant max-w-xs">Your data is secured by industry standard encryption and transmitted directly to Razorpay.</span>
+                        </div>
+                    </form>
+                </div>
+                
+                <div id="payout-connected-view" class="hidden bg-secondary/5 border border-secondary/20 rounded-2xl p-6 flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-secondary/20 flex items-center justify-center text-secondary">
+                            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+                        </div>
+                        <div>
+                            <p class="font-bold text-on-surface">Verified Bank Account</p>
+                            <p class="text-xs text-on-surface-variant mt-0.5">Automated payouts enabled via Razorpay Route</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -233,6 +269,7 @@
                                 <th class="p-4">Resource Guide</th>
                                 <th class="p-4">Category</th>
                                 <th class="p-4 text-center">Status</th>
+                                <th class="p-4 text-center">Sales</th>
                                 <th class="p-4 text-right">Price</th>
                                 <th class="p-4 text-right">Action</th>
                             </tr>
@@ -253,6 +290,77 @@
         </main>
     </div>
 
+    <!-- Edit Resource Slide-over Panel Overlay -->
+    <div class="fixed inset-0 z-[100] hidden flex-row justify-end items-stretch p-0 bg-black/40 backdrop-blur-sm transition-opacity duration-300 opacity-0" id="edit-modal-container">
+        <!-- Panel Card -->
+        <div class="bg-surface-container-lowest w-full max-w-sm shadow-2xl overflow-hidden transform transition-transform duration-300 translate-x-full flex flex-col h-full border-l border-outline-variant/20" id="edit-modal-card">
+            <!-- Header -->
+            <div class="flex items-center justify-between px-6 py-5 border-b border-outline-variant/20 sticky top-0 bg-surface-container-lowest/80 backdrop-blur-xl z-10">
+                <h2 class="font-headline-md text-[24px] text-on-surface font-bold">Edit Resource</h2>
+                <button aria-label="Close" class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-variant transition-colors active:scale-95" onclick="closeEditModal()">
+                    <span class="material-symbols-outlined text-on-surface-variant">close</span>
+                </button>
+            </div>
+            
+            <form id="edit-note-form" onsubmit="event.preventDefault(); submitEditForm();">
+                <!-- Form Content -->
+                <div class="flex-1 overflow-y-auto px-6 py-6 space-y-6">
+                    <input type="hidden" id="edit-note-id" />
+                    <!-- Title Field -->
+                    <div class="space-y-1.5">
+                        <label class="block font-label-sm text-[12px] font-medium text-outline uppercase tracking-wider">Title</label>
+                        <input id="edit-note-title" required class="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/50 rounded-xl focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:outline-none transition-all duration-200 font-body-md text-on-surface" placeholder="Enter resource title" type="text" />
+                    </div>
+                    <!-- Subject Field -->
+                    <div class="space-y-1.5">
+                        <label class="block font-label-sm text-[12px] font-medium text-outline uppercase tracking-wider">Subject/Category</label>
+                        <div class="relative">
+                            <input id="edit-note-subject" required class="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/50 rounded-xl focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:outline-none transition-all duration-200 font-body-md text-on-surface" placeholder="e.g. Organic Chemistry" type="text" />
+                            <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-outline-variant">school</span>
+                        </div>
+                    </div>
+                    <!-- Description Field -->
+                    <div class="space-y-1.5">
+                        <label class="block font-label-sm text-[12px] font-medium text-outline uppercase tracking-wider">Description</label>
+                        <textarea id="edit-note-desc" required class="w-full px-4 py-3 bg-surface-container-low border border-outline-variant/50 rounded-xl focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:outline-none transition-all duration-200 font-body-md text-on-surface resize-none" placeholder="Describe what's included in this resource..." rows="4"></textarea>
+                    </div>
+                    <!-- Price Field & Visibility -->
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-1.5">
+                            <label class="block font-label-sm text-[12px] font-medium text-outline uppercase tracking-wider">Price</label>
+                            <div class="relative">
+                                <div class="absolute left-5 top-1/2 -translate-y-1/2 font-medium text-on-surface-variant flex items-center justify-center">₹</div>
+                                <input id="edit-note-price" required class="w-full pl-12 pr-4 py-3 bg-surface-container-low border border-outline-variant/50 rounded-xl focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:outline-none transition-all duration-200 font-body-md text-on-surface" placeholder="0.00" type="number" step="0.01" min="0" />
+                            </div>
+                        </div>
+                        <div class="space-y-1.5">
+                            <label class="block font-label-sm text-[12px] font-medium text-outline uppercase tracking-wider">Visibility Status</label>
+                            <div class="relative">
+                                <select id="edit-note-status" class="w-full pl-4 pr-12 py-3 bg-surface-container-low border border-outline-variant/50 rounded-xl focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:outline-none transition-all duration-200 font-body-md text-on-surface appearance-none">
+                                    <option value="live">Live</option>
+                                    <option value="hidden">Hidden</option>
+                                </select>
+                                <span class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-outline-variant pointer-events-none">expand_more</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Footer Actions -->
+                <div class="p-6 bg-surface-container-low/50 border-t border-outline-variant/20 flex flex-col-reverse sm:flex-row gap-3">
+                    <button type="button" onclick="deleteResource()" class="px-5 py-4 rounded-xl font-headline-md text-[16px] font-bold text-error hover:bg-error/10 transition-all duration-200 active:scale-[0.98] flex items-center justify-center" title="Delete Resource">
+                        <span class="material-symbols-outlined">delete</span>
+                    </button>
+                    <button type="button" onclick="closeEditModal()" class="flex-1 px-6 py-4 rounded-xl font-headline-md text-[16px] font-bold text-on-surface-variant hover:bg-surface-variant transition-all duration-200 active:scale-[0.98]">
+                        Cancel
+                    </button>
+                    <button type="submit" id="edit-save-btn" class="flex-1 px-6 py-4 bg-primary text-on-primary rounded-xl font-headline-md text-[16px] font-bold shadow-lg shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 transition-all duration-200 active:scale-[0.98] flex items-center justify-center gap-2">
+                        Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Footer -->
     <footer class="bg-surface-container-low border-t border-outline-variant/30 py-12 px-gutter mt-auto">
         <div class="max-w-container-max mx-auto px-gutter flex justify-between items-center flex-col sm:flex-row gap-4">
@@ -266,7 +374,7 @@
     <script>
         function resolveUrl(url, fallback) {
             if (!url) return fallback;
-            return url.startsWith('http') ? url : 'https://academiahub-backend-k2cq.onrender.com' + url;
+            return url.startsWith('http') ? url : window.BACKEND_URL + url;
         }
 
         async function loadSellerDashboard() {
@@ -282,11 +390,26 @@
             document.getElementById('header-avatar').src = userObj.profileImage;
             document.getElementById('sidebar-avatar').src = userObj.profileImage;
             document.getElementById('sidebar-name').textContent = userObj.name;
-            document.getElementById('sidebar-major').textContent = `${userObj.major} • ${userObj.year}`;
-            document.getElementById('sidebar-uni').textContent = userObj.university;
+            const major = userObj.major && userObj.major !== 'Not set' ? userObj.major : '';
+            const year = userObj.year && userObj.year !== 'Not set' ? userObj.year : '';
+            const majorText = [major, year].filter(Boolean).join(' • ');
+            const majorEl = document.getElementById('sidebar-major');
+            if (majorText) { majorEl.textContent = majorText; majorEl.style.display = ''; } else { majorEl.style.display = 'none'; }
+
+            const uni = userObj.university && userObj.university !== 'Not set' ? userObj.university : '';
+            const uniEl = document.getElementById('sidebar-uni');
+            if (uni) { uniEl.textContent = uni; uniEl.style.display = ''; } else { uniEl.style.display = 'none'; }
+
+            // Show payout connected view if razorpay_account_id exists
+            if (userObj.razorpay_account_id) {
+                document.getElementById('payout-connect-form').classList.add('hidden');
+                document.getElementById('payout-connected-view').classList.remove('hidden');
+                document.getElementById('payout-status-badge').classList.remove('hidden');
+            }
 
             // Sync dynamic metrics from backend dashboard stats
             let totalEarnings = userObj.earnings || 0;
+            let totalSpent = 0;
             let totalNotesCount = 0;
             let avgRating = 0;
 
@@ -295,6 +418,7 @@
                 if (statsJson.success && statsJson.data?.dashboard) {
                     const stats = statsJson.data.dashboard;
                     totalEarnings = stats.total_earnings || 0;
+                    totalSpent = stats.total_spent || 0;
                     totalNotesCount = stats.total_notes || 0;
                     avgRating = stats.avg_rating || 0;
 
@@ -303,12 +427,47 @@
                     userObj.soldCount = stats.total_sales || 0;
                     userObj.balance = stats.available_earnings || 0;
                     localStorage.setItem('current_user', JSON.stringify(userObj));
+
+                    // Update Subject Demand UI
+                    const subjectDemandList = document.getElementById('subject-demand-list');
+                    if (subjectDemandList && stats.subject_demand) {
+                        subjectDemandList.innerHTML = '';
+                        if (stats.subject_demand.length === 0) {
+                            subjectDemandList.innerHTML = '<div class="text-center text-on-surface-variant text-sm p-4">No data available yet</div>';
+                        } else {
+                            const colors = [
+                                { bg: 'bg-primary/10', text: 'text-primary' },
+                                { bg: 'bg-tertiary/10', text: 'text-tertiary' },
+                                { bg: 'bg-secondary/10', text: 'text-secondary' }
+                            ];
+                            
+                            stats.subject_demand.forEach((subject, idx) => {
+                                const c = colors[idx % colors.length];
+                                const safeName = escapeHTML(subject.name);
+                                const shortCode = safeName.substring(0, 2).toUpperCase();
+                                subjectDemandList.innerHTML += `
+                                    <div class="flex items-center justify-between p-3 bg-surface-container-low/50 rounded-2xl border border-outline-variant/10">
+                                        <div class="flex items-center gap-3 min-w-0">
+                                            <span class="px-2 py-0.5 ${c.bg} ${c.text} font-bold text-[10px] rounded uppercase font-label-sm flex-shrink-0">${shortCode}</span>
+                                            <span class="text-sm font-semibold text-on-surface truncate" title="${safeName}">${safeName}</span>
+                                        </div>
+                                        <span class="text-sm font-bold text-primary flex-shrink-0 ml-2">₹${subject.revenue.toFixed(2)}</span>
+                                    </div>
+                                `;
+                            });
+                        }
+                    }
                 }
             } catch (err) {
                 console.error("Failed to load seller dashboard stats:", err);
+                const list = document.getElementById('subject-demand-list');
+                if(list) list.innerHTML = '<div class="text-center text-error text-sm p-4">Failed to load data</div>';
             }
 
             document.getElementById('total-earnings-val').textContent = `₹${totalEarnings.toFixed(2)}`;
+            if (document.getElementById('total-spent-val')) {
+                document.getElementById('total-spent-val').textContent = `₹${totalSpent.toFixed(2)}`;
+            }
             document.getElementById('total-sales-val').textContent = totalNotesCount;
 
             // Update average rating block dynamically
@@ -326,12 +485,27 @@
                 `;
             }
 
+            // Load Chart Analytics Data
+            try {
+                const analyticsJson = await apiFetch('/seller/analytics?days=30');
+                if (analyticsJson.success && analyticsJson.data?.chart) {
+                    renderRevenueChart(analyticsJson.data.chart);
+                } else {
+                    renderRevenueChart([]);
+                }
+            } catch (err) {
+                console.error("Failed to fetch analytics:", err);
+                renderRevenueChart([]);
+            }
+
             // Load and filter catalog for notes listed by this user
             let myNotes = [];
+            window.sellerNotesData = [];
             try {
                 const notesJson = await apiFetch('/seller/notes?limit=100');
                 if (notesJson.success && notesJson.data?.notes) {
                     myNotes = notesJson.data.notes;
+                    window.sellerNotesData = myNotes;
                 }
             } catch (err) {
                 console.error("Failed to fetch seller notes:", err);
@@ -356,8 +530,10 @@
                     row.className = 'hover:bg-primary/5 transition-colors border-b border-outline-variant/10';
 
                     const noteImage = resolveUrl(note.preview_url, 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600');
-                    const collegeName = note.colleges?.name || userObj.university || 'University';
-                    const deptOrSubject = note.departments?.name || note.subject || 'Notes';
+                    const collegeName = escapeHTML(note.colleges?.name || userObj.university || 'University');
+                    const deptOrSubject = escapeHTML(note.departments?.name || note.subject || 'Notes');
+                    const noteTitle = escapeHTML(note.title);
+                    const noteSubject = escapeHTML(note.subject || 'Study Guide');
 
                     // Format status badge dynamically
                     let statusHtml = '';
@@ -384,7 +560,7 @@
                         `;
                     } else if (note.status === 'rejected') {
                         statusHtml = `
-                            <span class="text-xs text-error font-bold flex items-center justify-center gap-1 cursor-help" title="${note.rejection_reason || 'No reason provided'}">
+                            <span class="text-xs text-error font-bold flex items-center justify-center gap-1 cursor-help" title="${escapeHTML(note.rejection_reason || 'No reason provided')}">
                                 <span class="w-2.5 h-2.5 bg-error rounded-full animate-pulse"></span>
                                 Rejected
                             </span>
@@ -393,7 +569,7 @@
                         statusHtml = `
                             <span class="text-xs text-on-surface-variant/70 font-bold flex items-center justify-center gap-1">
                                 <span class="w-2.5 h-2.5 bg-outline rounded-full"></span>
-                                ${note.status}
+                                ${escapeHTML(note.status)}
                             </span>
                         `;
                     }
@@ -405,8 +581,8 @@
                             <div class="flex items-center gap-3">
                                 <img src="${noteImage}" class="w-10 h-10 rounded-lg object-cover border border-outline-variant/20">
                                 <div>
-                                    <p class="font-bold text-on-surface text-sm hover:text-primary transition-all cursor-pointer" onclick="window.location.href='details.html?id=${note.id}'">${note.title}</p>
-                                    <p class="text-xs text-on-surface-variant opacity-75">${collegeName} • ${note.subject || 'Study Guide'}</p>
+                                    <p class="font-bold text-on-surface text-sm hover:text-primary transition-all cursor-pointer" onclick="window.location.href='details.html?id=${note.id}'">${noteTitle}</p>
+                                    <p class="text-xs text-on-surface-variant opacity-75">${collegeName} • ${noteSubject}</p>
                                 </div>
                             </div>
                         </td>
@@ -415,6 +591,9 @@
                         </td>
                         <td class="p-4 text-center">
                             ${statusHtml}
+                        </td>
+                        <td class="p-4 text-center font-bold text-on-surface">
+                            ${note.download_count || 0}
                         </td>
                         <td class="p-4 text-right font-bold text-primary text-sm">
                             ${priceText}
@@ -444,8 +623,404 @@
             });
         }
 
+        async function downloadStatsReport() {
+            const btn = document.getElementById('download-report-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<span>Generating PDF...</span><span class="material-symbols-outlined text-sm animate-spin">refresh</span>`;
+            btn.disabled = true;
+
+            try {
+                // Fetch sales data
+                const res = await apiFetch('/seller/sales');
+                if (!res.success) throw new Error(res.error?.message || "Failed to fetch sales data");
+
+                const sales = res.data.sales || [];
+                if (sales.length === 0) {
+                    showNotification("No sales data available to export.", "info");
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    return;
+                }
+
+                // Initialize jsPDF
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF();
+                
+                // Add Report Title
+                doc.setFontSize(20);
+                doc.setTextColor(53, 37, 205); // Primary color
+                doc.text("AcademiaHub Stats Report", 14, 22);
+                
+                doc.setFontSize(10);
+                doc.setTextColor(100, 100, 100);
+                doc.text(`Generated on: ${new Date().toLocaleString()}`, 14, 30);
+
+                let yPos = 40;
+
+                // Try to capture the chart as an image
+                const chartContainer = document.getElementById('revenue-chart-container');
+                if (chartContainer) {
+                    try {
+                        const canvas = await html2canvas(chartContainer, { scale: 2 });
+                        const imgData = canvas.toDataURL('image/png');
+                        const imgWidth = 182; // mm (A4 width - margins)
+                        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+                        
+                        doc.setFontSize(14);
+                        doc.setTextColor(0, 0, 0);
+                        doc.text("Revenue Trend", 14, yPos);
+                        yPos += 5;
+                        
+                        doc.addImage(imgData, 'PNG', 14, yPos, imgWidth, imgHeight);
+                        yPos += imgHeight + 15;
+                    } catch (e) {
+                        console.warn("Failed to capture chart image", e);
+                    }
+                }
+
+                // Prepare table data
+                const tableColumn = ["Transaction ID", "Date", "Guide Title", "Gross (INR)", "Net Earnings"];
+                const tableRows = [];
+
+                sales.forEach(sale => {
+                    const date = new Date(sale.created_at).toLocaleDateString();
+                    const title = sale.notes ? sale.notes.title : 'Unknown Note';
+                    const gross = `Rs. ${(sale.gross_amount || 0).toFixed(2)}`;
+                    const net = `Rs. ${(sale.net_amount || 0).toFixed(2)}`;
+                    
+                    tableRows.push([sale.id.substring(0, 8) + '...', date, title, gross, net]);
+                });
+
+                // Add Table to PDF
+                doc.setFontSize(14);
+                doc.setTextColor(0, 0, 0);
+                doc.text("Detailed Transactions", 14, yPos);
+                yPos += 5;
+
+                doc.autoTable({
+                    startY: yPos,
+                    head: [tableColumn],
+                    body: tableRows,
+                    theme: 'striped',
+                    headStyles: { fillColor: [53, 37, 205] },
+                    styles: { fontSize: 9 },
+                    margin: { top: 10 }
+                });
+
+                // Trigger file download
+                doc.save(`AcademiaHub_Stats_Report_${new Date().toISOString().split('T')[0]}.pdf`);
+
+                showNotification('Detailed Analytics PDF downloaded!', 'success');
+            } catch(err) {
+                console.error(err);
+                showNotification("Failed to generate PDF report.", "error");
+            }
+
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+
+        async function downloadCsvReport() {
+            const btn = document.getElementById('download-csv-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<span>Exporting...</span><span class="material-symbols-outlined text-sm animate-spin">refresh</span>`;
+            btn.disabled = true;
+
+            try {
+                const res = await apiFetch('/seller/sales');
+                if (!res.success) throw new Error(res.error?.message || "Failed to fetch sales data");
+
+                const sales = res.data.sales || [];
+                if (sales.length === 0) {
+                    showNotification("No sales data available to export.", "info");
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    return;
+                }
+
+                // Create CSV headers
+                let csvContent = "data:text/csv;charset=utf-8,";
+                csvContent += "Transaction ID,Date,Guide Title,Buyer Email,Gross (INR),Net Earnings (INR)\n";
+
+                // Add rows
+                sales.forEach(sale => {
+                    const date = new Date(sale.created_at).toLocaleDateString();
+                    // Escape title in case it has commas
+                    let title = sale.notes ? sale.notes.title : 'Unknown Note';
+                    if (title.includes(',')) {
+                        title = `"${title.replace(/"/g, '""')}"`;
+                    }
+                    const buyerEmail = sale.purchase?.buyer?.email || 'Unknown Buyer';
+                    const gross = (sale.gross_amount || 0).toFixed(2);
+                    const net = (sale.net_amount || 0).toFixed(2);
+                    
+                    csvContent += `${sale.id},${date},${title},${buyerEmail},${gross},${net}\n`;
+                });
+
+                // Trigger download
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", `AcademiaHub_Sales_${new Date().toISOString().split('T')[0]}.csv`);
+                document.body.appendChild(link); // Required for FF
+                link.click();
+                document.body.removeChild(link);
+
+                showNotification('CSV exported successfully!', 'success');
+            } catch(err) {
+                console.error(err);
+                showNotification("Failed to generate CSV report.", "error");
+            }
+
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+
+        function renderRevenueChart(chartData) {
+            const container = document.getElementById('revenue-chart-container');
+            if (!container) return;
+            
+            // Generate last 30 days including today
+            const daysData = [];
+            for (let i = 29; i >= 0; i--) {
+                const d = new Date();
+                d.setDate(d.getDate() - i);
+                const dateStr = d.toISOString().split('T')[0];
+                const displayDate = `${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
+                
+                // Find if backend returned revenue for this day
+                const existing = chartData.find(item => item.date === dateStr);
+                daysData.push({
+                    date: dateStr,
+                    display: displayDate,
+                    revenue: existing ? existing.revenue : 0
+                });
+            }
+
+            // Calculate minimum width to enable horizontal scrolling (50px per day)
+            const minWidth = daysData.length * 50;
+
+            container.innerHTML = `
+                <div class="relative h-full" style="min-width: max(100%, ${minWidth}px); padding: 1rem;">
+                    <canvas id="revenueChartCanvas"></canvas>
+                </div>
+            `;
+
+            const ctx = document.getElementById('revenueChartCanvas').getContext('2d');
+            
+            // Create gradient fill
+            const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(0, 'rgba(53, 37, 205, 0.4)');
+            gradient.addColorStop(1, 'rgba(53, 37, 205, 0.0)');
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: daysData.map(d => d.display),
+                    datasets: [{
+                        label: 'Revenue',
+                        data: daysData.map(d => d.revenue),
+                        borderColor: '#3525cd',
+                        backgroundColor: gradient,
+                        borderWidth: 3,
+                        pointBackgroundColor: '#fff',
+                        pointBorderColor: '#3525cd',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6,
+                        fill: true,
+                        tension: 0.4 // Smooth curves
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: {
+                        mode: 'index',
+                        intersect: false,
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#1a1a1a',
+                            padding: 12,
+                            titleFont: { size: 13, family: 'Inter' },
+                            bodyFont: { size: 15, family: 'Inter', weight: 'bold' },
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) { return '₹' + context.parsed.y; }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { display: false },
+                            ticks: { 
+                                font: { family: 'Inter', size: 10 },
+                                color: '#64748b'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            border: { display: false },
+                            grid: { 
+                                color: 'rgba(0,0,0,0.05)',
+                                tickLength: 0
+                            },
+                            ticks: { 
+                                font: { family: 'Inter', size: 10 },
+                                color: '#64748b',
+                                callback: function(value) { return '₹' + value; },
+                                padding: 10
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Automatically scroll to the extreme right to show the most recent days by default
+            setTimeout(() => {
+                const scrollWrapper = document.getElementById('revenue-chart-container');
+                if (scrollWrapper) {
+                    scrollWrapper.scrollLeft = scrollWrapper.scrollWidth;
+                }
+            }, 100);
+        }
+
         function editResource(id) {
-            showNotification(`Resource edit dashboard loaded for Note #${id}`, "info");
+            const note = window.sellerNotesData.find(n => n.id === id);
+            if (!note) {
+                showNotification('Resource not found', 'error');
+                return;
+            }
+
+            document.getElementById('edit-note-id').value = note.id;
+            document.getElementById('edit-note-title').value = note.title;
+            document.getElementById('edit-note-subject').value = note.departments?.name || note.subject || '';
+            document.getElementById('edit-note-desc').value = note.description || '';
+            document.getElementById('edit-note-price').value = note.is_free ? 0 : (note.price || 0);
+            
+            // Map status
+            const statusSelect = document.getElementById('edit-note-status');
+            if (note.status === 'live' || note.status === 'hidden') {
+                statusSelect.value = note.status;
+            } else {
+                statusSelect.value = 'hidden';
+            }
+
+            // Show modal
+            const container = document.getElementById('edit-modal-container');
+            const card = document.getElementById('edit-modal-card');
+            
+            container.classList.remove('hidden');
+            setTimeout(() => {
+                container.classList.remove('opacity-0');
+                card.classList.remove('translate-x-full');
+            }, 10);
+        }
+
+        function closeEditModal() {
+            const container = document.getElementById('edit-modal-container');
+            const card = document.getElementById('edit-modal-card');
+            
+            container.classList.add('opacity-0');
+            card.classList.add('translate-x-full');
+            
+            setTimeout(() => {
+                container.classList.add('hidden');
+            }, 300);
+        }
+
+        async function deleteResource() {
+            const id = document.getElementById('edit-note-id').value;
+            if (!confirm("Are you sure you want to permanently delete this resource? This action cannot be undone.")) return;
+            
+            try {
+                const res = await apiFetch(`/notes/${id}`, { method: 'DELETE' });
+                showNotification('Resource deleted successfully', 'success');
+                closeEditModal();
+                setTimeout(() => loadSellerDashboard(), 500);
+            } catch (err) {
+                console.error("Failed to delete note:", err);
+                showNotification(err.error?.message || 'Failed to delete resource', 'error');
+            }
+        }
+
+        async function submitEditForm() {
+            const id = document.getElementById('edit-note-id').value;
+            const btn = document.getElementById('edit-save-btn');
+            
+            const payload = {
+                title: document.getElementById('edit-note-title').value,
+                subject: document.getElementById('edit-note-subject').value,
+                description: document.getElementById('edit-note-desc').value,
+                price: parseFloat(document.getElementById('edit-note-price').value || 0),
+                status: document.getElementById('edit-note-status').value
+            };
+            
+            if (payload.price === 0) {
+                payload.is_free = true;
+            } else {
+                payload.is_free = false;
+            }
+
+            btn.disabled = true;
+            const originalBtnHtml = btn.innerHTML;
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin text-sm">sync</span> <span>Saving...</span>';
+
+            try {
+                const res = await apiFetch(`/notes/${id}`, {
+                    method: 'PUT',
+                    body: payload
+                });
+                
+                showNotification('Resource updated successfully!', 'success');
+                closeEditModal();
+                
+                // Reload dashboard to reflect changes
+                setTimeout(() => {
+                    loadSellerDashboard();
+                }, 500);
+            } catch (err) {
+                console.error("Failed to update note:", err);
+                showNotification(err.error?.message || 'Failed to update resource', 'error');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = originalBtnHtml;
+            }
+        }
+
+        async function connectBankAccount() {
+            const accNum = document.getElementById('bank-acc-num').value;
+            const ifsc = document.getElementById('bank-ifsc').value;
+            const btn = document.getElementById('connect-bank-btn');
+            
+            btn.disabled = true;
+            btn.innerHTML = '<span>Connecting...</span><span class="animate-spin inline-block w-4 h-4 border-2 border-current border-t-transparent rounded-full ml-2"></span>';
+            
+            try {
+                const res = await apiFetch('/seller/connect-bank', {
+                    method: 'POST',
+                    body: { accountNumber: accNum, ifsc: ifsc }
+                });
+                
+                showNotification("Bank account linked successfully!", "success");
+                
+                document.getElementById('payout-connect-form').classList.add('hidden');
+                document.getElementById('payout-connected-view').classList.remove('hidden');
+                document.getElementById('payout-status-badge').classList.remove('hidden');
+                
+                const userObj = JSON.parse(localStorage.getItem('current_user'));
+                if (userObj) {
+                    userObj.razorpay_account_id = res.data.razorpay_account_id;
+                    localStorage.setItem('current_user', JSON.stringify(userObj));
+                }
+            } catch (err) {
+                console.error("Connect bank error:", err);
+                showNotification(err.error?.message || "Failed to connect bank account", "error");
+                btn.disabled = false;
+                btn.innerHTML = '<span class="material-symbols-outlined text-sm">account_balance</span><span>Connect Account</span>';
+            }
         }
 
         window.addEventListener('DOMContentLoaded', loadSellerDashboard);

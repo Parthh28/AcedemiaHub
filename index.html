@@ -18,7 +18,7 @@
 <body class="bg-background text-on-surface font-body-md min-h-screen flex flex-col">
 
     <!-- Top Navigation Bar -->
-    <header class="bg-surface/80 backdrop-blur-[20px] sticky top-0 z-50 border-b border-outline-variant/30 shadow-sm h-16 flex items-center">
+    <header class="bg-surface sticky top-0 z-50 border-b border-outline-variant/30 shadow-sm h-16 flex items-center">
         <div class="flex justify-between items-center w-full px-gutter max-w-container-max mx-auto h-16">
             <div class="flex items-center gap-8">
                 <a class="font-headline-md text-headline-md font-extrabold text-primary flex items-center gap-2" href="index.html">
@@ -67,7 +67,7 @@
                         Elevate your academic <span class="text-primary">success</span>.
                     </h1>
                     <p class="text-body-lg text-on-surface-variant opacity-90 max-w-xl">
-                        Buy highly organized, course-specific notes from top-performing students at your university, or turn your own study materials into passive income.
+                        Unlock premium, exam-focused notes from your university's top performers — or start earning by selling the notes you've already created.
                     </p>
                     <div class="relative w-full max-w-md">
                         <span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant text-xl opacity-60">search</span>
@@ -300,7 +300,8 @@
                 <ul class="space-y-4">
                     <li><a class="text-on-surface-variant hover:text-primary transition-colors font-label-sm text-xs uppercase" href="#">About Us</a></li>
                     <li><a class="text-on-surface-variant hover:text-primary transition-colors font-label-sm text-xs uppercase" href="#">Careers</a></li>
-                    <li><a class="text-on-surface-variant hover:text-primary transition-colors font-label-sm text-xs uppercase" href="#">Privacy Policy</a></li>
+                    <li><a class="text-on-surface-variant hover:text-primary transition-colors font-label-sm text-xs uppercase" href="privacy-policy.html">Privacy Policy</a></li>
+                    <li><a class="text-on-surface-variant hover:text-primary transition-colors font-label-sm text-xs uppercase" href="terms.html">Terms & Conditions</a></li>
                 </ul>
             </div>
             <div>
@@ -352,18 +353,21 @@
                     card.className = 'bg-surface-container-lowest rounded-3xl overflow-hidden border border-outline-variant/30 card-hover-premium group cursor-pointer shadow-sm flex flex-col justify-between';
                     card.onclick = () => window.location.href = `details.html?id=${note.id}`;
                     
-                    const noteImage = note.preview_url ? (note.preview_url.startsWith('http') ? note.preview_url : 'https://academiahub-backend-k2cq.onrender.com' + note.preview_url) : "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600";
-                    const sellerImage = note.seller?.profile_pic_url ? (note.seller.profile_pic_url.startsWith('http') ? note.seller.profile_pic_url : 'https://academiahub-backend-k2cq.onrender.com' + note.seller.profile_pic_url) : "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120";
-                    const sellerName = note.seller ? `${note.seller.first_name || ''} ${note.seller.last_name || ''}`.trim() : 'Contributor';
-                    const courseDept = note.subject || note.departments?.name || 'Study Material';
+                    const noteImage = note.preview_url ? (note.preview_url.startsWith('http') ? note.preview_url : window.BACKEND_URL + note.preview_url) : "https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600";
+                    const sellerImage = note.seller?.profile_pic_url ? (note.seller.profile_pic_url.startsWith('http') ? note.seller.profile_pic_url : window.BACKEND_URL + note.seller.profile_pic_url) : "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120";
+                    const sellerName = escapeHTML(note.seller ? `${note.seller.first_name || ''} ${note.seller.last_name || ''}`.trim() : 'Contributor');
+                    const courseDept = escapeHTML(note.subject || note.departments?.name || 'Study Material');
                     const rating = note.rating !== undefined && note.rating !== null ? parseFloat(note.rating).toFixed(1) : '5.0';
                     const reviewsCount = note.rating_count || 0;
                     const priceText = note.is_free ? 'Free' : `₹${parseFloat(note.price || 0).toFixed(2)}`;
                     
+                    const noteTitle = escapeHTML(note.title);
+                    const noteDescription = escapeHTML(note.description || 'No description provided.');
+
                     card.innerHTML = `
                         <div>
                             <div class="relative h-48 overflow-hidden bg-surface-variant">
-                                <img alt="${note.title}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="${noteImage}">
+                                <img alt="${noteTitle}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="${noteImage}">
                                 <div class="absolute top-4 left-4">
                                     <span class="px-3 py-1 bg-white/95 backdrop-blur-md rounded-full font-label-sm text-xs font-semibold text-primary uppercase shadow-sm">${courseDept}</span>
                                 </div>
@@ -373,8 +377,8 @@
                                     <span class="material-symbols-outlined text-sm text-tertiary" style="font-variation-settings: 'FILL' 1;">star</span>
                                     <span class="text-xs font-label-sm font-bold text-on-surface-variant">${rating} (${reviewsCount} reviews)</span>
                                 </div>
-                                <h4 class="font-headline-md text-xl font-bold text-on-surface mb-2 line-clamp-1 group-hover:text-primary transition-colors">${note.title}</h4>
-                                <p class="text-sm text-on-surface-variant line-clamp-2">${note.description || 'No description provided.'}</p>
+                                <h4 class="font-headline-md text-xl font-bold text-on-surface mb-2 line-clamp-1 group-hover:text-primary transition-colors">${noteTitle}</h4>
+                                <p class="text-sm text-on-surface-variant line-clamp-2">${noteDescription}</p>
                             </div>
                         </div>
                         <div class="p-6 pt-0">

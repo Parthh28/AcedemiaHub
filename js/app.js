@@ -1,5 +1,22 @@
 // CampusNotes Marketplace - Shared Application Logic & State Management
 
+/**
+ * Escapes HTML characters in a string to prevent Cross-Site Scripting (XSS).
+ * @param {string} str - The untrusted string.
+ * @returns {string} The escaped string safe for use in innerHTML.
+ */
+function escapeHTML(str) {
+  if (str === null || str === undefined) return '';
+  return String(str).replace(/[&<>'"]/g, 
+    tag => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      "'": '&#39;',
+      '"': '&quot;'
+    }[tag])
+  );
+}
 // Initialize Data Catalogs in localStorage if they don't exist
 const DEFAULT_NOTES = [
   {
@@ -16,7 +33,7 @@ const DEFAULT_NOTES = [
     pages: 42,
     university: "Stanford University",
     course: "CS 106B",
-    year: "Junior",
+    year: "3rd year",
     uploadedDate: "2026-04-12"
   },
   {
@@ -33,7 +50,7 @@ const DEFAULT_NOTES = [
     pages: 28,
     university: "MIT",
     course: "18.02 Multivariable Calculus",
-    year: "Sophomore",
+    year: "2nd year",
     uploadedDate: "2026-05-01"
   },
   {
@@ -50,7 +67,7 @@ const DEFAULT_NOTES = [
     pages: 56,
     university: "UC Berkeley",
     course: "ME 40 Thermodynamics",
-    year: "Senior",
+    year: "4th year",
     uploadedDate: "2026-03-20"
   },
   {
@@ -67,7 +84,7 @@ const DEFAULT_NOTES = [
     pages: 15,
     university: "NYU",
     course: "PSYCH 22 Cognitive Psych",
-    year: "Sophomore",
+    year: "2nd year",
     uploadedDate: "2026-05-15"
   },
   {
@@ -84,7 +101,7 @@ const DEFAULT_NOTES = [
     pages: 84,
     university: "Harvard University",
     course: "MCB 52 Molecular Bio",
-    year: "Senior",
+    year: "4th year",
     uploadedDate: "2026-02-10"
   },
   {
@@ -101,7 +118,7 @@ const DEFAULT_NOTES = [
     pages: 22,
     university: "Georgia Tech",
     course: "CS 3251 Computer Networks",
-    year: "Junior",
+    year: "3rd year",
     uploadedDate: "2026-05-09"
   },
   {
@@ -118,7 +135,7 @@ const DEFAULT_NOTES = [
     pages: 35,
     university: "Stanford University",
     course: "CS 106A Python",
-    year: "Freshman",
+    year: "1st year",
     uploadedDate: "2026-01-15"
   },
   {
@@ -135,7 +152,7 @@ const DEFAULT_NOTES = [
     pages: 50,
     university: "IIT Bombay",
     course: "MA 106 Discrete Mathematics",
-    year: "Sophomore",
+    year: "2nd year",
     uploadedDate: "2026-05-18"
   },
   {
@@ -152,7 +169,7 @@ const DEFAULT_NOTES = [
     pages: 75,
     university: "IIT Bombay",
     course: "CS 302 Compiler Design",
-    year: "Junior",
+    year: "3rd year",
     uploadedDate: "2026-05-10"
   },
   {
@@ -169,7 +186,7 @@ const DEFAULT_NOTES = [
     pages: 60,
     university: "IIT Bombay",
     course: "EE 210 Signals and Systems",
-    year: "Sophomore",
+    year: "2nd year",
     uploadedDate: "2026-05-12"
   },
   {
@@ -186,7 +203,7 @@ const DEFAULT_NOTES = [
     pages: 85,
     university: "IIT Bombay",
     course: "CL 301 Chemical Reaction Eng",
-    year: "Junior",
+    year: "3rd year",
     uploadedDate: "2026-05-15"
   },
   {
@@ -203,7 +220,7 @@ const DEFAULT_NOTES = [
     pages: 70,
     university: "IIT Bombay",
     course: "CE 204 Structural Mechanics",
-    year: "Junior",
+    year: "3rd year",
     uploadedDate: "2026-05-16"
   },
   {
@@ -220,7 +237,7 @@ const DEFAULT_NOTES = [
     pages: 95,
     university: "IIT Bombay",
     course: "AE 201 Aerodynamics",
-    year: "Junior",
+    year: "3rd year",
     uploadedDate: "2026-05-17"
   },
   {
@@ -237,7 +254,7 @@ const DEFAULT_NOTES = [
     pages: 55,
     university: "IIT Bombay",
     course: "PH 108 Classical Mechanics",
-    year: "Freshman",
+    year: "1st year",
     uploadedDate: "2026-05-14"
   },
   {
@@ -254,13 +271,18 @@ const DEFAULT_NOTES = [
     pages: 80,
     university: "IIT Bombay",
     course: "ME 202 Fluid Mechanics",
-    year: "Sophomore",
+    year: "2nd year",
     uploadedDate: "2026-05-13"
   }
 ];
 
-// express API Configuration
-const API_BASE_URL = 'https://academiahub-backend-k2cq.onrender.com/api/v1';
+// Dynamic API Configuration
+const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.hostname === '' || window.location.protocol === 'file:';
+const isLanOrTailscale = window.location.hostname.startsWith('192.168.') || window.location.hostname.startsWith('10.') || window.location.hostname.startsWith('100.');
+const IS_LOCAL = isLocalhost || isLanOrTailscale;
+const localBackendHost = window.location.hostname || '127.0.0.1';
+window.BACKEND_URL = IS_LOCAL ? (window.location.port === '5000' ? window.location.origin : `http://${localBackendHost}:5000`) : 'https://your-production-backend.com'; // REPLACE THIS with your actual live backend URL
+const API_BASE_URL = `${window.BACKEND_URL}/api/v1`;
 
 async function apiFetch(endpoint, options = {}) {
   const url = endpoint.startsWith('http') ? endpoint : `${API_BASE_URL}${endpoint}`;
@@ -565,21 +587,23 @@ function setupProfileDropdown() {
         <li>
           <a href="buyer-dashboard.html" class="${getLinkClass('buyer-dashboard.html')}">
             <span class="material-symbols-outlined text-[20px]" ${getIconStyle('buyer-dashboard.html')}>school</span>
-            <span>My Study Hub (Buyer)</span>
+            <span>My Study Hub</span>
           </a>
         </li>
         <li>
           <a href="seller-dashboard.html" class="${getLinkClass('seller-dashboard.html')}">
             <span class="material-symbols-outlined text-[20px]" ${getIconStyle('seller-dashboard.html')}>monetization_on</span>
-            <span>Earnings & Sales (Seller)</span>
+            <span>Earnings & Sales</span>
           </a>
         </li>
+        ${user.role === 'admin' ? `
         <li>
           <a href="admin-dashboard.html" class="${getLinkClass('admin-dashboard.html')}">
             <span class="material-symbols-outlined text-[20px]" ${getIconStyle('admin-dashboard.html')}>admin_panel_settings</span>
             <span>Admin System Overview</span>
           </a>
         </li>
+        ` : ''}
         <li>
           <a href="settings.html" class="${getLinkClass('settings.html')}">
             <span class="material-symbols-outlined text-[20px]" ${getIconStyle('settings.html')}>person</span>
@@ -683,27 +707,7 @@ function setupHeaderLinks() {
   });
 
   // Bind sidebar/aside navigation links active state dynamically
-  const asideLinks = document.querySelectorAll('aside nav a');
-  asideLinks.forEach(link => {
-    const href = link.getAttribute('href');
-    if (!href) return;
-    const normalizedHref = href.split('?')[0].split('#')[0];
-    const isSidebarActive = normalizedHref === currentPath;
-
-    if (isSidebarActive) {
-      link.className = "flex items-center gap-3 p-3 bg-primary/10 text-primary font-bold rounded-xl transition-all duration-200";
-      const icon = link.querySelector('.material-symbols-outlined');
-      if (icon) {
-        icon.style.fontVariationSettings = "'FILL' 1";
-      }
-    } else {
-      link.className = "flex items-center gap-3 p-3 text-on-surface-variant hover:bg-primary/5 hover:text-primary transition-all duration-200 rounded-xl";
-      const icon = link.querySelector('.material-symbols-outlined');
-      if (icon) {
-        icon.style.fontVariationSettings = "";
-      }
-    }
-  });
+  bindSidebarActiveStates();
 
   // Bind Upload button
   const uploadBtn = document.querySelector('header button.bg-primary, header a.bg-primary');
@@ -733,6 +737,40 @@ function setupHeaderLinks() {
       }
     });
   }
+
+  addMobileBottomNav();
+}
+
+function addMobileBottomNav() {
+  if (document.getElementById('mobile-bottom-nav')) return;
+  const nav = document.createElement('nav');
+  nav.id = 'mobile-bottom-nav';
+  nav.className = 'md:hidden fixed bottom-0 w-full bg-surface border-t border-outline-variant/30 flex justify-around items-center h-16 z-50 shadow-[0_-4px_20px_rgba(0,0,0,0.05)]';
+  
+  const currentPath = window.location.pathname.split('/').pop() || 'index.html';
+  const getNavClass = (path) => currentPath === path ? "text-primary" : "text-on-surface-variant hover:text-primary";
+  const getIconFill = (path) => currentPath === path ? "style=\"font-variation-settings: 'FILL' 1;\"" : "";
+
+  nav.innerHTML = `
+    <a href="index.html" class="flex flex-col items-center justify-center w-full h-full ${getNavClass('index.html')}">
+      <span class="material-symbols-outlined text-2xl" ${getIconFill('index.html')}>home</span>
+      <span class="text-[9px] font-bold mt-0.5 uppercase tracking-wide">Home</span>
+    </a>
+    <a href="browse.html" class="flex flex-col items-center justify-center w-full h-full ${getNavClass('browse.html')}">
+      <span class="material-symbols-outlined text-2xl" ${getIconFill('browse.html')}>search</span>
+      <span class="text-[9px] font-bold mt-0.5 uppercase tracking-wide">Browse</span>
+    </a>
+    <a href="upload.html" class="flex flex-col items-center justify-center w-full h-full ${getNavClass('upload.html')}">
+      <span class="material-symbols-outlined text-2xl" ${getIconFill('upload.html')}>cloud_upload</span>
+      <span class="text-[9px] font-bold mt-0.5 uppercase tracking-wide">Upload</span>
+    </a>
+    <a href="buyer-dashboard.html" class="flex flex-col items-center justify-center w-full h-full ${getNavClass('buyer-dashboard.html')}">
+      <span class="material-symbols-outlined text-2xl" ${getIconFill('buyer-dashboard.html')}>school</span>
+      <span class="text-[9px] font-bold mt-0.5 uppercase tracking-wide">Hub</span>
+    </a>
+  `;
+  document.body.appendChild(nav);
+  document.body.style.paddingBottom = '64px';
 }
 
 // Initialize layout elements once DOM is fully loaded
@@ -751,11 +789,42 @@ function updateDOMWithUser(user) {
       loginBtn.onclick = () => window.location.href = 'login.html';
       headerActions.appendChild(loginBtn);
     }
+    // Remove admin console from sidebar if not logged in
+    const sidebarNav = document.querySelector('aside nav');
+    if (sidebarNav) {
+      const adminLink = sidebarNav.querySelector('a[href="admin-dashboard.html"]');
+      if (adminLink) adminLink.remove();
+    }
     return;
   } else {
     if (profileContainer) profileContainer.classList.remove('hidden');
     const loginBtn = document.getElementById('login-action-btn');
     if (loginBtn) loginBtn.remove();
+  }
+
+  // Manage Admin Console sidebar link based on user role
+  const sidebarNav = document.querySelector('aside nav');
+  if (sidebarNav) {
+    const adminLink = sidebarNav.querySelector('a[href="admin-dashboard.html"]');
+    if (user.role === 'admin') {
+      if (!adminLink) {
+        const link = document.createElement('a');
+        link.href = 'admin-dashboard.html';
+        link.className = 'flex items-center gap-3 p-3 text-on-surface-variant hover:bg-primary/5 hover:text-primary transition-all duration-200 rounded-xl';
+        link.innerHTML = `
+            <span class="material-symbols-outlined">admin_panel_settings</span>
+            <span class="text-sm font-semibold">Admin Console</span>
+        `;
+        sidebarNav.appendChild(link);
+      }
+    } else {
+      if (adminLink) {
+        adminLink.remove();
+      }
+    }
+    if (typeof bindSidebarActiveStates === 'function') {
+      bindSidebarActiveStates();
+    }
   }
   
   // Header Avatar
@@ -812,20 +881,23 @@ async function syncUserWithBackend() {
       id: dbUser.id,
       name: `${dbUser.first_name || ''} ${dbUser.last_name || ''}`.trim() || 'Anonymous User',
       email: dbUser.email,
-      university: dbUser.colleges ? dbUser.colleges.name : 'Not set',
+      university: dbUser.colleges ? dbUser.colleges.name : dbUser.college || '',
       college_id: dbUser.colleges ? dbUser.colleges.id : null,
-      major: dbUser.departments ? dbUser.departments.name : 'Not set',
+      major: dbUser.major || (dbUser.departments ? dbUser.departments.name : ''),
       department_id: dbUser.departments ? dbUser.departments.id : null,
-      year: dbUser.year ? ['Freshman', 'Sophomore', 'Junior', 'Senior', 'Fifth Year', 'Graduate'][dbUser.year - 1] : 'Not set',
+      year: dbUser.year ? ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year', 'Masters'][dbUser.year - 1] : '',
       yearNum: dbUser.year,
       bio: dbUser.bio || '',
       phone: dbUser.phone || '',
       upiId: dbUser.upi_id || '',
       role: dbUser.role || 'buyer',
-      profileImage: dbUser.profile_pic_url ? (dbUser.profile_pic_url.startsWith('http') ? dbUser.profile_pic_url : 'https://academiahub-backend-k2cq.onrender.com' + dbUser.profile_pic_url) : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80',
+      email: dbUser.email,
+      profileImage: dbUser.profile_pic_url ? (dbUser.profile_pic_url.startsWith('http') ? dbUser.profile_pic_url : window.BACKEND_URL + dbUser.profile_pic_url) : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&auto=format&fit=crop&q=80',
+      universityId: dbUser.college_id,
       earnings: 0.0,
       soldCount: 0,
-      balance: dbUser.balance || 0.0
+      balance: dbUser.balance || 0.0,
+      razorpay_account_id: dbUser.razorpay_account_id || null
     };
     
     // Fetch stats if they are a seller
@@ -849,15 +921,67 @@ async function syncUserWithBackend() {
     syncPurchasesWithBackend();
   } catch (err) {
     console.error('Failed to sync user with backend:', err);
-    if (err.status === 401) {
+    // If user no longer exists or token is invalid, log them out locally
+    if (err.status === 401 || err.status === 404) {
       logoutUser();
     }
   }
 }
+function bindSidebarActiveStates() {
+  const currentPath = window.location.pathname.split('/').pop() || 'index.html';
+  const asideLinks = document.querySelectorAll('aside nav a');
+  asideLinks.forEach(link => {
+    const href = link.getAttribute('href');
+    if (!href) return;
+    const normalizedHref = href.split('?')[0].split('#')[0];
+    const isSidebarActive = normalizedHref === currentPath;
 
+    if (isSidebarActive) {
+      link.className = "flex items-center gap-3 p-3 bg-primary/10 text-primary font-bold rounded-xl transition-all duration-200";
+      const icon = link.querySelector('.material-symbols-outlined');
+      if (icon) {
+        icon.style.fontVariationSettings = "'FILL' 1";
+      }
+    } else {
+      link.className = "flex items-center gap-3 p-3 text-on-surface-variant hover:bg-primary/5 hover:text-primary transition-all duration-200 rounded-xl";
+      const icon = link.querySelector('.material-symbols-outlined');
+      if (icon) {
+        icon.style.fontVariationSettings = "";
+      }
+    }
+  });
+}
 
+/**
+ * Securely fetch a download URL and open it, preventing JWT from appearing in the URL query string.
+ * @param {string} noteId 
+ */
+async function downloadNote(noteId) {
+    try {
+        const res = await apiFetch(`/notes/downloads/url/${noteId}`);
+        if (res.success && res.data?.download_url) {
+            window.open(res.data.download_url, '_blank');
+        } else {
+            showNotification(res.message || 'Failed to get download link. Have you purchased this?', 'error');
+        }
+    } catch (err) {
+        console.error("Failed to download note:", err);
+        showNotification(err.message || 'Failed to initialize download.', 'error');
+    }
+}
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Frontend Route Protection
+  const protectedRoutes = ['dashboard', 'upload', 'cart', 'checkout', 'purchase', 'settings'];
+  const currentPath = window.location.pathname.toLowerCase();
+  const isProtected = protectedRoutes.some(route => currentPath.includes(route));
+
+  if (isProtected && !localStorage.getItem('accessToken')) {
+      const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+      window.location.href = `login.html?mode=signup&ref=${returnUrl}`;
+      return;
+  }
+
   setupHeaderLinks();
   updateCartBadge();
   setupProfileDropdown();

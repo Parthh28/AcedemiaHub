@@ -55,11 +55,33 @@ async function initiatePayment(req, res, next) {
     const { notesId } = req.body;
     if (!notesId) return badRequest(res, 'notesId is required');
 
-    const { data: note } = await supabase.from('notes').select('id, price, is_free, status').eq('id', notesId).single();
+    const { data: note } = await supabase
+      .from('notes')
+      .select('id, price, is_free, status, seller:users!seller_id(id, razorpay_account_id)')
+      .eq('id', notesId)
+      .single();
+      
     if (!note || note.status !== 'live') return notFound(res, 'Note not available');
     if (note.is_free) return badRequest(res, 'This note is free. Use direct purchase endpoint.');
 
-    const result = await paymentService.initiatePayment({ userId: req.user.id, notesId, amount: note.price });
+    const PLATFORM_COMMISSION = parseFloat(process.env.PLATFORM_COMMISSION) || 0.20;
+    const sellerId = note.seller.id;
+    const razorpayAccountId = note.seller.razorpay_account_id || `acc_mock_${sellerId.substring(0,8)}`;
+    
+    const grossAmount = note.price;
+    const commission = grossAmount * PLATFORM_COMMISSION;
+    const netAmount = grossAmount - commission;
+    const netAmountPaisa = Math.round(netAmount * 100);
+
+    const transfers = [{
+        account: razorpayAccountId,
+        amount: netAmountPaisa,
+        currency: 'INR',
+        notes: { seller_id: sellerId },
+        on_hold: 0
+    }];
+
+    const result = await paymentService.initiatePayment({ userId: req.user.id, notesId, amount: note.price, transfers });
     return success(res, result, 'Payment initiated');
   } catch (err) { next(err); }
 }
@@ -92,19 +114,43 @@ async function verifyPayment(req, res, next) {
 
 async function initiateCartPayment(req, res, next) {
   try {
-    // Fetch cart total
+    // Fetch cart total and seller details
     const { data: cartItems, error: cartErr } = await supabase
       .from('cart_items')
-      .select('notes:notes_id(price, status, is_free)')
+      .select('notes:notes_id(price, status, is_free, seller:users!seller_id(id, razorpay_account_id))')
       .eq('user_id', req.user.id);
 
     if (cartErr || !cartItems || cartItems.length === 0) return badRequest(res, 'Cart is empty');
 
     let totalAmount = 0;
+    const transfers = [];
+    const PLATFORM_COMMISSION = parseFloat(process.env.PLATFORM_COMMISSION) || 0.20;
+
     for (const item of cartItems) {
       if (item.notes.status !== 'live') return badRequest(res, 'One or more items in your cart are no longer available.');
       if (!item.notes.is_free) {
         totalAmount += item.notes.price;
+        
+        const sellerId = item.notes.seller.id;
+        const razorpayAccountId = item.notes.seller.razorpay_account_id || `acc_mock_${sellerId.substring(0,8)}`;
+        
+        const grossAmount = item.notes.price;
+        const commission = grossAmount * PLATFORM_COMMISSION;
+        const netAmount = grossAmount - commission;
+        const netAmountPaisa = Math.round(netAmount * 100);
+
+        const existingTransfer = transfers.find(t => t.account === razorpayAccountId);
+        if (existingTransfer) {
+            existingTransfer.amount += netAmountPaisa;
+        } else {
+            transfers.push({
+                account: razorpayAccountId,
+                amount: netAmountPaisa,
+                currency: 'INR',
+                notes: { seller_id: sellerId },
+                on_hold: 0
+            });
+        }
       }
     }
 
@@ -112,7 +158,7 @@ async function initiateCartPayment(req, res, next) {
       return badRequest(res, 'All items in cart are free. Use free purchase endpoint instead.');
     }
 
-    const result = await paymentService.initiateCartPayment({ userId: req.user.id, amount: totalAmount });
+    const result = await paymentService.initiateCartPayment({ userId: req.user.id, amount: totalAmount, transfers });
     return success(res, result, 'Cart payment initiated');
   } catch (err) { next(err); }
 }
@@ -161,136 +207,7 @@ async function purchaseFree(req, res, next) {
 
 async function purchaseWithCredits(req, res, next) {
   try {
-    const { notesId } = req.body;
-    if (!notesId) return badRequest(res, 'notesId is required');
-
-    // 1. Get note details (check status and price)
-    const { data: note, error: noteErr } = await supabase
-      .from('notes')
-      .select('id, seller_id, price, title, is_free, status, download_count')
-      .eq('id', notesId)
-      .single();
-
-    if (noteErr || !note) return notFound(res, 'Note not found');
-    if (note.status !== 'live') return badRequest(res, 'Note is not available for purchase');
-    if (note.is_free) return badRequest(res, 'This note is free. Use direct purchase endpoint.');
-    if (note.seller_id === req.user.id) return badRequest(res, 'Cannot purchase your own note');
-
-    // 2. Check if already purchased
-    const { data: existingPurchase } = await supabase
-      .from('purchases')
-      .select('id')
-      .eq('buyer_id', req.user.id)
-      .eq('notes_id', notesId)
-      .eq('status', 'completed')
-      .single();
-    if (existingPurchase) return error(res, 'Already purchased', 409, 'DUPLICATE_PURCHASE');
-
-    // 3. Check buyer balance in seller_earnings (available net_amount sum)
-    const { data: earningsData, error: earningsErr } = await supabase
-      .from('seller_earnings')
-      .select('net_amount, status')
-      .eq('seller_id', req.user.id);
-
-    if (earningsErr) throw earningsErr;
-
-    const availableBalance = (earningsData || [])
-      .filter(e => e.status === 'available')
-      .reduce((sum, e) => sum + parseFloat(e.net_amount), 0);
-
-    if (availableBalance < note.price) {
-      return badRequest(res, `Insufficient Hub Credits. Balance is ₹${availableBalance.toFixed(2)}, note price is ₹${note.price.toFixed(2)}.`);
-    }
-
-    // 4. Create Purchase record
-    const purchaseId = uuidv4();
-    const { data: purchase, error: purchaseError } = await supabase
-      .from('purchases')
-      .insert({
-        id: purchaseId,
-        buyer_id: req.user.id,
-        notes_id: notesId,
-        amount_paid: note.price,
-        payment_method: 'wallet',
-        status: 'completed'
-      })
-      .select()
-      .single();
-
-    if (purchaseError) {
-      if (purchaseError.code === '23505') return error(res, 'Already purchased', 409, 'DUPLICATE_PURCHASE');
-      throw purchaseError;
-    }
-
-    // 5. Debit buyer (insert row in seller_earnings)
-    const buyerDebitId = uuidv4();
-    const { error: debitError } = await supabase
-      .from('seller_earnings')
-      .insert({
-        id: buyerDebitId,
-        seller_id: req.user.id,
-        notes_id: notesId,
-        purchase_id: purchaseId,
-        gross_amount: -note.price,
-        platform_commission: 0,
-        net_amount: -note.price,
-        status: 'available'
-      });
-    if (debitError) throw debitError;
-
-    // 6. Credit seller (insert row in seller_earnings)
-    const sellerCreditId = uuidv4();
-    const PLATFORM_COMMISSION = parseFloat(process.env.PLATFORM_COMMISSION) || 0.20;
-    const grossAmount = note.price;
-    const commission = grossAmount * PLATFORM_COMMISSION;
-    const netAmount = grossAmount - commission;
-
-    const { error: creditError } = await supabase
-      .from('seller_earnings')
-      .insert({
-        id: sellerCreditId,
-        seller_id: note.seller_id,
-        notes_id: notesId,
-        purchase_id: purchaseId,
-        gross_amount: grossAmount,
-        platform_commission: commission,
-        net_amount: netAmount,
-        status: 'available'
-      });
-    if (creditError) throw creditError;
-
-    // 7. Send notification to seller
-    const notificationId = uuidv4();
-    await supabase.from('notifications').insert({
-      id: notificationId,
-      user_id: note.seller_id,
-      type: 'sale',
-      title: 'New Sale! 🎉',
-      message: `Someone purchased "${note.title}" using credits for ₹${note.price.toFixed(2)}. You earned ₹${netAmount.toFixed(2)}.`,
-      related_id: purchaseId
-    });
-
-    // 8. Increment download count
-    try {
-      const { error: rpcErr } = await supabase.rpc('increment_download_count', { note_id: notesId });
-      if (rpcErr) throw rpcErr;
-    } catch (err) {
-      // Fallback
-      await supabase.from('notes').update({ download_count: (note.download_count || 0) + 1 }).eq('id', notesId);
-    }
-
-    // 9. Remove from cart if present
-    await supabase.from('cart_items').delete().eq('user_id', req.user.id).eq('notes_id', notesId);
-
-    return success(res, {
-      purchase_id: purchaseId,
-      notes_id: notesId,
-      amount_paid: note.price,
-      status: 'completed',
-      download_url: `/api/v1/notes/downloads/file/${notesId}`,
-      purchased_at: purchase.purchased_at
-    }, 'Purchase completed with credits');
-
+    return error(res, 'Credit system is currently on hold.', 403, 'FEATURE_DISABLED');
   } catch (err) {
     next(err);
   }

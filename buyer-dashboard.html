@@ -18,7 +18,7 @@
 <body class="bg-surface font-body-md text-on-surface flex flex-col min-h-screen">
 
     <!-- Top Navigation Bar -->
-    <header class="bg-surface/80 backdrop-blur-[20px] sticky top-0 z-50 border-b border-outline-variant/30 shadow-sm h-16 flex items-center">
+    <header class="bg-surface sticky top-0 z-50 border-b border-outline-variant/30 shadow-sm h-16 flex items-center">
         <div class="flex justify-between items-center w-full px-gutter max-w-container-max mx-auto h-16">
             <div class="flex items-center gap-8">
                 <a class="font-headline-md text-headline-md font-extrabold text-primary flex items-center gap-2" href="index.html">
@@ -54,7 +54,7 @@
 
     <div class="flex-grow flex max-w-container-max mx-auto w-full min-h-[calc(100vh-64px)]">
         <!-- Side Navigation Bar -->
-        <aside class="hidden md:flex flex-col p-6 space-y-4 bg-surface/80 backdrop-blur-[20px] border-r border-outline-variant/20 w-64 sticky top-16 h-[calc(100vh-64px)]">
+        <aside class="hidden md:flex flex-col p-6 space-y-4 bg-surface border-r border-outline-variant/20 w-64 sticky top-16 h-[calc(100vh-64px)] overflow-y-auto custom-scrollbar">
             <div class="flex flex-col items-center py-6 border-b border-outline-variant/20 mb-4 text-center">
                 <img id="sidebar-avatar" alt="Student avatar" class="w-16 h-16 rounded-full mb-3 shadow-md border-2 border-primary/10 object-cover" src=""/>
                 <h3 id="sidebar-name" class="font-bold text-on-surface text-base">Alex Mercer</h3>
@@ -68,7 +68,7 @@
                 </a>
                 <a class="flex items-center gap-3 p-3 text-on-surface-variant hover:bg-primary/5 hover:text-primary transition-all duration-200 rounded-xl" href="seller-dashboard.html">
                     <span class="material-symbols-outlined">monetization_on</span>
-                    <span class="text-sm font-semibold">Seller Dashboard</span>
+                    <span class="text-sm font-semibold">Earnings & Sales</span>
                 </a>
                 <a class="flex items-center gap-3 p-3 text-on-surface-variant hover:bg-primary/5 hover:text-primary transition-all duration-200 rounded-xl" href="upload.html">
                     <span class="material-symbols-outlined">cloud_upload</span>
@@ -100,7 +100,7 @@
             </header>
 
             <!-- Analytics Cards (Bento Style) -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
                 <div class="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/20 shadow-sm flex items-start justify-between">
                     <div>
                         <p class="text-on-surface-variant text-xs font-bold uppercase tracking-wider font-label-sm mb-1 opacity-70">Purchased Guides</p>
@@ -114,45 +114,22 @@
                         <span class="material-symbols-outlined">description</span>
                     </div>
                 </div>
-                <div class="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/20 shadow-sm flex items-start justify-between">
-                    <div>
-                        <p class="text-on-surface-variant text-xs font-bold uppercase tracking-wider font-label-sm mb-1 opacity-70">Hub Balance</p>
-                        <h2 id="hub-credits-badge" class="text-4xl font-extrabold text-tertiary">0 HC</h2>
-                        <p id="hub-credits-equiv" class="text-xs text-on-surface-variant mt-2 font-medium">Available: ₹0.00</p>
-                    </div>
-                    <div class="bg-tertiary/10 p-3 rounded-2xl text-tertiary">
-                        <span class="material-symbols-outlined">token</span>
-                    </div>
-                </div>
-                <div class="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/20 shadow-sm flex items-start justify-between">
-                    <div>
-                        <p class="text-on-surface-variant text-xs font-bold uppercase tracking-wider font-label-sm mb-1 opacity-70">Learning Goal</p>
-                        <h2 class="text-4xl font-extrabold text-secondary">3.9 GPA</h2>
-                        <div class="flex gap-1 mt-2">
-                            <span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">star</span>
-                            <span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">star</span>
-                            <span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">star</span>
-                            <span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">star</span>
-                            <span class="material-symbols-outlined text-secondary" style="font-variation-settings: 'FILL' 1;">star</span>
-                        </div>
-                    </div>
-                    <div class="bg-secondary/10 p-3 rounded-2xl text-secondary">
-                        <span class="material-symbols-outlined">school</span>
-                    </div>
-                </div>
+
             </div>
 
             <!-- Recently Viewed & My Purchased Notes Section -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
                 
                 <!-- Recently Viewed Section -->
-                <section class="lg:col-span-4">
-                    <div class="flex justify-between items-center mb-6">
-                        <h3 class="text-lg font-bold text-on-surface">Trending Guides</h3>
-                        <a class="text-primary font-bold text-xs hover:underline" href="browse.html">View Catalog</a>
-                    </div>
-                    <div class="space-y-4" id="trending-container">
-                        <!-- Loaded dynamically -->
+                <section class="lg:col-span-4 flex flex-col">
+                    <div class="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/20 shadow-sm flex-grow">
+                        <div class="flex justify-between items-center mb-6">
+                            <h3 class="text-lg font-bold text-on-surface">Trending Guides</h3>
+                            <a class="text-primary font-bold text-xs hover:underline" href="browse.html">View Catalog</a>
+                        </div>
+                        <div class="space-y-4" id="trending-container">
+                            <!-- Loaded dynamically -->
+                        </div>
                     </div>
                 </section>
                 
@@ -229,7 +206,7 @@
     <script>
         function resolveUrl(url, fallback) {
             if (!url) return fallback;
-            return url.startsWith('http') ? url : 'https://academiahub-backend-k2cq.onrender.com' + url;
+            return url.startsWith('http') ? url : window.BACKEND_URL + url;
         }
 
         async function loadDashboard() {
@@ -253,14 +230,16 @@
             document.getElementById('header-avatar').src = userObj.profileImage;
             document.getElementById('sidebar-avatar').src = userObj.profileImage;
             document.getElementById('sidebar-name').textContent = userObj.name;
-            document.getElementById('sidebar-major').textContent = `${userObj.major} • ${userObj.year}`;
-            document.getElementById('sidebar-uni').textContent = userObj.university;
-            document.getElementById('welcome-title').textContent = `Welcome back, ${userObj.name.split(' ')[0]}!`;
+            const major = userObj.major && userObj.major !== 'Not set' ? userObj.major : '';
+            const year = userObj.year && userObj.year !== 'Not set' ? userObj.year : '';
+            const majorText = [major, year].filter(Boolean).join(' • ');
+            const majorEl = document.getElementById('sidebar-major');
+            if (majorText) { majorEl.textContent = majorText; majorEl.style.display = ''; } else { majorEl.style.display = 'none'; }
 
-            // Update balance and badges
-            const creditsVal = Math.round(userObj.balance * 10);
-            document.getElementById('hub-credits-badge').textContent = `${creditsVal.toLocaleString()} HC`;
-            document.getElementById('hub-credits-equiv').textContent = `Available: ₹${userObj.balance.toFixed(2)}`;
+            const uni = userObj.university && userObj.university !== 'Not set' ? userObj.university : '';
+            const uniEl = document.getElementById('sidebar-uni');
+            if (uni) { uniEl.textContent = uni; uniEl.style.display = ''; } else { uniEl.style.display = 'none'; }
+            document.getElementById('welcome-title').textContent = `Welcome back, ${userObj.name.split(' ')[0]}!`;
 
             // Load purchased notes from backend
             let purchases = [];
@@ -290,7 +269,7 @@
 
                     const noteImage = resolveUrl(note.preview_url, 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600');
                     const sellerName = note.seller ? `${note.seller.first_name || ''} ${note.seller.last_name || ''}`.trim() : 'Contributor';
-                    const collegeName = note.colleges ? note.colleges.name : 'University';
+                    const collegeName = note.colleges ? note.colleges.name : (note.seller?.college || 'University');
                     const subjectText = note.subject || 'Study Material';
 
                     const row = document.createElement('tr');
@@ -315,9 +294,16 @@
                             </span>
                         </td>
                         <td class="p-4 text-right">
-                            <button onclick="downloadNoteFile('${note.id}')" class="bg-surface border border-outline-variant/40 hover:bg-primary hover:text-on-primary hover:border-primary p-2 rounded-xl transition-all shadow-sm active:scale-95 text-primary">
-                                <span class="material-symbols-outlined text-sm flex items-center justify-center">download</span>
-                            </button>
+                            <div class="flex items-center justify-end gap-2">
+                                <button onclick="window.location.href='reader.html?id=${note.id}'" class="bg-surface border border-outline-variant/40 hover:bg-primary hover:text-on-primary hover:border-primary px-4 py-2 rounded-xl transition-all shadow-sm active:scale-95 text-primary text-xs font-bold flex items-center justify-center gap-2">
+                                    <span class="material-symbols-outlined text-sm">menu_book</span>
+                                    Read Online
+                                </button>
+                                <button onclick="window.location.href='details.html?id=${note.id}#reviews-list'" class="bg-surface border border-outline-variant/40 hover:bg-secondary hover:text-on-secondary hover:border-secondary px-4 py-2 rounded-xl transition-all shadow-sm active:scale-95 text-secondary text-xs font-bold flex items-center justify-center gap-2" title="Write a Review">
+                                    <span class="material-symbols-outlined text-sm">rate_review</span>
+                                    Review
+                                </button>
+                            </div>
                         </td>
                     `;
                     tableBody.appendChild(row);
@@ -370,9 +356,7 @@
         }
 
         function downloadNoteFile(noteId) {
-            const token = localStorage.getItem('accessToken');
-            const url = `https://academiahub-backend-k2cq.onrender.com/api/v1/notes/downloads/file/${noteId}${token ? `?token=${token}` : ''}`;
-            window.open(url, '_blank');
+            // Deprecated: Replaced by Read Online (reader.html)
         };
 
         window.addEventListener('DOMContentLoaded', loadDashboard);

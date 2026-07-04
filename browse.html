@@ -18,7 +18,7 @@
 <body class="bg-background text-on-surface font-body-md min-h-screen flex flex-col">
 
     <!-- Top Navigation Bar -->
-    <header class="bg-surface/80 backdrop-blur-[20px] sticky top-0 z-50 border-b border-outline-variant/30 shadow-sm h-16 flex items-center">
+    <header class="bg-surface sticky top-0 z-50 border-b border-outline-variant/30 shadow-sm h-16 flex items-center">
         <div class="flex justify-between items-center w-full px-gutter max-w-container-max mx-auto h-16">
             <div class="flex items-center gap-8">
                 <a class="font-headline-md text-headline-md font-extrabold text-primary flex items-center gap-2" href="index.html">
@@ -56,7 +56,7 @@
     <div class="max-w-container-max mx-auto px-gutter py-8 flex flex-col md:flex-row gap-8 flex-grow w-full">
         
         <!-- Sidebar Filters -->
-        <aside class="w-full md:w-64 flex-shrink-0 space-y-6 sticky top-20 self-start">
+        <aside class="w-full md:w-64 flex-shrink-0 space-y-6 sticky top-20 self-start custom-scrollbar filter-sidebar-scroll">
             <div class="bg-surface-container-lowest p-6 rounded-3xl border border-outline-variant/30 shadow-sm glass-card">
                 
                 <div class="flex items-center justify-between mb-6 border-b border-outline-variant/20 pb-3">
@@ -100,10 +100,10 @@
                 <div class="mb-6">
                     <h4 class="font-bold text-on-surface text-sm mb-3">Academic Year</h4>
                     <div class="grid grid-cols-2 gap-2" id="year-filters">
-                        <button class="year-filter-btn px-2 py-1.5 border border-outline-variant/40 rounded-xl text-xs font-bold transition-all text-on-surface-variant hover:border-primary hover:text-primary" data-year="Freshman">Freshman</button>
-                        <button class="year-filter-btn px-2 py-1.5 border border-outline-variant/40 rounded-xl text-xs font-bold transition-all text-on-surface-variant hover:border-primary hover:text-primary" data-year="Sophomore">Sophomore</button>
-                        <button class="year-filter-btn px-2 py-1.5 border border-outline-variant/40 rounded-xl text-xs font-bold transition-all text-on-surface-variant hover:border-primary hover:text-primary" data-year="Junior">Junior</button>
-                        <button class="year-filter-btn px-2 py-1.5 border border-outline-variant/40 rounded-xl text-xs font-bold transition-all text-on-surface-variant hover:border-primary hover:text-primary" data-year="Senior">Senior</button>
+                        <button class="year-filter-btn px-2 py-1.5 border border-outline-variant/40 rounded-xl text-xs font-bold transition-all text-on-surface-variant hover:border-primary hover:text-primary" data-year="1st year">1st year</button>
+                        <button class="year-filter-btn px-2 py-1.5 border border-outline-variant/40 rounded-xl text-xs font-bold transition-all text-on-surface-variant hover:border-primary hover:text-primary" data-year="2nd year">2nd year</button>
+                        <button class="year-filter-btn px-2 py-1.5 border border-outline-variant/40 rounded-xl text-xs font-bold transition-all text-on-surface-variant hover:border-primary hover:text-primary" data-year="3rd year">3rd year</button>
+                        <button class="year-filter-btn px-2 py-1.5 border border-outline-variant/40 rounded-xl text-xs font-bold transition-all text-on-surface-variant hover:border-primary hover:text-primary" data-year="4th year">4th year</button>
                     </div>
                 </div>
 
@@ -219,7 +219,7 @@
         let totalResults = 0;
         let fetchDebounceTimer = null;
 
-        const YEAR_MAP = { 'Freshman': 1, 'Sophomore': 2, 'Junior': 3, 'Senior': 4 };
+        const YEAR_MAP = { '1st year': 1, '2nd year': 2, '3rd year': 3, '4th year': 4 };
 
         // Extract URL Parameters
         function parseUrlParams() {
@@ -266,7 +266,7 @@
         // Helper: resolve image URLs
         function resolveUrl(url, fallback) {
             if (!url) return fallback;
-            return url.startsWith('http') ? url : 'https://academiahub-backend-k2cq.onrender.com' + url;
+            return url.startsWith('http') ? url : window.BACKEND_URL + url;
         }
 
         // Build query params and fetch notes from the backend
@@ -383,7 +383,7 @@
                 const sellerImage = resolveUrl(note.seller?.profile_pic_url, 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100');
                 const sellerName = note.seller ? `${note.seller.first_name || ''} ${note.seller.last_name || ''}`.trim() : 'Contributor';
                 const category = note.subject || note.department?.name || 'Study Material';
-                const collegeName = note.colleges?.name || '';
+                const collegeName = note.colleges ? note.colleges.name : (note.seller?.college || 'University');
                 const rating = note.rating != null ? parseFloat(note.rating).toFixed(1) : '5.0';
                 const reviewsCount = note.rating_count || 0;
                 const priceText = note.is_free ? 'Free' : `₹${parseFloat(note.price || 0).toFixed(2)}`;
@@ -397,14 +397,14 @@
                     `;
                 } else if (purchasedIds.includes(note.id)) {
                     actionButtonHtml = `
-                        <button class="w-8 h-8 rounded-full bg-secondary/15 text-secondary hover:bg-secondary hover:text-on-secondary flex items-center justify-center transition-all" onclick="event.stopPropagation(); window.open('https://academiahub-backend-k2cq.onrender.com/api/v1/notes/downloads/file/${note.id}${accessToken ? '?token='+accessToken : ''}', '_blank')" title="Download Purchased Note">
-                            <span class="material-symbols-outlined text-base">download</span>
+                        <button class="w-8 h-8 rounded-full bg-secondary/15 text-secondary hover:bg-secondary hover:text-on-secondary flex items-center justify-center transition-all" onclick="event.stopPropagation(); downloadNote('${note.id}')" title="Download Purchased Note">
+                            <span class="material-symbols-outlined text-sm">download</span>
                         </button>
                     `;
                 } else if (note.is_free || note.price === 0) {
                     actionButtonHtml = `
-                        <button class="w-8 h-8 rounded-full bg-secondary/15 text-secondary hover:bg-secondary hover:text-on-secondary flex items-center justify-center transition-all" onclick="event.stopPropagation(); window.open('https://academiahub-backend-k2cq.onrender.com/api/v1/notes/downloads/file/${note.id}${accessToken ? '?token='+accessToken : ''}', '_blank')" title="Download Free Note">
-                            <span class="material-symbols-outlined text-base">download</span>
+                        <button class="w-8 h-8 rounded-full bg-secondary/15 text-secondary hover:bg-secondary hover:text-on-secondary flex items-center justify-center transition-all" onclick="event.stopPropagation(); downloadNote('${note.id}')" title="Download Free Note">
+                            <span class="material-symbols-outlined text-sm">download</span>
                         </button>
                     `;
                 } else if (cartIds.includes(note.id)) {

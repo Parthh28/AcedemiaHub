@@ -29,7 +29,7 @@
 <body class="bg-surface text-on-surface font-body-md min-h-screen flex flex-col">
 
     <!-- Top Navigation Bar -->
-    <header class="bg-surface/80 backdrop-blur-[20px] sticky top-0 z-50 border-b border-outline-variant/30 shadow-sm h-16 flex items-center">
+    <header class="bg-surface sticky top-0 z-50 border-b border-outline-variant/30 shadow-sm h-16 flex items-center">
         <div class="flex justify-between items-center w-full px-gutter max-w-container-max mx-auto h-16">
             <div class="flex items-center gap-8">
                 <a class="font-headline-md text-headline-md font-extrabold text-primary flex items-center gap-2" href="index.html">
@@ -62,7 +62,7 @@
 
     <div class="flex-grow flex max-w-container-max mx-auto w-full min-h-[calc(100vh-64px)]">
         <!-- Side Navigation Bar -->
-        <aside class="hidden md:flex flex-col p-6 space-y-4 bg-surface/80 backdrop-blur-[20px] border-r border-outline-variant/20 w-64 sticky top-16 h-[calc(100vh-64px)] font-medium">
+        <aside class="hidden md:flex flex-col p-6 space-y-4 bg-surface border-r border-outline-variant/20 w-64 sticky top-16 h-[calc(100vh-64px)] font-medium overflow-y-auto custom-scrollbar">
             <div class="flex flex-col items-center py-6 border-b border-outline-variant/20 mb-4 text-center">
                 <img id="sidebar-avatar" alt="Student avatar" class="w-16 h-16 rounded-full mb-3 shadow-md border-2 border-primary/10 object-cover" src=""/>
                 <h3 id="sidebar-name" class="font-bold text-on-surface text-base">Alex Mercer</h3>
@@ -76,7 +76,7 @@
                 </a>
                 <a class="flex items-center gap-3 p-3 text-on-surface-variant hover:bg-primary/5 hover:text-primary transition-all duration-200 rounded-xl" href="seller-dashboard.html">
                     <span class="material-symbols-outlined">monetization_on</span>
-                    <span class="text-sm font-semibold">Seller Dashboard</span>
+                    <span class="text-sm font-semibold">Earnings & Sales</span>
                 </a>
                 <a class="flex items-center gap-3 p-3 text-on-surface-variant hover:bg-primary/5 hover:text-primary transition-all duration-200 rounded-xl" href="upload.html">
                     <span class="material-symbols-outlined">cloud_upload</span>
@@ -170,11 +170,12 @@
                                     <div class="flex flex-col gap-2">
                                         <label class="text-xs font-bold text-on-surface-variant uppercase tracking-wide">Academic Year</label>
                                         <select id="settings-year-input" class="bg-surface-container-low border border-outline-variant/30 focus:border-primary rounded-2xl px-4 py-3 text-on-surface text-sm transition-all">
-                                            <option value="Freshman">Freshman</option>
-                                            <option value="Sophomore">Sophomore</option>
-                                            <option value="Junior">Junior</option>
-                                            <option value="Senior">Senior</option>
-                                            <option value="Graduate">Graduate</option>
+                                            <option value="1st Year">1st Year</option>
+                                            <option value="2nd Year">2nd Year</option>
+                                            <option value="3rd Year">3rd Year</option>
+                                            <option value="4th Year">4th Year</option>
+                                            <option value="5th Year">5th Year</option>
+                                            <option value="Masters/PG">Masters/PG</option>
                                         </select>
                                     </div>
                                     <div class="flex flex-col gap-2 md:col-span-2">
@@ -387,8 +388,15 @@
             document.getElementById('header-avatar').src = userObj.profileImage;
             document.getElementById('sidebar-avatar').src = userObj.profileImage;
             document.getElementById('sidebar-name').textContent = userObj.name;
-            document.getElementById('sidebar-major').textContent = `${userObj.major} • ${userObj.year}`;
-            document.getElementById('sidebar-uni').textContent = userObj.university;
+            const major = userObj.major && userObj.major !== 'Not set' ? userObj.major : '';
+            const year = userObj.year && userObj.year !== 'Not set' ? userObj.year : '';
+            const majorText = [major, year].filter(Boolean).join(' • ');
+            const majorEl = document.getElementById('sidebar-major');
+            if (majorText) { majorEl.textContent = majorText; majorEl.style.display = ''; } else { majorEl.style.display = 'none'; }
+
+            const uni = userObj.university && userObj.university !== 'Not set' ? userObj.university : '';
+            const uniEl = document.getElementById('sidebar-uni');
+            if (uni) { uniEl.textContent = uni; uniEl.style.display = ''; } else { uniEl.style.display = 'none'; }
 
             // Bind form inputs
             document.getElementById('preview-avatar').src = userObj.profileImage;
@@ -435,7 +443,7 @@
         }
 
         // Save profile modifications back to localStorage
-        function saveUserProfile() {
+        async function saveUserProfile() {
             const userObj = JSON.parse(localStorage.getItem('current_user'));
             if (!userObj) return;
 
@@ -452,29 +460,64 @@
                 return;
             }
 
-            // Save to object
-            userObj.name = newName;
-            userObj.university = newUni;
-            userObj.major = newMajor;
-            userObj.year = newYear;
-            userObj.bio = newBio;
-            userObj.profileImage = newAvatar;
+            showNotification("Saving changes...", "info");
 
-            localStorage.setItem('current_user', JSON.stringify(userObj));
+            try {
+                // Split name into first and last name
+                const first = newName.split(' ')[0] || '';
+                const last = newName.split(' ').slice(1).join(' ') || '';
 
-            // Dynamically update page components instantly
-            document.getElementById('header-avatar').src = newAvatar;
-            document.getElementById('sidebar-avatar').src = newAvatar;
-            document.getElementById('sidebar-name').textContent = newName;
-            document.getElementById('sidebar-major').textContent = `${newMajor} • ${newYear}`;
-            document.getElementById('sidebar-uni').textContent = newUni;
-            document.getElementById('card-holder-name').textContent = newName.toUpperCase();
+                // Map year option string to number for backend (1 to 6)
+                const yearsArray = ['1st Year', '2nd Year', '3rd Year', '4th Year', '5th Year', 'Masters/PG'];
+                let yearInt = yearsArray.indexOf(newYear) + 1;
+                if (yearInt === 0) yearInt = 1;
 
-            // Dispatch profile change notification
-            showNotification("Your profile changes have been saved successfully!", "success");
+                await apiFetch('/auth/profile', {
+                    method: 'PUT',
+                    body: {
+                        firstName: first,
+                        lastName: last,
+                        college: newUni,
+                        major: newMajor,
+                        year: yearInt,
+                        bio: newBio
+                    }
+                });
 
-            // Dispatch event to redraw dynamic parts (like top dropdown menu name/image if clicked)
-            window.dispatchEvent(new CustomEvent('userUpdated'));
+                // Save to local object
+                userObj.name = newName;
+                userObj.university = newUni;
+                userObj.major = newMajor;
+                userObj.year = newYear;
+                userObj.bio = newBio;
+                userObj.profileImage = newAvatar;
+
+                localStorage.setItem('current_user', JSON.stringify(userObj));
+
+                // Dynamically update page components instantly
+                document.getElementById('header-avatar').src = newAvatar;
+                document.getElementById('sidebar-avatar').src = newAvatar;
+                document.getElementById('sidebar-name').textContent = newName;
+                const majorText = [newMajor, newYear].filter(Boolean).join(' • ');
+                const majorEl = document.getElementById('sidebar-major');
+                if (majorText && newMajor !== 'Not set') { majorEl.textContent = majorText; majorEl.style.display = ''; } else { majorEl.style.display = 'none'; }
+                
+                const uniEl = document.getElementById('sidebar-uni');
+                if (newUni && newUni !== 'Not set') { uniEl.textContent = newUni; uniEl.style.display = ''; } else { uniEl.style.display = 'none'; }
+                document.getElementById('card-holder-name').textContent = newName.toUpperCase();
+
+                // Dispatch profile change notification
+                showNotification("Your profile changes have been saved successfully!", "success");
+
+                // Dispatch event to redraw dynamic parts (like top dropdown menu name/image if clicked)
+                window.dispatchEvent(new CustomEvent('userUpdated'));
+                
+                // Sync details globally
+                await syncUserWithBackend();
+            } catch (err) {
+                console.error(err);
+                showNotification(err.error?.message || "Failed to save profile changes. Please try again.", "error");
+            }
         }
 
         // Toggle 2FA mock security state

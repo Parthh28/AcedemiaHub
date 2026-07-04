@@ -8,7 +8,15 @@
     <!-- Tailwind CSS (Static Compiled Build) -->
     <link href="css/tailwind.css" rel="stylesheet">
     
-    <!-- Google Fonts -->
+    <!-- PDF.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
+    <script>
+        const workerBlob = new Blob(
+            [`importScripts('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js');`],
+            { type: 'text/javascript' }
+        );
+        pdfjsLib.GlobalWorkerOptions.workerSrc = URL.createObjectURL(workerBlob);
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@500&amp;display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
     
@@ -28,7 +36,7 @@
 <body class="bg-surface text-on-surface font-body-md min-h-screen flex flex-col">
 
     <!-- Top Navigation Bar -->
-    <header class="bg-surface/80 backdrop-blur-[20px] sticky top-0 z-50 border-b border-outline-variant/30 shadow-sm h-16 flex items-center">
+    <header class="bg-surface sticky top-0 z-50 border-b border-outline-variant/30 shadow-sm h-16 flex items-center">
         <div class="flex justify-between items-center w-full px-gutter max-w-container-max mx-auto h-16">
             <div class="flex items-center gap-8">
                 <a class="font-headline-md text-headline-md font-extrabold text-primary flex items-center gap-2" href="index.html">
@@ -61,7 +69,7 @@
 
     <div class="flex-grow flex max-w-container-max mx-auto w-full min-h-[calc(100vh-64px)]">
         <!-- Side Navigation Bar -->
-        <aside class="hidden md:flex flex-col p-6 space-y-4 bg-surface/80 backdrop-blur-[20px] border-r border-outline-variant/20 w-64 sticky top-16 h-[calc(100vh-64px)] font-medium">
+        <aside class="hidden md:flex flex-col p-6 space-y-4 bg-surface border-r border-outline-variant/20 w-64 sticky top-16 h-[calc(100vh-64px)] font-medium overflow-y-auto custom-scrollbar">
             <div class="flex flex-col items-center py-6 border-b border-outline-variant/20 mb-4 text-center">
                 <img id="sidebar-avatar" alt="Student avatar" class="w-16 h-16 rounded-full mb-3 shadow-md border-2 border-primary/10 object-cover" src=""/>
                 <h3 id="sidebar-name" class="font-bold text-on-surface text-base">Alex Mercer</h3>
@@ -75,7 +83,7 @@
                 </a>
                 <a class="flex items-center gap-3 p-3 text-on-surface-variant hover:bg-primary/5 hover:text-primary transition-all duration-200 rounded-xl" href="seller-dashboard.html">
                     <span class="material-symbols-outlined">monetization_on</span>
-                    <span class="text-sm font-semibold">Seller Dashboard</span>
+                    <span class="text-sm font-semibold">Earnings & Sales</span>
                 </a>
                 <a class="flex items-center gap-3 p-3 text-on-surface-variant hover:bg-primary/5 hover:text-primary transition-all duration-200 rounded-xl" href="upload.html">
                     <span class="material-symbols-outlined">cloud_upload</span>
@@ -121,6 +129,10 @@
                         <div class="flex items-center text-green-600 gap-1 mt-2 text-[10px] font-bold">
                             <span class="material-symbols-outlined text-xs">trending_up</span>
                             <span>+12.5% this month</span>
+                        </div>
+                        <div class="mt-4 pt-3 border-t border-outline-variant/10">
+                            <p class="text-[10px] text-on-surface-variant uppercase font-bold tracking-wide">Gross Merchandise Value</p>
+                            <p class="text-sm font-extrabold text-on-surface" id="total-gmv-stat">₹0.00</p>
                         </div>
                     </div>
                     <div class="bg-primary/10 p-3 rounded-2xl text-primary">
@@ -181,7 +193,10 @@
                         <h3 class="text-lg font-bold text-on-surface" id="trends-title">Revenue Growth: Weekly</h3>
                         <p class="text-on-surface-variant text-xs mt-0.5">Platform sales metrics over the active time range.</p>
                     </div>
-                    <div class="flex gap-2">
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button id="export-platform-csv-btn" onclick="exportPlatformCsv()" class="px-4 py-1.5 rounded-full text-xs font-bold border border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary transition-all flex items-center gap-1">
+                            <span class="material-symbols-outlined text-[14px]">download</span> Export CSV
+                        </button>
                         <button id="chart-btn-monthly" onclick="switchChartData('monthly')" class="px-4 py-1.5 rounded-full text-xs font-bold border border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary transition-all">Monthly</button>
                         <button id="chart-btn-weekly" onclick="switchChartData('weekly')" class="px-4 py-1.5 rounded-full text-xs font-bold bg-primary text-on-primary transition-all shadow-md">Weekly</button>
                     </div>
@@ -213,6 +228,7 @@
                                 <thead>
                                     <tr class="bg-surface-container-low/30 border-b border-outline-variant/20 text-xs font-bold text-on-surface-variant font-label-sm uppercase tracking-wider">
                                         <th class="p-4 pl-6">User</th>
+                                        <th class="p-4">Email</th>
                                         <th class="p-4">University</th>
                                         <th class="p-4">Status</th>
                                         <th class="p-4 text-right pr-6">Actions</th>
@@ -229,26 +245,95 @@
                     </div>
                 </div>
 
-                <!-- Flagged Materials moderation Widget (1/3 width) -->
+                <!-- Pending Approvals Widget (1/3 width) -->
                 <div class="bg-surface-container-lowest rounded-3xl border border-outline-variant/20 shadow-sm flex flex-col justify-between">
                     <div>
                         <div class="p-6 border-b border-outline-variant/10 bg-surface">
-                            <h3 class="text-lg font-bold text-on-surface">Flagged Materials</h3>
-                            <p class="text-xs text-error font-bold mt-0.5">Moderation action required</p>
+                            <h3 class="text-lg font-bold text-on-surface">Pending Approvals</h3>
+                            <p class="text-xs text-error font-bold mt-0.5">Notes requiring review</p>
                         </div>
 
                         <!-- Moderation Queue -->
-                        <div class="p-4 space-y-4 max-h-[360px] overflow-y-auto" id="flags-container">
+                        <div class="p-4 space-y-4 max-h-[360px] overflow-y-auto" id="moderation-queue-container">
                             <!-- Dynamic Cards -->
+                            <div class="text-center py-4 text-xs text-on-surface-variant font-bold">Loading queue...</div>
                         </div>
                     </div>
 
                     <div class="p-4 bg-surface-container-low/30 text-center rounded-b-3xl border-t border-outline-variant/10">
-                        <button onclick="clearAllFlags()" id="clear-flags-btn" class="text-primary hover:text-primary-hover font-bold text-xs uppercase transition-all">Clear All Pending</button>
+                        <button onclick="loadModerationQueue()" id="refresh-queue-btn" class="text-primary hover:text-primary-hover font-bold text-xs uppercase transition-all">Refresh Queue</button>
                     </div>
                 </div>
             </div>
         </main>
+    </div>
+
+    <!-- Note Preview Modal -->
+    <div id="note-preview-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[10000] flex items-center justify-center p-4 hidden">
+        <div class="modal-container bg-surface-container-lowest border border-outline-variant/30 rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden flex flex-col md:flex-row max-h-[90vh] md:max-h-[80vh] transform scale-95 opacity-0 transition-all duration-300 relative">
+            
+            <!-- Close button top-right -->
+            <button onclick="closeNotePreviewModal()" class="absolute top-4 right-4 z-20 text-on-surface-variant hover:text-on-surface hover:bg-surface-variant/30 p-2 rounded-full transition-all">
+                <span class="material-symbols-outlined text-[20px]">close</span>
+            </button>
+
+            <!-- Visual Preview Canvas (Left) -->
+            <div class="w-full md:w-1/2 bg-surface-container-low flex flex-col items-center justify-start p-4 border-b md:border-b-0 md:border-r border-outline-variant/20 relative min-h-[350px] overflow-y-auto max-h-[90vh] md:max-h-full custom-scrollbar" id="preview-modal-viewer-container">
+                <!-- Loader -->
+                <div id="preview-modal-loader" class="absolute inset-0 flex flex-col items-center justify-center bg-surface-container-low z-10 hidden">
+                    <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-primary border-r-2 border-b-2"></div>
+                    <p class="text-[10px] text-on-surface-variant font-bold mt-2">Loading document preview...</p>
+                </div>
+                <!-- Error -->
+                <div id="preview-modal-error" class="absolute inset-0 flex flex-col items-center justify-center bg-surface-container-low z-10 hidden p-4 text-center">
+                    <span class="material-symbols-outlined text-error text-3xl mb-1">error</span>
+                    <p class="text-xs text-error font-bold" id="preview-modal-error-text">Failed to load preview</p>
+                </div>
+                <!-- PDF Render Canvas Area -->
+                <div id="preview-modal-pdf-pages" class="w-full flex flex-col items-center gap-4 py-2">
+                    <!-- PDF pages will render here -->
+                </div>
+                <!-- Fallback Cover image -->
+                <img id="preview-modal-img" alt="Note visual preview" class="max-w-full max-h-[350px] object-contain rounded-xl shadow-md hidden" src="">
+                <!-- Generic Placeholder -->
+                <div id="preview-modal-placeholder" class="text-center p-6 flex flex-col items-center justify-center h-full my-auto hidden">
+                    <span class="material-symbols-outlined text-5xl text-primary/40 mb-3">description</span>
+                    <p class="font-bold text-on-surface text-sm">Secure Document File</p>
+                    <p class="text-on-surface-variant text-[11px] mt-1 max-w-[200px]">No visual cover preview is uploaded.</p>
+                </div>
+            </div>
+
+            <!-- Details Content (Right) -->
+            <div class="w-full md:w-1/2 p-8 flex flex-col justify-between max-h-[450px] md:max-h-full overflow-y-auto">
+                <div>
+                    <div class="flex items-center justify-between gap-4 mb-3">
+                        <span id="preview-modal-subject" class="text-[9px] font-bold text-primary uppercase tracking-wider bg-primary/10 px-2 py-0.5 rounded">Category</span>
+                        <span id="preview-modal-price" class="text-xs font-bold text-on-surface">₹0.00</span>
+                    </div>
+                    
+                    <h4 id="preview-modal-title" class="font-headline-sm font-extrabold text-on-surface text-lg mb-2 line-clamp-2">Note Title</h4>
+                    
+                    <p class="text-[11px] text-on-surface-variant">Uploaded by <span id="preview-modal-author" class="font-bold text-primary">@author</span></p>
+                    
+                    <div class="mt-4 pt-4 border-t border-outline-variant/10">
+                        <h5 class="text-xs font-bold text-on-surface mb-1">Description</h5>
+                        <p id="preview-modal-desc" class="text-xs text-on-surface-variant font-medium line-clamp-4 leading-relaxed">No description provided.</p>
+                    </div>
+                </div>
+
+                <div class="mt-8 space-y-3">
+                    <a id="preview-modal-reader-link" target="_blank" href="#" class="w-full bg-primary text-on-primary hover:bg-primary-hover font-bold text-xs py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2">
+                        <span class="material-symbols-outlined text-[16px]">menu_book</span> Open in Secure Reader
+                    </a>
+                    
+                    <div class="flex gap-2">
+                        <button id="preview-modal-approve-btn" class="flex-1 bg-surface-container-high hover:bg-primary hover:text-on-primary text-on-surface font-bold text-xs py-2.5 rounded-xl transition-all active:scale-95">Approve</button>
+                        <button id="preview-modal-reject-btn" class="flex-1 bg-error-container hover:bg-error hover:text-on-error text-on-error-container font-bold text-xs py-2.5 rounded-xl transition-all active:scale-95">Reject</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
     </div>
 
     <!-- Footer -->
@@ -264,9 +349,9 @@
     <script>
         // Mock data lists
         let mockUsers = [
-            { id: "JM", name: "Julian Mercer", university: "Stanford University", status: "Verified" },
-            { id: "LA", name: "Lana Adkins", university: "MIT", status: "Standard" },
-            { id: "BK", name: "Ben King", university: "Oxford University", status: "Verified" }
+            { id: "JM", name: "Julian Mercer", email: "julian.mercer@stanford.edu", university: "Stanford University", status: "Verified" },
+            { id: "LA", name: "Lana Adkins", email: "lana.adkins@mit.edu", university: "MIT", status: "Standard" },
+            { id: "BK", name: "Ben King", email: "ben.king@oxford.edu", university: "Oxford University", status: "Verified" }
         ];
 
         let mockFlags = [
@@ -291,9 +376,9 @@
         };
 
         // Initialize Admin page
-        function initAdminDashboard() {
+        async function initAdminDashboard() {
             const userObj = JSON.parse(localStorage.getItem('current_user'));
-            if (!userObj) {
+            if (!userObj || userObj.role !== 'admin') {
                 showNotification("Please log in to view administrator console.", "error");
                 setTimeout(() => { window.location.href = "login.html"; }, 1000);
                 return;
@@ -310,9 +395,74 @@
             const opt = { month: 'short', day: 'numeric', year: 'numeric' };
             document.getElementById('current-date-range').textContent = `${lastWeek.toLocaleDateString('en-US', opt)} - ${today.toLocaleDateString('en-US', opt)}`;
 
+            // Fetch Real Data
+            try {
+                const [statsRes, usersRes, queueRes] = await Promise.all([
+                    apiFetch('/admin/dashboard'),
+                    apiFetch('/admin/users?limit=6'),
+                    apiFetch('/admin/moderation-queue')
+                ]);
+
+                if (statsRes.success) {
+                    const stats = statsRes.data;
+                    
+                    if (stats.platform_revenue > 0 || stats.total_users > 0) {
+                        document.querySelector('.admin-stat-card:nth-child(1) h2').textContent = `₹${(stats.platform_revenue || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                        document.querySelector('.admin-stat-card:nth-child(2) h2').textContent = (stats.total_users || 0).toLocaleString();
+                        document.querySelector('.admin-stat-card:nth-child(3) h2').textContent = (stats.new_notes_today || 0).toLocaleString();
+                        document.querySelector('.admin-stat-card:nth-child(4) h2').textContent = (stats.pending_moderation || 0).toLocaleString();
+                        
+                        const gmvEl = document.getElementById('total-gmv-stat');
+                        if (gmvEl) gmvEl.textContent = `₹${(stats.total_gmv || 0).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+                        
+                        if (stats.weekly_revenue && stats.weekly_revenue.length > 0) {
+                            chartData.weekly.labels = stats.weekly_revenue.map(r => {
+                                const d = new Date(r.date);
+                                return d.toLocaleDateString('en-US', { weekday: 'short' }).toUpperCase();
+                            });
+                            chartData.weekly.values = stats.weekly_revenue.map(r => r.revenue);
+                            chartData.weekly.max = Math.max(...chartData.weekly.values, 100);
+                        }
+                    }
+                }
+
+                if (usersRes.success && usersRes.data.users && usersRes.data.users.length > 0) {
+                    mockUsers = usersRes.data.users.map(u => ({
+                        id: u.id.slice(0, 5).toUpperCase(),
+                        rawId: u.id,
+                        name: `${u.first_name || ''} ${u.last_name || ''}`.trim() || u.email,
+                        email: u.email,
+                        university: "Registered Student",
+                        status: u.status === 'active' ? 'Verified' : (u.status === 'suspended' ? 'Blocked' : 'Standard')
+                    }));
+                }
+
+                if (queueRes.success && queueRes.data.queue && queueRes.data.queue.length > 0) {
+                    mockFlags = queueRes.data.queue.map(q => {
+                        const n = Array.isArray(q.notes) ? q.notes[0] : q.notes;
+                        return {
+                            id: q.id,
+                            notes_id: n?.id,
+                            type: "Manual Review",
+                            title: n?.title || 'Unknown Material',
+                            description: n?.description || '',
+                            subject: n?.subject || '',
+                            file_url: n?.file_url || null,
+                            preview_url: n?.preview_url || null,
+                            price: n?.price || 0,
+                            author: n?.seller ? `${n.seller.first_name || ''} ${n.seller.last_name || ''}`.trim() : 'Unknown',
+                            time: new Date(q.submitted_at).toLocaleDateString()
+                        };
+                    });
+                }
+            } catch(e) {
+                console.error("Failed to load admin data:", e);
+                showNotification("Could not connect to backend server.", "error");
+            }
+
             // Render components
             renderUsers();
-            renderFlags();
+            loadModerationQueue();
             switchChartData('weekly');
 
             // Bind log out
@@ -356,6 +506,9 @@
                         <span class="font-bold text-on-surface text-sm">${user.name}</span>
                     </td>
                     <td class="p-4 text-sm text-on-surface-variant font-medium">
+                        <span class="text-xs font-mono select-all bg-surface-container/30 px-2 py-1 rounded border border-outline-variant/20">${user.email || 'N/A'}</span>
+                    </td>
+                    <td class="p-4 text-sm text-on-surface-variant font-medium">
                         <span class="bg-surface-container px-3 py-1 rounded-full text-xs">${user.university}</span>
                     </td>
                     <td class="p-4">
@@ -379,18 +532,24 @@
         }
 
         // Action: Block/Unblock mock user
-        function toggleBlockUser(id) {
+        async function toggleBlockUser(id) {
             const user = mockUsers.find(u => u.id === id);
-            if (!user) return;
+            if (!user || !user.rawId) return;
 
-            if (user.status === 'Blocked') {
-                user.status = 'Verified';
-                showNotification(`User ${user.name} has been unblocked.`, "success");
-            } else {
-                user.status = 'Blocked';
-                showNotification(`User ${user.name} has been blocked and suspended.`, "error");
+            try {
+                if (user.status === 'Blocked') {
+                    await apiFetch(`/admin/users/${user.rawId}/unsuspend`, { method: 'POST' });
+                    user.status = 'Verified';
+                    showNotification(`User ${user.name} has been unblocked.`, "success");
+                } else {
+                    await apiFetch(`/admin/users/${user.rawId}/suspend`, { method: 'POST', body: { reason: 'Admin suspended' } });
+                    user.status = 'Blocked';
+                    showNotification(`User ${user.name} has been blocked and suspended.`, "error");
+                }
+                renderUsers();
+            } catch(e) {
+                showNotification(e.error?.message || "Failed to update user.", "error");
             }
-            renderUsers();
         }
 
         // Action: Edit mock user university
@@ -406,11 +565,11 @@
             }
         }
 
-        // Render flagged materials moderation panel
-        function renderFlags() {
-            const container = document.getElementById('flags-container');
+        // Render pending approvals queue
+        function loadModerationQueue() {
+            const container = document.getElementById('moderation-queue-container');
             const pendingCountEl = document.getElementById('pending-reports-count');
-            const clearBtn = document.getElementById('clear-flags-btn');
+            const refreshBtn = document.getElementById('refresh-queue-btn');
 
             container.innerHTML = '';
             pendingCountEl.textContent = mockFlags.length;
@@ -420,14 +579,11 @@
                     <div class="p-8 text-center text-on-surface-variant">
                         <span class="material-symbols-outlined text-4xl text-primary opacity-40 mb-2">done_all</span>
                         <p class="font-bold text-sm">All caught up!</p>
-                        <p class="text-xs mt-1">No pending materials flagged for review.</p>
+                        <p class="text-xs mt-1">No pending notes requiring review.</p>
                     </div>
                 `;
-                clearBtn.classList.add('hidden');
                 return;
             }
-
-            clearBtn.classList.remove('hidden');
 
             mockFlags.forEach(flag => {
                 const card = document.createElement('div');
@@ -436,62 +592,254 @@
                 
                 card.innerHTML = `
                     <div class="flex justify-between items-start mb-2">
-                        <span class="text-[9px] font-bold text-error uppercase tracking-wider bg-error/10 px-2 py-0.5 rounded">${flag.type}</span>
+                        <span class="text-[9px] font-bold text-tertiary uppercase tracking-wider bg-tertiary/10 px-2 py-0.5 rounded font-sans">New Note</span>
                         <span class="text-[10px] text-on-surface-variant opacity-75 font-semibold font-sans">${flag.time}</span>
                     </div>
                     <h5 class="font-bold text-on-surface text-sm mb-1 line-clamp-1">${flag.title}</h5>
-                    <p class="text-[11px] text-on-surface-variant font-medium mb-4">Uploaded by <span class="text-primary font-semibold">@${flag.author}</span></p>
-                    <div class="flex gap-2">
-                        <button onclick="approveFlag(${flag.id})" class="flex-1 bg-surface-container-high hover:bg-primary hover:text-on-primary text-on-surface font-bold text-[11px] py-2 rounded-xl transition-all active:scale-95">Approve</button>
-                        <button onclick="removeFlagMaterial(${flag.id})" class="flex-1 bg-error-container hover:bg-error hover:text-on-error text-on-error-container font-bold text-[11px] py-2 rounded-xl transition-all active:scale-95">Remove</button>
+                    <p class="text-[11px] text-on-surface-variant font-medium mb-3">Uploaded by <span class="text-primary font-semibold">@${flag.author}</span></p>
+                    <div class="flex flex-col gap-2">
+                        <button onclick="openNotePreviewModal(${flag.id})" class="w-full bg-primary/10 hover:bg-primary hover:text-on-primary text-primary font-bold text-[11px] py-2 rounded-xl transition-all active:scale-95 flex items-center justify-center gap-1">
+                            <span class="material-symbols-outlined text-[14px]">visibility</span> Preview Material
+                        </button>
+                        <div class="flex gap-2">
+                            <button onclick="approveNote(${flag.id})" class="flex-1 bg-surface-container-high hover:bg-primary hover:text-on-primary text-on-surface font-bold text-[11px] py-2 rounded-xl transition-all active:scale-95">Approve</button>
+                            <button onclick="rejectNote(${flag.id})" class="flex-1 bg-error-container hover:bg-error hover:text-on-error text-on-error-container font-bold text-[11px] py-2 rounded-xl transition-all active:scale-95">Reject</button>
+                        </div>
                     </div>
                 `;
                 container.appendChild(card);
             });
         }
 
-        // Action: Approve note (keep on market, clear flags)
-        function approveFlag(id) {
+        // Action: Approve note
+        async function approveNote(id) {
             const flag = mockFlags.find(f => f.id === id);
             if (!flag) return;
 
             const card = document.getElementById(`flag-card-${id}`);
-            card.classList.add('translate-x-full', 'opacity-0');
+            if (card) card.classList.add('translate-x-full', 'opacity-0');
             
-            setTimeout(() => {
-                mockFlags = mockFlags.filter(f => f.id !== id);
-                showNotification(`"${flag.title}" approved and flags cleared.`, "success");
-                renderFlags();
-            }, 300);
+            try {
+                await apiFetch(`/admin/notes/${flag.notes_id}/approve`, { method: 'POST', body: { comments: 'Approved by admin' }});
+                setTimeout(() => {
+                    mockFlags = mockFlags.filter(f => f.id !== id);
+                    showNotification(`"${flag.title}" approved and is now live.`, "success");
+                    loadModerationQueue();
+                }, 300);
+            } catch (err) {
+                showNotification(err.error?.message || "Failed to approve note.", "error");
+                if (card) card.classList.remove('translate-x-full', 'opacity-0');
+            }
         }
 
-        // Action: Remove flagged note from catalog
-        function removeFlagMaterial(id) {
+        // Action: Reject note
+        async function rejectNote(id) {
             const flag = mockFlags.find(f => f.id === id);
             if (!flag) return;
 
+            const reason = prompt(`Please provide a rejection reason for "${flag.title}":`);
+            if (!reason) return; // Admin cancelled
+
             const card = document.getElementById(`flag-card-${id}`);
-            card.classList.add('-translate-x-full', 'opacity-0');
+            if (card) card.classList.add('-translate-x-full', 'opacity-0');
             
-            setTimeout(() => {
-                mockFlags = mockFlags.filter(f => f.id !== id);
-                showNotification(`"${flag.title}" removed from marketplace.`, "error");
-                renderFlags();
-            }, 300);
+            try {
+                await apiFetch(`/admin/notes/${flag.notes_id}/reject`, { method: 'POST', body: { reason: reason, comments: 'Rejected by admin' }});
+                setTimeout(() => {
+                    mockFlags = mockFlags.filter(f => f.id !== id);
+                    showNotification(`"${flag.title}" rejected.`, "error");
+                    loadModerationQueue();
+                }, 300);
+            } catch (err) {
+                showNotification(err.error?.message || "Failed to reject note.", "error");
+                if (card) card.classList.remove('-translate-x-full', 'opacity-0');
+            }
         }
 
-        // Action: Clear all flags at once
-        function clearAllFlags() {
-            if (mockFlags.length === 0) return;
+        // Action: Refresh Queue (formerly Clear All Flags)
+        async function refreshQueue() {
+            try {
+                const res = await apiFetch('/admin/moderation-queue');
+                if (res.success) {
+                    mockFlags = res.data.queue.map(q => ({
+                        id: q.id,
+                        notes_id: q.notes?.id,
+                        type: "Manual Review",
+                        title: q.notes?.title || 'Unknown Material',
+                        description: q.notes?.description || '',
+                        subject: q.notes?.subject || '',
+                        file_url: q.notes?.file_url || null,
+                        preview_url: q.notes?.preview_url || null,
+                        price: q.notes?.price || 0,
+                        author: q.notes?.seller ? `${q.notes.seller.first_name || ''} ${q.notes.seller.last_name || ''}`.trim() : 'Unknown',
+                        time: new Date(q.submitted_at).toLocaleDateString()
+                    }));
+                    loadModerationQueue();
+                    showNotification("Queue refreshed.", "success");
+                }
+            } catch (err) {
+                showNotification("Failed to refresh queue", "error");
+            }
+        }
 
-            const container = document.getElementById('flags-container');
-            container.classList.add('scale-95', 'opacity-0', 'transition-all', 'duration-300');
+        // Modal actions: Open and Close Note Preview Modal
+        let currentPdfRenderTask = null;
 
+        async function openNotePreviewModal(id) {
+            const flag = mockFlags.find(f => f.id === id);
+            if (!flag) return;
+
+            const modal = document.getElementById('note-preview-modal');
+            const container = modal.querySelector('.modal-container');
+
+            // Populate metadata
+            document.getElementById('preview-modal-title').textContent = flag.title;
+            document.getElementById('preview-modal-subject').textContent = flag.subject || 'Study Guide';
+            document.getElementById('preview-modal-author').textContent = `@${flag.author}`;
+            document.getElementById('preview-modal-price').textContent = flag.price > 0 ? `₹${flag.price.toFixed(2)}` : 'FREE';
+            document.getElementById('preview-modal-desc').textContent = flag.description || 'No description provided by the uploader.';
+
+            // Setup Secure Reader link
+            const readerLink = document.getElementById('preview-modal-reader-link');
+            if (flag.notes_id) {
+                readerLink.href = `reader.html?id=${flag.notes_id}`;
+                readerLink.classList.remove('hidden');
+            } else {
+                readerLink.classList.add('hidden');
+            }
+
+            // Hide/Show viewer containers based on file types
+            const imgEl = document.getElementById('preview-modal-img');
+            const placeholderEl = document.getElementById('preview-modal-placeholder');
+            const pdfContainer = document.getElementById('preview-modal-pdf-pages');
+            const loader = document.getElementById('preview-modal-loader');
+            const errorEl = document.getElementById('preview-modal-error');
+
+            imgEl.classList.add('hidden');
+            placeholderEl.classList.add('hidden');
+            pdfContainer.innerHTML = '';
+            loader.classList.add('hidden');
+            errorEl.classList.add('hidden');
+
+            // Show modal first so canvas has dimensions if we render PDF
+            modal.classList.remove('hidden');
             setTimeout(() => {
-                mockFlags = [];
-                showNotification("All pending moderation claims cleared successfully.", "success");
-                renderFlags();
                 container.classList.remove('scale-95', 'opacity-0');
+            }, 10);
+
+            // Fetch and render the uploaded note PDF
+            if (flag.notes_id) {
+                loader.classList.remove('hidden');
+                try {
+                    // Request file directly through authenticated API route
+                    const token = localStorage.getItem('accessToken');
+                    const proxyUrl = `${window.BACKEND_URL}/api/v1/notes/downloads/file/${flag.notes_id}`;
+                    
+                    const response = await fetch(proxyUrl, {
+                        headers: { 'Authorization': `Bearer ${token}` }
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`Failed to load file. Status: ${response.status} ${response.statusText}`);
+                    }
+
+                    const blob = await response.blob();
+                    
+                    // Render if it's a PDF
+                    if (blob.type === 'application/pdf') {
+                        const arrayBuffer = await blob.arrayBuffer();
+                        loader.classList.add('hidden');
+
+                        const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+                        currentPdfRenderTask = loadingTask;
+                        const pdf = await loadingTask.promise;
+
+                        // Render first 2 pages for dynamic preview
+                        const pagesToRender = Math.min(pdf.numPages, 2);
+                        for (let pageNum = 1; pageNum <= pagesToRender; pageNum++) {
+                            const page = await pdf.getPage(pageNum);
+                            const viewport = page.getViewport({ scale: 0.8 });
+                            
+                            const canvas = document.createElement('canvas');
+                            canvas.className = 'w-full max-w-full bg-white rounded-xl shadow border border-outline-variant/30';
+                            const ctx = canvas.getContext('2d');
+                            
+                            canvas.height = viewport.height;
+                            canvas.width = viewport.width;
+
+                            const renderContext = {
+                                canvasContext: ctx,
+                                viewport: viewport
+                            };
+                            
+                            pdfContainer.appendChild(canvas);
+                            await page.render(renderContext).promise;
+                        }
+
+                        if (pdf.numPages > pagesToRender) {
+                            const moreIndicator = document.createElement('div');
+                            moreIndicator.className = 'text-[10px] text-on-surface-variant bg-surface-container-high px-3 py-1.5 rounded-full font-bold mt-2';
+                            moreIndicator.textContent = `Showing 2 of ${pdf.numPages} pages. Open in Secure Reader for all pages.`;
+                            pdfContainer.appendChild(moreIndicator);
+                        }
+                    } else {
+                        // Non-PDF fallback (e.g. image or docx)
+                        loader.classList.add('hidden');
+                        if (flag.preview_url) {
+                            imgEl.src = flag.preview_url;
+                            imgEl.classList.remove('hidden');
+                        } else {
+                            placeholderEl.classList.remove('hidden');
+                        }
+                    }
+                } catch (err) {
+                    console.error("Preview render failed:", err);
+                    loader.classList.add('hidden');
+                    
+                    // On error, fallback to preview cover image if available
+                    if (flag.preview_url) {
+                        imgEl.src = flag.preview_url;
+                        imgEl.classList.remove('hidden');
+                    } else {
+                        document.getElementById('preview-modal-error-text').textContent = "Visual preview unavailable. Click 'Open in Secure Reader'.";
+                        errorEl.classList.remove('hidden');
+                    }
+                }
+            } else {
+                // Mock fallback
+                if (flag.preview_url) {
+                    imgEl.src = flag.preview_url;
+                    imgEl.classList.remove('hidden');
+                } else {
+                    placeholderEl.classList.remove('hidden');
+                }
+            }
+
+            // Bind Approval/Rejection buttons in the modal
+            document.getElementById('preview-modal-approve-btn').onclick = () => {
+                closeNotePreviewModal();
+                approveNote(id);
+            };
+            document.getElementById('preview-modal-reject-btn').onclick = () => {
+                closeNotePreviewModal();
+                rejectNote(id);
+            };
+        }
+
+        function closeNotePreviewModal() {
+            // Cancel active PDF rendering if any
+            if (currentPdfRenderTask) {
+                try {
+                    currentPdfRenderTask.destroy();
+                } catch(e){}
+                    currentPdfRenderTask = null;
+            }
+
+            const modal = document.getElementById('note-preview-modal');
+            const container = modal.querySelector('.modal-container');
+            container.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                modal.classList.add('hidden');
             }, 300);
         }
 
@@ -544,6 +892,62 @@
                 `;
                 barsContainer.appendChild(col);
             });
+        }
+
+        async function exportPlatformCsv() {
+            const btn = document.getElementById('export-platform-csv-btn');
+            const originalText = btn.innerHTML;
+            btn.innerHTML = `<span class="material-symbols-outlined text-[14px] animate-spin">refresh</span> Exporting...`;
+            btn.disabled = true;
+
+            try {
+                const res = await apiFetch('/admin/sales');
+                if (!res.success) throw new Error(res.error?.message || "Failed to fetch sales data");
+
+                const sales = res.data.sales || [];
+                if (sales.length === 0) {
+                    showNotification("No sales data available to export.", "info");
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    return;
+                }
+
+                // Create CSV headers
+                let csvContent = "data:text/csv;charset=utf-8,";
+                csvContent += "Transaction ID,Date,Guide Title,Seller Email,Gross (INR),Platform Commission (INR),Net Earnings (INR),Status\n";
+
+                // Add rows
+                sales.forEach(sale => {
+                    const date = new Date(sale.created_at).toLocaleDateString();
+                    let title = sale.notes ? sale.notes.title : 'Unknown Note';
+                    if (title.includes(',')) {
+                        title = `"${title.replace(/"/g, '""')}"`;
+                    }
+                    const sellerEmail = sale.seller ? sale.seller.email : 'Unknown Seller';
+                    const gross = (sale.gross_amount || 0).toFixed(2);
+                    const commission = (sale.platform_commission || 0).toFixed(2);
+                    const net = (sale.net_amount || 0).toFixed(2);
+                    
+                    csvContent += `${sale.id},${date},${title},${sellerEmail},${gross},${commission},${net},${sale.status}\n`;
+                });
+
+                // Trigger download
+                const encodedUri = encodeURI(csvContent);
+                const link = document.createElement("a");
+                link.setAttribute("href", encodedUri);
+                link.setAttribute("download", `AcademiaHub_Platform_Sales_${new Date().toISOString().split('T')[0]}.csv`);
+                document.body.appendChild(link); // Required for FF
+                link.click();
+                document.body.removeChild(link);
+
+                showNotification('Platform CSV exported successfully!', 'success');
+            } catch(err) {
+                console.error(err);
+                showNotification("Failed to generate CSV report.", "error");
+            }
+
+            btn.innerHTML = originalText;
+            btn.disabled = false;
         }
 
         window.addEventListener('DOMContentLoaded', initAdminDashboard);

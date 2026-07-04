@@ -4,6 +4,7 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 const path = require('path');
 
 const { errorHandler, notFoundHandler } = require('./middleware/errorHandler');
@@ -19,10 +20,38 @@ const notificationRoutes = require('./routes/notifications');
 
 const app = express();
 
+// ─── SECURITY HEADERS ─────────────────────────────────────────────────────────
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      ...helmet.contentSecurityPolicy.getDefaultDirectives(),
+      "upgrade-insecure-requests": null, // Disable so Tailscale HTTP connections work
+      "img-src": ["'self'", "data:", "https:"],
+      "script-src": ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+    },
+  },
+}));
+
 // ─── CORS ─────────────────────────────────────────────────────────────────────
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://127.0.0.1:5500';
+const allowedOrigins = process.env.ALLOWED_ORIGINS 
+  ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
+  : [FRONTEND_URL, 'http://localhost:3000', 'http://localhost:5173', 'http://127.0.0.1:5500', 'http://localhost:5500', 'https://acedemia-hub.vercel.app'];
+
 app.use(cors({
-  origin: [FRONTEND_URL, 'http://localhost:3000', 'http://localhost:5173', 'http://127.0.0.1:5500', 'http://localhost:5500', 'https://acedemia-hub.vercel.app'],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    // Allow any origin that looks like localhost, 127.0.0.1, or Tailscale/LAN IPs
+    if (origin.includes('localhost') || origin.includes('127.0.0.1') || origin.includes('192.168.') || origin.includes('10.') || origin.includes('100.')) {
+      return callback(null, true);
+    }
+    // Fallback to allowed list
+    if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes('*')) {
+      return callback(null, true);
+    }
+    callback(new Error('Not allowed by CORS'));
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
@@ -31,7 +60,7 @@ app.use(cors({
 // ─── RATE LIMITING ────────────────────────────────────────────────────────────
 app.use(rateLimit({
   windowMs: 15 * 60 * 1000, // 15 min
-  max: 2000,
+  max: 150, // Tightened global limit to 150
   standardHeaders: true,
   legacyHeaders: false,
   message: { success: false, error: { code: 'RATE_LIMITED', message: 'Too many requests' } }
@@ -54,6 +83,11 @@ app.use('/uploads', express.static(path.resolve(UPLOAD_DIR)));
 // Serve frontend static files (for production / demo)
 const frontendPath = path.join(__dirname, '../../');
 app.use(express.static(frontendPath));
+
+// Explicit fallback for root and HTML pages if static middleware misses
+app.get('/', (req, res) => {
+  res.sendFile(path.join(frontendPath, 'index.html'));
+});
 
 // ─── HEALTH CHECK ─────────────────────────────────────────────────────────────
 app.get('/health', (req, res) => {

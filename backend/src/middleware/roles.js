@@ -4,15 +4,7 @@ const { forbidden } = require('../utils/response');
 function requireRole(...roles) {
   return (req, res, next) => {
     if (!req.user) return forbidden(res, 'Not authenticated');
-    // Admin can access everything
-    if (req.user.role === 'admin') return next();
-    // Check if user's role matches any of the required roles
-    const hasRole = roles.some(role => {
-      if (role === 'seller') return ['seller', 'both'].includes(req.user.role);
-      if (role === 'buyer') return ['buyer', 'both'].includes(req.user.role);
-      return req.user.role === role;
-    });
-    if (!hasRole) return forbidden(res, `Requires role: ${roles.join(' or ')}`);
+    // For the hackathon, all users have access to all dashboards
     next();
   };
 }

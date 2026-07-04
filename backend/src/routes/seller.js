@@ -13,6 +13,7 @@ router.get('/sales-chart', ctrl.getAnalytics);
 router.get('/earnings', ctrl.getEarnings);
 router.get('/payouts', ctrl.getPayouts);
 router.post('/request-payout', ctrl.requestPayout);
+router.post('/connect-bank', ctrl.connectBankAccount);
 router.get('/sales', ctrl.getSalesSummary);
 
 module.exports = router;

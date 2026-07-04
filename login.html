@@ -71,7 +71,7 @@
                     <div class="space-y-2">
                         <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider font-label-sm">University Email</label>
                         <div class="relative">
-                            <input required id="loginEmail" class="w-full bg-surface-container-low border border-outline-variant/30 rounded-xl p-4 focus:ring-2 focus:ring-primary outline-none transition-all text-sm font-medium" placeholder="alex.mercer@university.edu" type="email" value="sneha@student.iitb.ac.in"/>
+                            <input required id="loginEmail" class="w-full bg-surface-container-low border border-outline-variant/30 rounded-xl p-4 focus:ring-2 focus:ring-primary outline-none transition-all text-sm font-medium" placeholder="alex.mercer@university.edu" type="email" />
                             <span class="material-symbols-outlined absolute right-4 top-4 text-on-surface-variant opacity-60">mail</span>
                         </div>
                     </div>
@@ -79,10 +79,10 @@
                     <div class="space-y-2">
                         <div class="flex justify-between items-center">
                             <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider font-label-sm">Password</label>
-                            <a class="text-xs font-bold text-primary hover:underline" href="#">Forgot?</a>
+                            <button type="button" class="text-xs font-bold text-primary hover:underline" onclick="showForgotPassword()">Forgot?</button>
                         </div>
                         <div class="relative">
-                            <input required id="loginPassword" class="w-full bg-surface-container-low border border-outline-variant/30 rounded-xl p-4 focus:ring-2 focus:ring-primary outline-none transition-all text-sm font-medium" placeholder="••••••••" type="password" value="Password@123"/>
+                            <input required id="loginPassword" class="w-full bg-surface-container-low border border-outline-variant/30 rounded-xl p-4 focus:ring-2 focus:ring-primary outline-none transition-all text-sm font-medium" placeholder="••••••••" type="password" />
                             <button type="button" class="absolute right-4 top-4 text-on-surface-variant hover:text-primary transition-colors" onclick="togglePassword('loginPassword', 'loginEye')">
                                 <span class="material-symbols-outlined" id="loginEye">visibility</span>
                             </button>
@@ -118,6 +118,38 @@
                     </div>
 
                     <div class="space-y-2">
+                        <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider font-label-sm">Which College?</label>
+                        <input required id="signupUniversity" class="w-full bg-surface-container-low border border-outline-variant/30 rounded-xl p-4 focus:ring-2 focus:ring-primary outline-none transition-all text-sm font-medium" placeholder="e.g. Stanford University" type="text"/>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider font-label-sm">Phone Number</label>
+                        <input required id="signupPhone" class="w-full bg-surface-container-low border border-outline-variant/30 rounded-xl p-4 focus:ring-2 focus:ring-primary outline-none transition-all text-sm font-medium" placeholder="10-digit mobile number" type="tel" pattern="[0-9]{10}" title="Please enter a valid 10-digit phone number"/>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider font-label-sm">Which year?</label>
+                            <div class="relative">
+                                <select required id="signupCurrentYear" class="w-full bg-surface-container-low border border-outline-variant/30 rounded-xl p-4 focus:ring-2 focus:ring-primary outline-none transition-all text-sm font-medium appearance-none">
+                                    <option value="" disabled selected>Select year</option>
+                                    <option value="1st Year">1st Year</option>
+                                    <option value="2nd Year">2nd Year</option>
+                                    <option value="3rd Year">3rd Year</option>
+                                    <option value="4th Year">4th Year</option>
+                                    <option value="5th Year">5th Year</option>
+                                    <option value="Masters/PG">Masters/PG</option>
+                                </select>
+                                <span class="material-symbols-outlined absolute right-4 top-4 text-outline-variant pointer-events-none">expand_more</span>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider font-label-sm">Academic Year</label>
+                            <input required id="signupAcademicYear" class="w-full bg-surface-container-low border border-outline-variant/30 rounded-xl p-4 focus:ring-2 focus:ring-primary outline-none transition-all text-sm font-medium" placeholder="e.g. 2021-2025" type="text"/>
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
                         <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider font-label-sm">Password</label>
                         <div class="relative">
                             <input required id="signupPassword" class="w-full bg-surface-container-low border border-outline-variant/30 rounded-xl p-4 focus:ring-2 focus:ring-primary outline-none transition-all text-sm font-medium" placeholder="Min. 8 characters" type="password" minlength="8"/>
@@ -132,6 +164,85 @@
                         <span class="material-symbols-outlined">person_add</span>
                     </button>
                 </form>
+
+                <!-- OTP Verification Form Content -->
+                <form id="otpForm" class="space-y-6 hidden" onsubmit="event.preventDefault(); handleVerifyOTP();">
+                    <div class="text-center mb-6">
+                        <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span class="material-symbols-outlined text-primary text-3xl">mark_email_read</span>
+                        </div>
+                        <h2 class="text-xl font-bold font-headline-sm">Verify Your Email</h2>
+                        <p class="text-sm text-on-surface-variant mt-2">We've sent a 6-digit verification code to <span id="displayOtpEmail" class="font-bold text-on-surface"></span></p>
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider font-label-sm text-center">Verification Code</label>
+                        <input required id="otpInput" class="w-full bg-surface-container-low border border-outline-variant/30 rounded-xl p-4 focus:ring-2 focus:ring-primary outline-none transition-all text-2xl font-bold tracking-[0.5em] text-center" placeholder="------" type="text" maxlength="6" pattern="[0-9]{6}"/>
+                    </div>
+
+                    <button type="submit" class="w-full bg-primary text-on-primary py-4 rounded-xl font-bold btn-glow transition-all active:scale-[0.98] shadow-md flex items-center justify-center gap-2">
+                        <span>Verify & Login</span>
+                        <span class="material-symbols-outlined">check_circle</span>
+                    </button>
+                    
+                    <div class="text-center mt-4">
+                        <button type="button" onclick="handleResendOTP()" class="text-xs font-bold text-primary hover:underline" id="resendBtn">Didn't receive the code? Resend</button>
+                    </div>
+                </form>
+
+                <!-- Forgot Password Form Content -->
+                <form id="forgotPasswordForm" class="space-y-6 hidden" onsubmit="event.preventDefault(); handleForgotPassword();">
+                    <div class="text-center mb-6">
+                        <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span class="material-symbols-outlined text-primary text-3xl">lock_reset</span>
+                        </div>
+                        <h2 class="text-xl font-bold font-headline-sm">Reset Password</h2>
+                        <p class="text-sm text-on-surface-variant mt-2">Enter your email and we'll send you a link to reset your password.</p>
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider font-label-sm">University Email</label>
+                        <div class="relative">
+                            <input required id="forgotEmail" class="w-full bg-surface-container-low border border-outline-variant/30 rounded-xl p-4 focus:ring-2 focus:ring-primary outline-none transition-all text-sm font-medium" placeholder="alex.mercer@university.edu" type="email" />
+                            <span class="material-symbols-outlined absolute right-4 top-4 text-on-surface-variant opacity-60">mail</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-primary text-on-primary py-4 rounded-xl font-bold btn-glow transition-all active:scale-[0.98] shadow-md flex items-center justify-center gap-2">
+                        <span>Send Reset Link</span>
+                        <span class="material-symbols-outlined">send</span>
+                    </button>
+                    
+                    <div class="text-center mt-4">
+                        <button type="button" onclick="switchTab('login')" class="text-xs font-bold text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center gap-1 mx-auto"><span class="material-symbols-outlined text-[14px]">arrow_back</span> Back to Login</button>
+                    </div>
+                </form>
+
+                <!-- Reset Password Form Content -->
+                <form id="resetPasswordForm" class="space-y-6 hidden" onsubmit="event.preventDefault(); handleResetPassword();">
+                    <div class="text-center mb-6">
+                        <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <span class="material-symbols-outlined text-primary text-3xl">password</span>
+                        </div>
+                        <h2 class="text-xl font-bold font-headline-sm">Create New Password</h2>
+                        <p class="text-sm text-on-surface-variant mt-2">Your new password must be at least 8 characters long.</p>
+                    </div>
+                    
+                    <div class="space-y-2">
+                        <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider font-label-sm">New Password</label>
+                        <div class="relative">
+                            <input required id="resetPasswordInput" class="w-full bg-surface-container-low border border-outline-variant/30 rounded-xl p-4 focus:ring-2 focus:ring-primary outline-none transition-all text-sm font-medium" placeholder="Min. 8 characters" type="password" minlength="8"/>
+                            <button type="button" class="absolute right-4 top-4 text-on-surface-variant hover:text-primary transition-colors" onclick="togglePassword('resetPasswordInput', 'resetEye')">
+                                <span class="material-symbols-outlined" id="resetEye">visibility</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full bg-primary text-on-primary py-4 rounded-xl font-bold btn-glow transition-all active:scale-[0.98] shadow-md flex items-center justify-center gap-2">
+                        <span>Save Password</span>
+                        <span class="material-symbols-outlined">save</span>
+                    </button>
+                </form>
             </div>
 
             <!-- Social Logins -->
@@ -141,17 +252,8 @@
                     <span class="flex-shrink mx-4 text-[10px] font-bold text-on-surface-variant opacity-60 uppercase font-label-sm tracking-wider">Or continue with</span>
                     <div class="flex-grow border-t border-outline-variant/30"></div>
                 </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <button type="button" onclick="socialLogin('Google')" class="flex items-center justify-center gap-3 py-3 px-4 bg-surface hover:bg-primary/5 border border-outline-variant/30 rounded-xl transition-all group">
-                        <svg class="w-5 h-5 group-hover:scale-110 transition-transform" viewBox="0 0 24 24">
-                            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"></path>
-                            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"></path>
-                            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"></path>
-                            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"></path>
-                        </svg>
-                        <span class="text-xs font-bold">Google</span>
-                    </button>
-                    <button type="button" onclick="socialLogin('Microsoft')" class="flex items-center justify-center gap-3 py-3 px-4 bg-surface hover:bg-primary/5 border border-outline-variant/30 rounded-xl transition-all group">
+                <div class="flex flex-col gap-4">
+                    <button type="button" onclick="socialLogin('Microsoft')" class="w-full flex items-center justify-center gap-3 py-3 px-4 bg-surface hover:bg-primary/5 border border-outline-variant/30 rounded-xl transition-all group">
                         <svg class="w-5 h-5 group-hover:scale-110 transition-transform" viewBox="0 0 23 23">
                             <path d="M0 0h23v23H0z" fill="#f3f3f3"></path>
                             <path d="M1 1h10v10H1z" fill="#f35325"></path>
@@ -159,7 +261,7 @@
                             <path d="M1 12h10v10H1z" fill="#05a6f0"></path>
                             <path d="M12 12h10v10H12z" fill="#ffba08"></path>
                         </svg>
-                        <span class="text-xs font-bold">Microsoft</span>
+                        <span class="text-xs font-bold">Continue with Microsoft</span>
                     </button>
                 </div>
             </div>
@@ -178,25 +280,60 @@
         // Redirect check
         const urlParams = new URLSearchParams(window.location.search);
         const redirectRef = urlParams.get('ref');
+        
+        let pendingVerificationEmail = "";
 
         function switchTab(tab) {
             const loginTab = document.getElementById('loginTab');
             const signupTab = document.getElementById('signupTab');
             const loginForm = document.getElementById('loginForm');
             const signupForm = document.getElementById('signupForm');
+            const otpForm = document.getElementById('otpForm');
+            const forgotPasswordForm = document.getElementById('forgotPasswordForm');
+            const resetPasswordForm = document.getElementById('resetPasswordForm');
+
+            // Ensure auth tabs are visible
+            document.querySelector('nav').classList.remove('hidden');
 
             if (tab === 'login') {
                 loginTab.className = "flex-grow py-3 font-bold text-base transition-all active-tab";
                 signupTab.className = "flex-grow py-3 font-bold text-base transition-all text-on-surface-variant";
                 loginForm.classList.remove('hidden');
                 signupForm.classList.add('hidden');
+                if(otpForm) otpForm.classList.add('hidden');
+                if(forgotPasswordForm) forgotPasswordForm.classList.add('hidden');
+                if(resetPasswordForm) resetPasswordForm.classList.add('hidden');
             } else {
                 signupTab.className = "flex-grow py-3 font-bold text-base transition-all active-tab";
                 loginTab.className = "flex-grow py-3 font-bold text-base transition-all text-on-surface-variant";
                 signupForm.classList.remove('hidden');
                 loginForm.classList.add('hidden');
+                if(otpForm) otpForm.classList.add('hidden');
+                if(forgotPasswordForm) forgotPasswordForm.classList.add('hidden');
+                if(resetPasswordForm) resetPasswordForm.classList.add('hidden');
             }
         }
+
+        function showForgotPassword() {
+            document.querySelector('nav').classList.add('hidden');
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('forgotPasswordForm').classList.remove('hidden');
+        }
+
+        function showResetPassword() {
+            document.querySelector('nav').classList.add('hidden');
+            document.getElementById('loginForm').classList.add('hidden');
+            document.getElementById('signupForm').classList.add('hidden');
+            document.getElementById('resetPasswordForm').classList.remove('hidden');
+        }
+
+        // Initialize state based on URL parameters
+        window.addEventListener('DOMContentLoaded', () => {
+            const resetToken = urlParams.get('reset_token');
+            if (resetToken) {
+                showResetPassword();
+            }
+        });
 
         function togglePassword(inputId, iconId) {
             const input = document.getElementById(inputId);
@@ -266,7 +403,17 @@
                     }
                 }, 1200);
             } catch (err) {
-                showNotification(err.error?.message || "Login failed. Please check your credentials.", "error");
+                if (err.error?.code === 'INACTIVE') {
+                    pendingVerificationEmail = email;
+                    document.getElementById('displayOtpEmail').innerText = email;
+                    document.getElementById('loginForm').classList.add('hidden');
+                    const otpForm = document.getElementById('otpForm');
+                    if(otpForm) otpForm.classList.remove('hidden');
+                    showNotification("Please verify your email to continue.", "warning");
+                    handleResendOTP(); // Automatically trigger a resend when they hit this block
+                } else {
+                    showNotification(err.error?.message || "Login failed. Please check your credentials.", "error");
+                }
             }
         }
 
@@ -275,6 +422,10 @@
             const last = document.getElementById('signupLast').value.trim();
             const email = document.getElementById('signupEmail').value.trim();
             const password = document.getElementById('signupPassword').value;
+            const university = document.getElementById('signupUniversity').value.trim();
+            const currentYear = document.getElementById('signupCurrentYear').value;
+            const academicYear = document.getElementById('signupAcademicYear').value.trim();
+            const phone = document.getElementById('signupPhone').value.trim();
 
             showNotification("Creating your account...", "info");
             try {
@@ -285,8 +436,36 @@
                         password,
                         firstName: first,
                         lastName: last,
+                        university,
+                        currentYear,
+                        academicYear,
+                        phone,
                         role: 'both' // Support both buyer and seller dashboards by default
                     }
+                });
+
+                // Hide signup and show OTP
+                pendingVerificationEmail = email;
+                document.getElementById('displayOtpEmail').innerText = email;
+                document.getElementById('signupForm').classList.add('hidden');
+                document.getElementById('otpForm').classList.remove('hidden');
+
+                showNotification(`Account created! Please check your email for the code.`, "success");
+
+            } catch (err) {
+                showNotification(err.error?.message || "Registration failed. Please check your inputs.", "error");
+            }
+        }
+
+        async function handleVerifyOTP() {
+            const otp = document.getElementById('otpInput').value.trim();
+            if(!pendingVerificationEmail || otp.length !== 6) return;
+
+            showNotification("Verifying...", "info");
+            try {
+                const res = await apiFetch('/auth/verify-otp', {
+                    method: 'POST',
+                    body: { email: pendingVerificationEmail, otp }
                 });
 
                 const { accessToken, refreshToken } = res.data;
@@ -296,7 +475,7 @@
                 // Fetch full profile details
                 await syncUserWithBackend();
 
-                showNotification(`Welcome to AcademiaHub, ${first}!`, "success");
+                showNotification("Verification successful! Logging in...", "success");
 
                 setTimeout(() => {
                     if (redirectRef === 'cart') {
@@ -306,13 +485,82 @@
                     }
                 }, 1500);
             } catch (err) {
-                showNotification(err.error?.message || "Registration failed. Please check your inputs.", "error");
+                showNotification(err.error?.message || "Verification failed. Invalid code.", "error");
+            }
+        }
+
+        async function handleResendOTP() {
+            if(!pendingVerificationEmail) return;
+            showNotification("Resending code...", "info");
+            try {
+                await apiFetch('/auth/resend-otp', {
+                    method: 'POST',
+                    body: { email: pendingVerificationEmail }
+                });
+                showNotification("A new code has been sent to your email.", "success");
+            } catch (err) {
+                showNotification(err.error?.message || "Failed to resend code.", "error");
+            }
+        }
+
+        async function handleForgotPassword() {
+            const email = document.getElementById('forgotEmail').value.trim();
+            if (!email) return;
+
+            showNotification("Sending reset link...", "info");
+            try {
+                await apiFetch('/auth/forgot-password', {
+                    method: 'POST',
+                    body: { email }
+                });
+                
+                showNotification("If that email exists, a reset link has been sent.", "success");
+                setTimeout(() => switchTab('login'), 3000);
+            } catch (err) {
+                showNotification(err.error?.message || "Failed to process request.", "error");
+            }
+        }
+
+        async function handleResetPassword() {
+            const password = document.getElementById('resetPasswordInput').value;
+            const token = urlParams.get('reset_token');
+
+            if (!password || !token) {
+                showNotification("Invalid reset link. Please request a new one.", "error");
+                return;
+            }
+
+            showNotification("Resetting password...", "info");
+            try {
+                await apiFetch('/auth/reset-password', {
+                    method: 'POST',
+                    body: { token, password }
+                });
+                
+                showNotification("Password successfully reset! You can now log in.", "success");
+                
+                // Remove token from URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+                
+                setTimeout(() => switchTab('login'), 2000);
+            } catch (err) {
+                showNotification(err.error?.message || "Failed to reset password. Link may be expired.", "error");
             }
         }
 
         function socialLogin(prov) {
             showNotification(`Social login is disabled. Please register using standard form.`, "warning");
         }
+
+        // Initialize view based on URL parameters
+        document.addEventListener('DOMContentLoaded', () => {
+            if (urlParams.get('mode') === 'signup') {
+                switchTab('signup');
+                if (urlParams.get('ref')) {
+                    showNotification("Please create an account or log in to access that page.", "info");
+                }
+            }
+        });
     </script>
 </body>
 </html>

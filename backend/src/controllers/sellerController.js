@@ -94,7 +94,7 @@ async function getSalesSummary(req, res, next) {
   try {
     const { data: sales, error } = await supabase
       .from('seller_earnings')
-      .select(`id, gross_amount, net_amount, created_at, notes:notes_id(id, title), purchase:purchase_id(buyer_id)`)
+      .select(`id, gross_amount, net_amount, created_at, notes:notes_id(id, title), purchase:purchases!purchase_id(buyer:users!buyer_id(email))`)
       .eq('seller_id', req.user.id)
       .order('created_at', { ascending: false })
       .limit(50);
@@ -104,4 +104,23 @@ async function getSalesSummary(req, res, next) {
   } catch (err) { next(err); }
 }
 
-module.exports = { getDashboard, getMyNotes, getAnalytics, getEarnings, getPayouts, requestPayout, getSalesSummary };
+async function connectBankAccount(req, res, next) {
+  try {
+    const { accountNumber, ifsc } = req.body;
+    if (!accountNumber || !ifsc) return badRequest(res, 'Account Number and IFSC are required');
+    
+    // Mock Razorpay API call
+    const mockRazorpayAccountId = `acc_MOCK_${Math.floor(100000 + Math.random() * 900000)}`;
+    
+    const { error } = await supabase
+      .from('users')
+      .update({ razorpay_account_id: mockRazorpayAccountId })
+      .eq('id', req.user.id);
+      
+    if (error) throw error;
+    
+    return success(res, { razorpay_account_id: mockRazorpayAccountId }, 'Bank account connected successfully');
+  } catch(err) { next(err); }
+}
+
+module.exports = { getDashboard, getMyNotes, getAnalytics, getEarnings, getPayouts, requestPayout, getSalesSummary, connectBankAccount };

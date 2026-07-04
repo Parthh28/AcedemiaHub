@@ -32,6 +32,7 @@ function errorHandler(err, req, res, next) {
 
   // Default 500
   const message = process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message;
+  require('fs').appendFileSync('debug_error.log', new Date().toISOString() + ' ' + (err.stack || JSON.stringify(err)) + '\n');
   return error(res, message, 500, 'SERVER_ERROR');
 }
 

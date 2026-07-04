@@ -3,11 +3,36 @@ const authService = require('../services/authService');
 const { success, created, error, badRequest } = require('../utils/response');
 const { z } = require('zod');
 
-const registerSchema = z.object({
+const verifyOtpSchema = z.object({
   email: z.string().email(),
+  otp: z.string().length(6)
+});
+
+const resendOtpSchema = z.object({
+  email: z.string().email()
+});
+
+const forgotPasswordSchema = z.object({
+  email: z.string().email()
+});
+
+const resetPasswordSchema = z.object({
+  token: z.string().min(1),
+  password: z.string().min(8, 'Password must be at least 8 characters')
+});
+
+const registerSchema = z.object({
+  email: z.string().email().refine(
+    (val) => /\.(edu|ac)(\.[a-z]{2,})?$/i.test(val) || val === 'acedemiahub@gmail.com',
+    { message: 'Only university/education emails (.edu or .ac) are allowed to sign up.' }
+  ),
   password: z.string().min(8, 'Password must be at least 8 characters'),
   firstName: z.string().min(1),
   lastName: z.string().min(1),
+  university: z.string().min(1, 'College/University is required'),
+  currentYear: z.string().min(1, 'Current year is required'),
+  academicYear: z.string().min(1, 'Academic year is required'),
+  phone: z.string().min(10, 'Valid phone number is required'),
   role: z.enum(['buyer', 'seller', 'both']).optional()
 });
 
@@ -22,8 +47,35 @@ async function register(req, res, next) {
     const result = await authService.register(data);
     return created(res, result, 'Account created successfully');
   } catch (err) {
-    if (err.name === 'ZodError') return badRequest(res, 'Validation failed', err.errors);
+    if (err.name === 'ZodError') {
+      const firstError = err.errors[0]?.message || 'Validation failed';
+      return badRequest(res, firstError, err.errors);
+    }
     if (err.code === 'EMAIL_EXISTS') return error(res, err.message, 409, err.code);
+    if (err.code === 'INVALID_EDU_EMAIL') return badRequest(res, err.message);
+    next(err);
+  }
+}
+
+async function verifyOTP(req, res, next) {
+  try {
+    const data = verifyOtpSchema.parse(req.body);
+    const result = await authService.verifyOTP(data.email, data.otp);
+    return success(res, result, 'Email verified and login successful');
+  } catch (err) {
+    if (err.name === 'ZodError') return badRequest(res, 'Validation failed', err.errors);
+    if (err.code === 'INVALID_OTP') return badRequest(res, err.message);
+    next(err);
+  }
+}
+
+async function resendOTP(req, res, next) {
+  try {
+    const data = resendOtpSchema.parse(req.body);
+    const result = await authService.resendOTP(data.email);
+    return success(res, result, 'OTP resent successfully');
+  } catch (err) {
+    if (err.name === 'ZodError') return badRequest(res, 'Validation failed', err.errors);
     next(err);
   }
 }
@@ -37,6 +89,29 @@ async function login(req, res, next) {
     if (err.name === 'ZodError') return badRequest(res, 'Validation failed', err.errors);
     if (err.code === 'INVALID_CREDENTIALS') return error(res, err.message, 401, err.code);
     if (err.code === 'SUSPENDED') return error(res, err.message, 403, err.code);
+    next(err);
+  }
+}
+
+async function forgotPassword(req, res, next) {
+  try {
+    const data = forgotPasswordSchema.parse(req.body);
+    const result = await authService.forgotPassword(data.email);
+    return success(res, result, 'Reset email processed');
+  } catch (err) {
+    if (err.name === 'ZodError') return badRequest(res, 'Validation failed', err.errors);
+    next(err);
+  }
+}
+
+async function resetPassword(req, res, next) {
+  try {
+    const data = resetPasswordSchema.parse(req.body);
+    const result = await authService.resetPassword(data.token, data.password);
+    return success(res, result, 'Password successfully reset');
+  } catch (err) {
+    if (err.name === 'ZodError') return badRequest(res, 'Validation failed', err.errors);
+    if (err.status === 400) return badRequest(res, err.message);
     next(err);
   }
 }
@@ -75,7 +150,9 @@ const updateProfileSchema = z.object({
   collegeId: z.string().uuid().nullable().optional(),
   departmentId: z.string().uuid().nullable().optional(),
   year: z.number().int().min(1).max(6).nullable().optional(),
-  bio: z.string().nullable().optional()
+  bio: z.string().nullable().optional(),
+  college: z.string().nullable().optional(),
+  major: z.string().nullable().optional()
 });
 
 async function getColleges(req, res, next) {
@@ -116,7 +193,11 @@ async function updateAvatar(req, res, next) {
 
 module.exports = {
   register,
+  verifyOTP,
+  resendOTP,
   login,
+  forgotPassword,
+  resetPassword,
   refreshToken,
   logout,
   getMe,

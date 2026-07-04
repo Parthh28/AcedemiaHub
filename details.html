@@ -18,7 +18,7 @@
 <body class="bg-background text-on-surface font-body-md min-h-screen flex flex-col">
 
     <!-- Top Navigation Bar -->
-    <header class="bg-surface/80 backdrop-blur-[20px] sticky top-0 z-50 border-b border-outline-variant/30 shadow-sm h-16 flex items-center">
+    <header class="bg-surface sticky top-0 z-50 border-b border-outline-variant/30 shadow-sm h-16 flex items-center">
         <div class="flex justify-between items-center w-full px-gutter max-w-container-max mx-auto h-16">
             <div class="flex items-center gap-8">
                 <a class="font-headline-md text-headline-md font-extrabold text-primary flex items-center gap-2" href="index.html">
@@ -95,6 +95,14 @@
                         <div class="space-y-4">
                             <span id="detail-subject-badge" class="px-3 py-1 bg-primary/10 text-primary text-xs font-bold rounded-full subject-chip uppercase tracking-wider">Subject</span>
                             <h1 id="detail-title" class="text-3xl font-extrabold text-on-surface font-headline-lg leading-tight">Meticulous Study Notes Title</h1>
+                            
+                            <div id="detail-rating-container" class="flex items-center gap-2 hidden">
+                                <div id="detail-stars" class="flex text-tertiary-container"></div>
+                                <span id="detail-rating-text" class="text-sm font-bold text-on-surface"></span>
+                                <span class="text-outline-variant">•</span>
+                                <a href="#reviews-list" id="detail-review-count" class="text-sm text-primary hover:underline"></a>
+                            </div>
+
                             <p id="detail-desc" class="text-sm text-on-surface-variant leading-relaxed">Detailed descriptions will reside here describing the comprehensive, course-specific insights.</p>
                         </div>
                         <div class="grid grid-cols-2 gap-4 border-t border-outline-variant/20 pt-6 mt-6">
@@ -115,6 +123,14 @@
                                 <span id="detail-year" class="text-sm font-bold text-on-surface">Junior</span>
                             </div>
                         </div>
+                    </div>
+                </div>
+
+                <!-- Preview Gallery Section (Hidden by default, shown via JS if previews exist) -->
+                <div id="preview-gallery-container" class="hidden bg-surface-container-lowest border border-outline-variant/30 rounded-3xl p-6 shadow-sm">
+                    <h3 class="text-lg font-bold text-on-surface mb-4 border-b border-outline-variant/20 pb-3">Preview Images</h3>
+                    <div id="preview-gallery-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Preview images injected here -->
                     </div>
                 </div>
 
@@ -258,7 +274,7 @@
 
         function resolveUrl(url, fallback) {
             if (!url) return fallback;
-            return url.startsWith('http') ? url : 'https://academiahub-backend-k2cq.onrender.com' + url;
+            return url.startsWith('http') ? url : window.BACKEND_URL + url;
         }
 
         function timeAgo(dateStr) {
@@ -292,10 +308,9 @@
                 document.getElementById('detail-content').style.opacity = '1';
 
                 const category = activeNote.subject || activeNote.department?.name || 'Study Material';
-                const collegeName = activeNote.colleges?.name || 'University';
-                const yearLabels = ['Freshman', 'Sophomore', 'Junior', 'Senior', 'Fifth Year', 'Graduate'];
+                const collegeName = activeNote.colleges?.name || activeNote.seller?.college || 'University';
+                const yearLabels = ['1st year', '2nd year', '3rd year', '4th year', '5th year', 'Graduate'];
                 const yearText = activeNote.year ? yearLabels[activeNote.year - 1] || `Year ${activeNote.year}` : 'All Years';
-                const noteImage = resolveUrl(activeNote.preview_url, 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600');
                 const sellerImage = resolveUrl(activeNote.seller?.profile_pic_url, 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120');
                 const sellerName = activeNote.seller ? `${activeNote.seller.first_name || ''} ${activeNote.seller.last_name || ''}`.trim() : 'Contributor';
                 const priceText = activeNote.is_free ? 'Free' : `₹${parseFloat(activeNote.price || 0).toFixed(2)}`;
@@ -306,7 +321,6 @@
                 document.getElementById('breadcrumb-title').textContent = activeNote.title;
 
                 // Detail card
-                document.getElementById('detail-image').src = noteImage;
                 document.getElementById('detail-title').textContent = activeNote.title;
                 document.getElementById('detail-desc').textContent = activeNote.description || 'No description provided.';
                 document.getElementById('detail-subject-badge').textContent = category;
@@ -315,6 +329,58 @@
                 document.getElementById('detail-course').textContent = category;
                 document.getElementById('detail-pages').textContent = `${activeNote.page_count || 0} Pages`;
                 document.getElementById('detail-year').textContent = yearText;
+
+                // Handle Rating Display
+                const ratingContainer = document.getElementById('detail-rating-container');
+                const rating = parseFloat(activeNote.rating || 0);
+                const reviewCount = parseInt(activeNote.rating_count || 0);
+                
+                if (reviewCount > 0) {
+                    const starsDiv = document.getElementById('detail-stars');
+                    starsDiv.innerHTML = Array.from({ length: 5 }, (_, i) => {
+                        const fill = i < Math.round(rating) ? 1 : 0;
+                        return `<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' ${fill};">star</span>`;
+                    }).join('');
+                    
+                    document.getElementById('detail-rating-text').textContent = rating.toFixed(1);
+                    document.getElementById('detail-review-count').textContent = `${reviewCount} Review${reviewCount > 1 ? 's' : ''}`;
+                    ratingContainer.classList.remove('hidden');
+                } else {
+                    document.getElementById('detail-stars').innerHTML = '';
+                    document.getElementById('detail-rating-text').textContent = 'No rating yet';
+                    document.getElementById('detail-review-count').textContent = 'Be the first to review';
+                    ratingContainer.classList.remove('hidden');
+                }
+
+                // Handle Preview Images
+                let previewUrls = [];
+                try {
+                    previewUrls = JSON.parse(activeNote.preview_url);
+                } catch(e) {
+                    if (activeNote.preview_url && activeNote.preview_url.startsWith('http')) {
+                        previewUrls = [activeNote.preview_url];
+                    }
+                }
+
+                if (previewUrls && previewUrls.length > 0) {
+                    document.getElementById('detail-image').src = resolveUrl(previewUrls[0], 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600');
+                    
+                    const galleryContainer = document.getElementById('preview-gallery-container');
+                    const galleryGrid = document.getElementById('preview-gallery-grid');
+                    galleryGrid.innerHTML = ''; // Clear existing
+                    
+                    previewUrls.forEach(url => {
+                        const img = document.createElement('img');
+                        img.src = resolveUrl(url, '');
+                        img.className = 'w-full h-64 object-cover rounded-2xl border border-outline-variant/20 shadow-sm cursor-pointer hover:opacity-90 transition-opacity';
+                        img.onclick = () => window.open(img.src, '_blank');
+                        galleryGrid.appendChild(img);
+                    });
+                    galleryContainer.classList.remove('hidden');
+                } else {
+                    // Fallback
+                    document.getElementById('detail-image').src = 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600';
+                }
 
                 // Sidebox price
                 document.getElementById('sidebox-price').textContent = priceText;
@@ -379,9 +445,7 @@
             if (activeNote.is_purchased) {
                 addBtn.innerHTML = '<span class="material-symbols-outlined">download</span><span>Download Notes</span>';
                 addBtn.onclick = () => {
-                    const token = localStorage.getItem('accessToken');
-                    const url = `https://academiahub-backend-k2cq.onrender.com/api/v1/notes/downloads/file/${activeNote.id}${token ? `?token=${token}` : ''}`;
-                    window.open(url, '_blank');
+                    downloadNote(activeNote.id);
                 };
                 buyBtn.classList.add('hidden');
                 return;
@@ -391,9 +455,7 @@
             if (activeNote.is_free) {
                 addBtn.innerHTML = '<span class="material-symbols-outlined">download</span><span>Download Free Notes</span>';
                 addBtn.onclick = () => {
-                    const token = localStorage.getItem('accessToken');
-                    const url = `https://academiahub-backend-k2cq.onrender.com/api/v1/notes/downloads/file/${activeNote.id}${token ? `?token=${token}` : ''}`;
-                    window.open(url, '_blank');
+                    downloadNote(activeNote.id);
                 };
                 buyBtn.classList.add('hidden');
                 return;
@@ -426,7 +488,8 @@
                     reviewsList.innerHTML = '';
                     reviews.forEach((review, idx) => {
                         const reviewer = review.reviewer || {};
-                        const name = `${reviewer.first_name || ''} ${reviewer.last_name || ''}`.trim() || 'Anonymous';
+                        const name = escapeHTML(`${reviewer.first_name || ''} ${reviewer.last_name || ''}`.trim() || 'Anonymous');
+                        const reviewText = escapeHTML(review.review_text || 'No comment.');
                         const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
                         const stars = Array.from({ length: 5 }, (_, i) =>
                             `<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' ${i < review.rating ? 1 : 0};">star</span>`
@@ -445,7 +508,7 @@
                                 </div>
                                 <span class="text-xs text-on-surface-variant opacity-60">${timeAgo(review.created_at)}</span>
                             </div>
-                            <p class="text-sm text-on-surface-variant leading-relaxed pl-11">"${review.review_text || 'No comment.'}"</p>
+                            <p class="text-sm text-on-surface-variant leading-relaxed pl-11">"${reviewText}"</p>
                         `;
                         reviewsList.appendChild(div);
                     });

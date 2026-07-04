@@ -21,7 +21,7 @@ server.listen(PORT, () => {
 ║   ➜ Frontend: http://localhost:${PORT}/             ║
 ║                                                    ║
 ║   Database:   Supabase PostgreSQL ☁️               ║
-║   Auth:       JWT (1h access + 7d refresh)         ║
+║   Auth:       JWT (30d access + 90d refresh)       ║
 ║   WebSocket:  Socket.io                            ║
 ╚════════════════════════════════════════════════════╝
   `);

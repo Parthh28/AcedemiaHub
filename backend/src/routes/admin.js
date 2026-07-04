@@ -16,5 +16,6 @@ router.post('/users/:userId/unsuspend', ctrl.unsuspendUser);
 router.get('/payouts', ctrl.getAdminPayouts);
 router.post('/payouts/:id/process', ctrl.processPayout);
 router.post('/college/add', ctrl.addCollege);
+router.get('/sales', ctrl.getAllSales);
 
 module.exports = router;

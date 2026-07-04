@@ -26,7 +26,7 @@ async function getModerationQueue(req, res, next) {
     const { page, limit, offset } = getPagination(req.query);
     const { data, error, count } = await supabase
       .from('moderation_queue')
-      .select(`id, status, submitted_at, reviewed_at, reviewer_comments, notes:notes_id(id, title, description, subject, seller:users!seller_id(first_name, last_name, email))`, { count: 'exact' })
+      .select(`id, status, submitted_at, reviewed_at, reviewer_comments, notes:notes_id(id, title, description, subject, file_url, preview_url, seller:users!seller_id(first_name, last_name, email))`, { count: 'exact' })
       .eq('status', req.query.status || 'pending')
       .order('submitted_at', { ascending: true })
       .range(offset, offset + limit - 1);
@@ -145,4 +145,16 @@ async function addCollege(req, res, next) {
   } catch (err) { next(err); }
 }
 
-module.exports = { getDashboard, getModerationQueue, approveNote, rejectNote, listUsers, suspendUser, unsuspendUser, getAdminPayouts, processPayout, addCollege };
+async function getAllSales(req, res, next) {
+  try {
+    const { data: sales, error } = await supabase
+      .from('seller_earnings')
+      .select(`id, gross_amount, platform_commission, net_amount, status, created_at, notes:notes_id(id, title), seller:seller_id(first_name, last_name, email)`)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return success(res, { sales });
+  } catch (err) { next(err); }
+}
+
+module.exports = { getDashboard, getModerationQueue, approveNote, rejectNote, listUsers, suspendUser, unsuspendUser, getAdminPayouts, processPayout, addCollege, getAllSales };
